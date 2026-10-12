@@ -12,7 +12,13 @@ Source of truth for scope and rules is [Plan.MD](Plan.MD); design decisions and 
 - Lint: `uv run ruff check . && uv run ruff format .`
 
 ## Layout
-`src/undertow/{config,db,web,worker}`, with `services/`, `scoring/` and `ingest/` added in later phases. Migrations in `migrations/`.
+- `src/undertow/config.py`: settings from env. `db/`: engine, session, Base.
+- `ingest/`: `feed.py` (the only HockeyTech access; live and fixture feeds), `parsing.py` (pure JSON to DTO), `dto.py`, `store.py` (snapshots and upserts), `sync.py` (sync jobs).
+- `models/`: SQLAlchemy tables (real-hockey tables so far). `data/`: small config data (conferences).
+- `scoring/`: pure scoring engine (exact fractions). `services/`: business logic with no HTTP; `stat_lines.py` bridges DB rows to scoring input.
+- `web/`: FastAPI app and templates. `worker/`: scheduler process.
+- `migrations/`: Alembic. `tests/`: `ingest/`, `scoring/`, fixtures in `tests/fixtures/hockeytech/`.
+- Later phases add fantasy tables, drafts, matchups and waivers under `models/` and `services/`.
 
 ## Rules (from Plan section 9)
 - One phase at a time; a phase is done when its tests pass.

@@ -5,7 +5,7 @@ Probed Oct 12, 2026 with ~25 requests total, 2 s apart, User-Agent `UndertowSpor
 ## Access
 - Base: `https://lscluster.hockeytech.com/feed/index.php`
 - Common params: `key=<appKey>&client_code=pwhl&fmt=json`
-- The key and client code are embedded in the public `thepwhl.com/en/stats/` page (`var appKey`, `var clientCode`). **The key goes in config (`HOCKEYTECH_KEY`), never in code.** It is not repeated in this doc; see the fixtures' `Parameters` block if you need to confirm it.
+- The key and client code are embedded in the public `thepwhl.com/en/stats/` page (`var appKey`, `var clientCode`). **The key goes in config (`HOCKEYTECH_KEY`), never in code.** It is not repeated in this doc. The recorded fixtures do contain it in their `Parameters` block (it is the public site key, not a secret, but do not copy it into code or config files in the repo).
 - Two response shapes: `modulekit` returns `{"SiteKit": {...}}` plain JSON. `statviewfeed` returns JSON wrapped in parentheses `( ... )` (JSONP style), so the adapter must strip them. `feed=gc` returns `{"GC": {...}}`.
 - All numbers inside `modulekit` are **strings**. `statviewfeed gameSummary` uses real ints. The adapter must normalize.
 
