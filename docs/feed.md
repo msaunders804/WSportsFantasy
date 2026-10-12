@@ -68,7 +68,7 @@ Games per PWHL team:
 - **W16 (Mar 29-Apr 4):** 1 game for everyone, except TOR with 2 and **LV with 0**. Every Las Vegas player scores nothing in the first fantasy playoff round.
 - **W17:** most teams 2; HAM 1, NY 1, OTT 1, LV 1.
 - **W18:** BOS, DET, NY, OTT, TOR, LV 2; HAM, MIN, MTL, SEA, SJ, VAN 1.
-This is a bigger imbalance than the plan assumed. Options: the "playoffs end one week before the regular season ends" setting (Plan 4.4), or 2-week playoff rounds. Raise with the commissioners before the draft, since it changes player value (especially for LV players).
+This is a bigger imbalance than the plan assumed. See [decisions.md](decisions.md) for the proposed fix (three 2-week playoff rounds). Other options: the "playoffs end one week before the regular season ends" setting (Plan 4.4), or 2-week playoff rounds. Raise with the commissioners before the draft, since it changes player value (especially for LV players).
 
 ## Open items for later
 1. In-progress and intermission `status` values and update latency: needs a live game. The first preseason game is a chance to observe it (Nov 22 start per Plan; the feed's preseason season runs Oct 1 to Nov 30).
