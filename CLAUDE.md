@@ -8,12 +8,13 @@ Source of truth for scope and rules is [Plan.MD](Plan.MD); design decisions and 
 - Migrate: `uv run alembic upgrade head`
 - Web: `uv run uvicorn undertow.web.app:app --reload`
 - Worker: `uv run python -m undertow.worker.main`
-- Test: `DATABASE_URL=postgresql+psycopg://undertow:undertow@localhost:5433/undertow uv run pytest` (tests marked `db` skip without `DATABASE_URL`)
+- Test: `DATABASE_URL=postgresql+psycopg://undertow:undertow@localhost:5433/undertow uv run pytest` (tests marked `db` skip without `DATABASE_URL`). **DB tests TRUNCATE the hockey tables in that database**, so never point them at anything but the throwaway dev DB.
+- Season replay: `uv run python -m undertow.ingest.replay --season 8 [--offline]` (caches responses in `data/replay_cache/`, gitignored; first run fetches about 130 responses live and needs `HOCKEYTECH_KEY`)
 - Lint: `uv run ruff check . && uv run ruff format .`
 
 ## Layout
 - `src/undertow/config.py`: settings from env. `db/`: engine, session, Base.
-- `ingest/`: `feed.py` (the only HockeyTech access; live and fixture feeds), `parsing.py` (pure JSON to DTO), `dto.py`, `store.py` (snapshots and upserts), `sync.py` (sync jobs).
+- `ingest/`: `feed.py` (the only HockeyTech access; live and fixture feeds), `parsing.py` (pure JSON to DTO), `dto.py`, `store.py` (snapshots and upserts), `sync.py` (sync functions), `jobs.py` (scheduled worker jobs), `replay.py` (season replay and integrity checks).
 - `models/`: SQLAlchemy tables (real-hockey tables so far). `data/`: small config data (conferences).
 - `scoring/`: pure scoring engine (exact fractions). `services/`: business logic with no HTTP; `stat_lines.py` bridges DB rows to scoring input.
 - `web/`: FastAPI app and templates. `worker/`: scheduler process.

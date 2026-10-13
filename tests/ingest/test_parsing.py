@@ -6,6 +6,7 @@ from undertow.ingest.parsing import (
     clock_to_seconds,
     map_position,
     parse_box_score,
+    parse_result_type,
     parse_roster,
     parse_schedule,
     parse_seasons,
@@ -126,3 +127,35 @@ def test_shutout_requires_sole_goalie_and_zero_goals_against():
     box = parse_box_score(raw)
     assert {g.player_id for g in box.goalies if g.shutout} == {211}
     assert not any(g.shutout for g in box.goalies if g.team_id != 6)
+
+
+def test_result_type_matches_schedule_and_box_score_spellings():
+    # The box score says "Final OT1" where the schedule says "Final OT" (found by season replay).
+    cases = {
+        "Final": ResultType.REG,
+        "Final OT": ResultType.OT,
+        "Final OT1": ResultType.OT,
+        "Final 2OT": ResultType.OT,
+        "Final SO": ResultType.SO,
+        "3:00 pm EST": None,
+        "Final PP": None,
+    }
+    for text, expected in cases.items():
+        assert parse_result_type(text) is expected, text
+
+
+def test_empty_net_goals_are_recorded_per_scorer():
+    raw = load("gamesummary_210_reg.json")
+    box = parse_box_score(raw)
+    goals = [g for p in raw["periods"] for g in p["goals"]]
+    assert sum(s.en_goals for s in box.skaters) == sum(
+        g["properties"]["isEmptyNet"] == "1" for g in goals
+    )
+
+
+def test_empty_goalie_result_means_no_decision():
+    from undertow.ingest.parsing import _combine_decisions
+
+    assert _combine_decisions(["", ""]) is None
+    assert _combine_decisions([]) is None
+    assert _combine_decisions(["", "L"]) == "L"

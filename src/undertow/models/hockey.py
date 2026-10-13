@@ -84,6 +84,9 @@ class Game(Base):
     venue_location: Mapped[str] = mapped_column(String(200), default="")
     notes: Mapped[str] = mapped_column(Text, default="")
     feed_last_modified: Mapped[str] = mapped_column(String(30), default="")
+    # When we first saw the game final, and how many follow-up re-fetches (+6 h, +24 h) are done.
+    final_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    reconcile_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
@@ -115,6 +118,7 @@ class SkaterGameStats(Base):
     sh_goals: Mapped[int] = mapped_column(Integer, default=0)
     sh_assists: Mapped[int] = mapped_column(Integer, default=0)
     gwg: Mapped[int] = mapped_column(Integer, default=0)
+    en_goals: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
 
     __table_args__ = (Index("ix_skater_game_stats_player_id", "player_id"),)
 
@@ -149,3 +153,18 @@ class RawSnapshot(Base):
     payload: Mapped[dict | list] = mapped_column(JSONB)
 
     __table_args__ = (Index("ix_raw_snapshot_url_fetched_at", "url", "fetched_at"),)
+
+
+class JobRun(Base):
+    """One row per worker job execution; feeds the health page and failure alerts."""
+
+    __tablename__ = "job_run"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    job: Mapped[str] = mapped_column(String(50))
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ok: Mapped[bool] = mapped_column(Boolean, default=False)
+    detail: Mapped[str] = mapped_column(Text, default="")
+
+    __table_args__ = (Index("ix_job_run_job_started_at", "job", "started_at"),)

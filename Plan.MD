@@ -219,7 +219,7 @@ Bottom tab bar on mobile, top tabs on desktop: **Matchup | Team | Players | Leag
 |---|---|---|
 | 0 | Feed discovery spike: document endpoints, available stats, ID stability, status values. Record fixtures. Write `docs/feed.md`. | Oct 16 (done) |
 | 1 | Project skeleton, Dockerfile, config, DB, Alembic, CI, `CLAUDE.md` conventions | Oct 19 (built, PR #1; CI file pending token scope) |
-| 2 | Ingestion: teams, rosters, schedule, game stats, raw snapshots, worker scheduler | Oct 26 (adapter, parsers, tables, syncs and scoring engine built, PR #2; worker jobs and season replay remain) |
+| 2 | Ingestion: teams, rosters, schedule, game stats, raw snapshots, worker scheduler | Oct 26 (done, PR #2: adapter, tables, worker jobs, scoring engine; 2025-26 season replay clean) |
 | 3 | Auth, leagues, invites, teams, league settings, commissioner wizard | Nov 2 |
 | 4 | Players tab, rankings from 2025-26 data, player detail | Nov 6 |
 | 5 | Live snake draft room (core MVP risk; budget the most time here) | Nov 16 |

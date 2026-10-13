@@ -100,6 +100,8 @@ class SkaterLineDTO:
     sh_goals: int = 0
     sh_assists: int = 0
     gwg: int = 0
+    # Goals scored into an empty net. These are not charged to the opposing goalie.
+    en_goals: int = 0
 
 
 @dataclass(frozen=True, slots=True)

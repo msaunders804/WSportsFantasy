@@ -70,9 +70,19 @@ Games per PWHL team:
 - **W18:** BOS, DET, NY, OTT, TOR, LV 2; HAM, MIN, MTL, SEA, SJ, VAN 1.
 This is a bigger imbalance than the plan assumed. See [decisions.md](decisions.md) for the proposed fix (three 2-week playoff rounds). Other options: the "playoffs end one week before the regular season ends" setting (Plan 4.4), or 2-week playoff rounds. Raise with the commissioners before the draft, since it changes player value (especially for LV players).
 
+## Findings from the full 2025-26 replay (Oct 13, 2026)
+All 120 games of season 8 were fetched and checked (see `undertow.ingest.replay`). Zero integrity problems after the fixes below.
+- **Result text differs by feed:** the schedule says `Final OT`, the box score says **`Final OT1`**. Match loosely (`FINAL` + `SO`/`OT` anywhere). Matching only the schedule spelling silently scored OT wins as regulation wins.
+- **`OTL` exists** as a goalie result (20 games), alongside `L` (90) and `SOL` (10). Every game has exactly one `W` and one loss-type decision. Shootout games: 10, with skater goals equal to team score minus the shootout-winning goal in every one, so the shootout convention holds on all of them.
+- **Empty-net goals are not charged to the goalie.** A team's skater goals can exceed the opposing goalies' goals against by the number of empty-net goals (`properties.isEmptyNet`). This happened in 34 regulation games.
+- **Relief goalies** can appear in `goalieLog` with an empty `result` (6 cases): no decision.
+- **Shutouts:** 30 across the season using "only goalie to play, 0 goals against".
+- Roster fetches for 2025-26 returned 219 distinct players across the 8 teams; every position mapped to F, D or G.
+- Request cost: 1 schedule, 1 seasons, 1 teams, 8 rosters and 120 box scores, about 130 requests at 2 s spacing (about 5 minutes).
+
 ## Open items for later
 1. In-progress and intermission `status` values and update latency: needs a live game. The first preseason game is a chance to observe it (Nov 22 start per Plan; the feed's preseason season runs Oct 1 to Nov 30).
-2. `OTL` goalie result and a second shootout game: grab fixtures when seen.
+2. ~~`OTL` goalie result and a second shootout game~~: seen in the replay cache (`data/replay_cache/`, not committed). Promote one OTL game and one empty-net game to `tests/fixtures/hockeytech/` if a unit test needs them.
 3. Bulk "season stats" table (`view=players`): not needed for scoring, skip unless rankings require it.
 4. Roster status for injuries/LTIR: see above.
 5. Terms of use unchanged: low volume, aggressive caching, identifying User-Agent.

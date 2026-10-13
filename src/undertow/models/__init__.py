@@ -1,6 +1,7 @@
 from undertow.models.hockey import (
     Game,
     GoalieGameStats,
+    JobRun,
     Player,
     ProTeam,
     RawSnapshot,
@@ -11,6 +12,7 @@ from undertow.models.hockey import (
 __all__ = [
     "Game",
     "GoalieGameStats",
+    "JobRun",
     "Player",
     "ProTeam",
     "RawSnapshot",

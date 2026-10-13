@@ -143,11 +143,30 @@ def parse_roster(payload: dict) -> list[PlayerDTO]:
     return players
 
 
+def parse_result_type(status_text: str) -> ResultType | None:
+    """'Final' -> REG, 'Final OT' / 'Final OT1' / 'Final 2OT' -> OT, 'Final SO' -> SO.
+
+    The schedule says 'Final OT' but box scores say 'Final OT1', so match loosely. Returns
+    None for text that is not a recognised final status.
+    """
+    text = status_text.strip().upper()
+    if not text.startswith("FINAL"):
+        return None
+    rest = text[len("FINAL") :].strip()
+    if not rest:
+        return ResultType.REG
+    if "SO" in rest:
+        return ResultType.SO
+    if "OT" in rest:
+        return ResultType.OT
+    return None
+
+
 def parse_game_status(
     status_text: str, started: bool, final: bool
 ) -> tuple[GameStatus, ResultType | None]:
     if final:
-        result = STATUS_TEXT_TO_RESULT.get(status_text)
+        result = parse_result_type(status_text)
         if result is None:
             log.warning("unrecognised final status text %r; treating as regulation", status_text)
             result = ResultType.REG
@@ -207,11 +226,12 @@ def _combine_decisions(results: list[str]) -> str | None:
     for preferred in ("W", "OTL", "SOL", "L"):
         if preferred in results:
             return preferred
-    return results[0] if results else None
+    # A relief goalie who is neither winner nor loser has an empty result: no decision.
+    return next((r for r in results if r), None)
 
 
 def _special_teams_and_gwg(summary: dict) -> dict[int, dict[str, int]]:
-    """Per-player pp/sh goals and assists plus GWG, derived from the goal list.
+    """Per-player pp/sh goals and assists, GWG and empty-net goals, derived from the goal list.
 
     Skater box lines carry no PP/SH/GWG fields. Shootout goals are not in `periods`, so they
     are excluded automatically.
@@ -237,6 +257,8 @@ def _special_teams_and_gwg(summary: dict) -> dict[int, dict[str, int]]:
                     bump(int(scorer["id"]), "sh_goals")
                 for a in assists:
                     bump(int(a["id"]), "sh_assists")
+            if props.get("isEmptyNet") == "1" and scorer.get("id"):
+                bump(int(scorer["id"]), "en_goals")
             if props.get("isGameWinningGoal") == "1" and scorer.get("id"):
                 bump(int(scorer["id"]), "gwg")
     return extra

@@ -5,7 +5,7 @@ Updated Oct 12, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 ## Done
 - Hosting: **Railway** (web, worker, Postgres as separate services). App name: **Undertow Sports**.
 - Playoff format: three 2-week rounds. Trade deadline end of Week 11.
-- Phase 0 (feed discovery), Phase 1 (skeleton, PR #1) and most of Phase 2 (PR #2) are built.
+- Phase 0 (feed discovery), Phase 1 (skeleton, PR #1) and Phase 2 (ingestion, worker jobs, scoring engine, PR #2) are built.
 
 ## Do now
 1. **GitHub token scope** (blocks CI): run `gh auth refresh -s workflow`, then tell me. I will move `ci/ci.yml.pending` to `.github/workflows/ci.yml`.
@@ -36,3 +36,7 @@ Updated Oct 12, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 - [ ] Invite links sent to managers.
 - [ ] Managers told that rankings are a rough guide and expansion players have no PWHL history.
 - [ ] Short privacy note (email, name, password hash collected).
+
+## Notes
+- Oct 13: I ran the full 2025-26 replay against the live feed (about 130 throttled requests, once). Responses are cached locally in `data/replay_cache/` (gitignored), so it does not need to hit the feed again.
+- The scoring defaults are untested against real play beyond the replay; confirm item 12 before Phase 7.

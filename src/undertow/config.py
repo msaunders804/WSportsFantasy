@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     hockeytech_client_code: str = "pwhl"
     hockeytech_user_agent: str = "UndertowSports/0.1 (contact: set HOCKEYTECH_USER_AGENT)"
 
+    # Comma-separated HockeyTech season IDs the worker keeps in sync (11 = 2026-27 regular season).
+    ingest_season_ids: str = "11"
+
+    @property
+    def season_ids(self) -> list[int]:
+        return [int(x) for x in self.ingest_season_ids.split(",") if x.strip()]
+
     @property
     def is_prod(self) -> bool:
         return self.environment == "prod"

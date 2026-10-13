@@ -14,7 +14,7 @@ PWHL fantasy leagues: two independent 10-team leagues, head-to-head points scori
 |---|---|
 | 0 Feed discovery | Done |
 | 1 Skeleton | Built (PR #1); CI file pending a token scope |
-| 2 Ingestion and scoring engine | Mostly built (PR #2); worker jobs and season replay remain |
+| 2 Ingestion and scoring engine | Complete (PR #2): adapter, tables, worker jobs, scoring engine, and a clean replay of all 120 games of 2025-26 |
 | 3 onward | Not started |
 
 ## Quick start
