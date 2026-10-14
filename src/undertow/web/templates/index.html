@@ -2,6 +2,7 @@
 {% block content %}
 <section class="hero">
   <div class="wave" aria-hidden="true">
+    <svg class="w3" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,220 C240,170 480,270 720,220 C960,170 1200,270 1440,220 L1440,320 L0,320 Z"/></svg>
     <svg class="w2" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,160 C240,100 480,220 720,160 C960,100 1200,220 1440,160 L1440,320 L0,320 Z"/></svg>
     <svg class="w1" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,200 C240,140 480,260 720,200 C960,140 1200,260 1440,200 L1440,320 L0,320 Z"/></svg>
   </div>
@@ -33,6 +34,11 @@
           <option value="{{ value }}"{% if form.experience == value %} selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
+      </div>
+      <div class="field">
+        <label for="commissioner_note">Signing up with a friend? Their email <span class="muted">(optional)</span></label>
+        <input id="commissioner_note" name="commissioner_note" type="text" maxlength="300" placeholder="friend@example.com" value="{{ form.commissioner_note or '' }}">
+        <p class="fine" style="margin: 2px 0 0">We'll make sure you end up in the same league.</p>
       </div>
       <div class="field">
         <label class="check" for="consent">
@@ -124,6 +130,7 @@
     <details><summary>Is it free?</summary><p>Yes. It's free to join and play.</p></details>
     <details><summary>Is this the official PWHL game?</summary><p>No. Undertow is an independent fan project with no affiliation with the PWHL or its teams.</p></details>
     <details><summary>What do you do with my email?</summary><p>We use it to send your league invite and Undertow updates, and nothing else. <a href="/privacy">Read the details.</a></p></details>
+    <details><summary>I have a friend I want to play in a league with. How can we make sure we end up in the same league?</summary><p>Add their email in the "Signing up with a friend?" field when you sign up, and we'll make sure you're placed in the same league.</p></details>
     <p style="margin-top: var(--space-5)"><a class="btn" href="#join">Get on the list</a></p>
   </div>
 </section>

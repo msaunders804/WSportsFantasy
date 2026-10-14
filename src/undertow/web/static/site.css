@@ -23,8 +23,11 @@ a { color: var(--primary); }
 
 /* Top bar */
 .bar { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) 0; }
-.wordmark { font-family: var(--font-heading); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--text); text-decoration: none; }
-.wordmark span { color: var(--primary); }
+.wordmark { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--text); text-decoration: none; }
+.wordmark-mark { flex: none; width: 30px; height: 30px; }
+.wordmark-mark .mark-w2 { fill: var(--accent); opacity: 0.9; }
+.wordmark-mark .mark-w1 { fill: var(--primary); }
+.wordmark .tow { color: var(--primary); }
 .wordmark small { font-weight: 500; font-size: 0.75em; color: var(--text-muted); margin-left: 0.35em; letter-spacing: 0; }
 .theme-toggle { background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 0.85rem; cursor: pointer; }
 .theme-toggle:hover { color: var(--text); }
@@ -36,8 +39,9 @@ a { color: var(--primary); }
 .lede { font-size: 1.15rem; color: var(--text-muted); max-width: 34rem; }
 .wave { position: absolute; left: 0; right: 0; bottom: 0; height: 70%; z-index: 0; pointer-events: none; transform: translateY(0); animation: wave-rise 0.9s ease-out both; }
 .wave svg { position: absolute; left: 0; bottom: 0; width: 200%; height: 100%; }
-.wave .w1 { fill: var(--primary); opacity: 0.16; animation: wave-drift 18s linear infinite; }
-.wave .w2 { fill: var(--primary); opacity: 0.09; animation: wave-drift 28s linear infinite reverse; }
+.wave .w1 { fill: var(--primary); opacity: 0.22; animation: wave-drift 18s linear infinite; }
+.wave .w2 { fill: var(--primary); opacity: 0.13; animation: wave-drift 28s linear infinite reverse; }
+.wave .w3 { fill: var(--accent); opacity: 0.16; animation: wave-drift 34s linear infinite; }
 @keyframes wave-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes wave-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
@@ -54,7 +58,7 @@ input[type="email"], input[type="text"], select {
 .check input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--primary); }
 .err { color: var(--negative); font-size: 0.9rem; margin: 0; }
 .alert { background: color-mix(in srgb, var(--negative) 14%, var(--surface)); border: 1px solid var(--negative); border-radius: var(--radius-sm); padding: var(--space-3); margin-bottom: var(--space-4); }
-.btn { display: inline-block; width: 100%; min-height: 52px; background: var(--primary); color: var(--on-primary); border: 0; border-radius: var(--radius-sm); font: inherit; font-weight: 700; font-size: 1.05rem; cursor: pointer; padding: 12px 20px; text-align: center; text-decoration: none; }
+.btn { display: inline-block; width: 100%; min-height: 52px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: var(--on-primary); border: 0; border-radius: var(--radius-sm); font: inherit; font-weight: 700; font-size: 1.05rem; cursor: pointer; padding: 12px 20px; text-align: center; text-decoration: none; }
 .btn:hover { filter: brightness(1.08); }
 .fine { font-size: 0.8rem; color: var(--text-muted); margin: var(--space-3) 0 0; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
