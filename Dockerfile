@@ -14,4 +14,5 @@ RUN uv sync --frozen --no-dev
 
 ENV PATH="/app/.venv/bin:$PATH"
 # Default process is web; the worker service overrides the start command.
-CMD ["sh", "-c", "uvicorn undertow.web.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Railway terminates TLS in front of the app, so trust its forwarded headers (scheme, client IP).
+CMD ["sh", "-c", "uvicorn undertow.web.app:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
