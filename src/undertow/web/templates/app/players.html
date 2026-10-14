@@ -1,0 +1,59 @@
+{% extends "app/base.html" %}
+{% block title %}Players | Undertow Fantasy{% endblock %}
+{% block content %}
+<div class="wrap view">
+  <label class="sr" for="q">Search players</label>
+  <input id="q" class="search" type="search" placeholder="Search players" autocomplete="off">
+  <div class="chips" role="group" aria-label="Filter by position">
+    {% for key, label in [("all", "All"), ("F", "F"), ("D", "D"), ("G", "G")] %}
+    <button class="chip" type="button" data-pos="{{ key }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ label }}</button>
+    {% endfor %}
+    <button class="chip" type="button" id="avail" aria-pressed="false">Available</button>
+    <span class="grow"></span>
+    <span class="muted sortlbl">Sort: FP/game</span>
+  </div>
+  <ul class="plist" id="plist">
+    {% for name, pos, team, fpg, fp, owned, avail in players %}
+    <li class="prow" data-pos="{{ pos }}" data-avail="{{ 1 if avail else 0 }}" data-name="{{ name|lower }}">
+      <div class="tinfo">
+        <span class="pl-name">{{ name }}</span>
+        <span class="pl-meta muted">{{ pos }} · {{ team }} · {{ owned }}% owned</span>
+      </div>
+      <div class="fp"><strong>{{ "%.1f"|format(fpg) }}</strong><small class="muted">FP/G</small></div>
+      <div class="fp"><strong>{{ "%.1f"|format(fp) }}</strong><small class="muted">Season</small></div>
+      {% if avail %}<button class="mini add" type="button">Add</button>{% else %}<span class="mini ghost">Owned</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="empty muted" id="empty" hidden>No players match. Try clearing a filter.</p>
+</div>
+<script>
+  (function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll(".prow"));
+    var chips = Array.prototype.slice.call(document.querySelectorAll("[data-pos]")).filter(function (c) { return c.tagName === "BUTTON"; });
+    var avail = document.getElementById("avail"), q = document.getElementById("q"), empty = document.getElementById("empty");
+    var pos = "all";
+    function apply() {
+      var text = q.value.trim().toLowerCase(), shown = 0;
+      rows.forEach(function (r) {
+        var ok = (pos === "all" || r.dataset.pos === pos) &&
+          (avail.getAttribute("aria-pressed") !== "true" || r.dataset.avail === "1") &&
+          (!text || r.dataset.name.indexOf(text) !== -1);
+        r.hidden = !ok; if (ok) shown++;
+      });
+      empty.hidden = shown !== 0;
+    }
+    chips.forEach(function (c) {
+      c.addEventListener("click", function () {
+        pos = c.dataset.pos;
+        chips.forEach(function (o) { o.setAttribute("aria-pressed", o === c ? "true" : "false"); });
+        apply();
+      });
+    });
+    avail.addEventListener("click", function () {
+      avail.setAttribute("aria-pressed", avail.getAttribute("aria-pressed") === "true" ? "false" : "true"); apply();
+    });
+    q.addEventListener("input", apply);
+  })();
+</script>
+{% endblock %}

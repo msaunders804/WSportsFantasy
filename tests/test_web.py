@@ -8,7 +8,7 @@ def test_landing_renders():
     resp = TestClient(app).get("/")
     assert resp.status_code == 200
     assert 'name="viewport"' in resp.text
-    assert "Fantasy hockey for people who love women's hockey" in resp.text
+    assert "Fantasy for people who love women's hockey" in resp.text
     assert 'name="email"' in resp.text
     # The unofficial marker is on every page.
     assert "Unofficial and unaffiliated" in resp.text
@@ -49,3 +49,32 @@ def test_healthz_ok():
     resp = TestClient(app).get("/healthz")
     assert resp.status_code == 200
     assert resp.json() == {"status": "ok", "db": True}
+
+
+@pytest.mark.parametrize("tab", ["matchup", "team", "players", "league"])
+def test_preview_tabs_render_with_sample_banner_and_marker(tab):
+    resp = TestClient(app).get(f"/preview/{tab}")
+    assert resp.status_code == 200
+    assert 'name="robots" content="noindex"' in resp.text
+    assert "Sample data for design preview" in resp.text
+    assert "Unofficial and unaffiliated" in resp.text
+    # All four tabs are linked, with the current one marked.
+    for other in ("matchup", "team", "players", "league"):
+        assert f'href="/preview/{other}"' in resp.text
+    assert f'href="/preview/{tab}" aria-current="page"' in resp.text
+
+
+def test_preview_hidden_in_prod_unless_enabled(monkeypatch):
+    from undertow.config import get_settings
+    from undertow.web.app import create_app
+
+    monkeypatch.setenv("ENVIRONMENT", "prod")
+    get_settings.cache_clear()
+    try:
+        assert TestClient(create_app()).get("/preview/matchup").status_code == 404
+        monkeypatch.setenv("PREVIEW_ENABLED", "true")
+        get_settings.cache_clear()
+        assert TestClient(create_app()).get("/preview/matchup").status_code == 200
+    finally:
+        monkeypatch.undo()
+        get_settings.cache_clear()

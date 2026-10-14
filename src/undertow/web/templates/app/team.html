@@ -1,0 +1,35 @@
+{% extends "app/base.html" %}
+{% block title %}Team | Undertow Fantasy{% endblock %}
+{% macro row(slot, p, locked) %}
+<li class="trow">
+  <span class="slot-tag">{{ slot }}</span>
+  <div class="tinfo">
+    <span class="pl-name">{{ p.name }}</span>
+    <span class="pl-meta muted">{{ p.pos }} · {{ p.team }}{% if p.next %} · Next {{ p.next }}{% endif %}</span>
+  </div>
+  <span class="games" title="Games this week">{{ p.games }} <small>gm</small></span>
+  {% if locked %}<span class="lock" aria-label="Locked">🔒</span>{% else %}<button class="mini" type="button">Move</button>{% endif %}
+</li>
+{% endmacro %}
+{% block content %}
+<div class="wrap view">
+  <div class="weekbar">
+    <button class="icon-btn" type="button" aria-label="Previous week">‹</button>
+    <div><strong>{{ me.name }}</strong> <span class="muted">· Week {{ league.week }}</span></div>
+    <button class="icon-btn" type="button" aria-label="Next week">›</button>
+  </div>
+  <h2 class="section-h">Lineup</h2>
+  <ul class="tlist">
+    {% for slot, p in lineup %}{{ row(slot, p, p.status == "final") }}{% endfor %}
+  </ul>
+  <h2 class="section-h">Bench</h2>
+  <ul class="tlist">
+    {% for p in bench %}{{ row("BN", p, false) }}{% endfor %}
+  </ul>
+  <h2 class="section-h">Injured reserve</h2>
+  <ul class="tlist">
+    {% for p in ir %}{{ row("IR", p, false) }}{% endfor %}
+  </ul>
+  <p class="legend muted">🔒 locked once a player's game starts.</p>
+</div>
+{% endblock %}

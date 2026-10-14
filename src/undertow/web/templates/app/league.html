@@ -1,0 +1,33 @@
+{% extends "app/base.html" %}
+{% block title %}League | Undertow Fantasy{% endblock %}
+{% block content %}
+<div class="wrap view">
+  <section class="card invite">
+    <h2 class="section-h">Invite friends</h2>
+    <div class="invite-row"><code>undertow.example/join/abc123</code><button class="mini" type="button">Copy link</button></div>
+    <p class="muted fine">10 teams · live snake draft · head-to-head points</p>
+  </section>
+
+  <h2 class="section-h">Standings</h2>
+  <table class="stand">
+    <thead><tr><th scope="col">#</th><th scope="col">Team</th><th scope="col">W-L</th><th scope="col" class="num">PF</th></tr></thead>
+    <tbody>
+      {% for name, owner, rec, pf in standings %}
+      <tr{% if owner == "You" %} class="me"{% endif %}><td>{{ loop.index }}</td><td>{{ name }}<small class="muted"> {{ owner }}</small></td><td>{{ rec }}</td><td class="num">{{ "%.1f"|format(pf) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="section-h">Week {{ league.week }} matchups</h2>
+  <ul class="games-list">
+    {% for a, sa, b, sb, st in schedule %}
+    <li><span class="g-team {% if sa > sb %}lead{% endif %}">{{ a }}</span><span class="g-score">{{ "%.1f"|format(sa) }}</span><span class="muted">vs</span><span class="g-score">{{ "%.1f"|format(sb) }}</span><span class="g-team right {% if sb > sa %}lead{% endif %}">{{ b }}</span></li>
+    {% endfor %}
+  </ul>
+
+  <h2 class="section-h">Activity</h2>
+  <ul class="feed">
+    {% for when, what in activity %}<li><span class="muted when">{{ when }}</span>{{ what }}</li>{% endfor %}
+  </ul>
+</div>
+{% endblock %}

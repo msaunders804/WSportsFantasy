@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from undertow.config import get_settings
 from undertow.db import get_session
 from undertow.services import waitlist
+from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
 WEB_DIR = Path(__file__).parent
@@ -83,6 +84,48 @@ def create_app() -> FastAPI:
     def privacy(request: Request) -> Response:
         context = {"app_name": settings.app_name, "contact_email": settings.contact_email}
         return templates.TemplateResponse(request, "privacy.html", context)
+
+    if settings.preview_enabled or not settings.is_prod:
+        # Design mockups on sample data (see preview_data.py). Replaced by real pages later.
+        def preview(request: Request, tab: str, **extra) -> Response:
+            context = {"league": sample.LEAGUE, "active": tab, "app_name": settings.app_name}
+            return templates.TemplateResponse(request, f"app/{tab}.html", context | extra)
+
+        @app.get("/preview/matchup", response_class=HTMLResponse)
+        def preview_matchup(request: Request) -> Response:
+            return preview(
+                request,
+                "matchup",
+                me=sample.MY_TEAM,
+                opp=sample.OPP_TEAM,
+                me_lineup=sample.MY_LINEUP,
+                opp_lineup=sample.OPP_LINEUP,
+            )
+
+        @app.get("/preview/team", response_class=HTMLResponse)
+        def preview_team(request: Request) -> Response:
+            return preview(
+                request,
+                "team",
+                me=sample.MY_TEAM,
+                lineup=sample.MY_LINEUP,
+                bench=sample.BENCH,
+                ir=sample.IR,
+            )
+
+        @app.get("/preview/players", response_class=HTMLResponse)
+        def preview_players(request: Request) -> Response:
+            return preview(request, "players", players=sample.PLAYERS)
+
+        @app.get("/preview/league", response_class=HTMLResponse)
+        def preview_league(request: Request) -> Response:
+            return preview(
+                request,
+                "league",
+                standings=sample.STANDINGS,
+                schedule=sample.SCHEDULE,
+                activity=sample.ACTIVITY,
+            )
 
     @app.get("/healthz")
     def healthz(response: Response, session: Session = Depends(get_session)) -> dict:

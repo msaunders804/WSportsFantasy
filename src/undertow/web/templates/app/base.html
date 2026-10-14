@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block head_extra %}
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/static/app.css">
+{% endblock %}
+
+{% macro icon(name) %}
+<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  {% if name == "matchup" %}<path d="M13 3 5 14h6l-1 7 8-11h-6z"/>
+  {% elif name == "team" %}<path d="M8 4 4 6v5l3 1v8h10v-8l3-1V6l-4-2a4 4 0 0 1-8 0z"/>
+  {% elif name == "players" %}<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>
+  {% elif name == "league" %}<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8"/>{% endif %}
+</svg>
+{% endmacro %}
+
+{% block header %}
+<div class="appbar">
+  <div class="wrap appbar-in">
+    <a class="wordmark" href="/preview/matchup" aria-label="Undertow Fantasy">under<span>tow</span></a>
+    <button class="league-pill" type="button" aria-label="Switch league">{{ league.name }} <span aria-hidden="true">▾</span></button>
+    <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch between dark and light theme">Light mode</button>
+  </div>
+</div>
+<nav class="tabs" aria-label="Main">
+    <div class="wrap tabs-in">
+      {% for key, label in [("matchup", "Matchup"), ("team", "Team"), ("players", "Players"), ("league", "League")] %}
+      <a href="/preview/{{ key }}"{% if active == key %} aria-current="page"{% endif %}>{{ icon(key) }}<span>{{ label }}</span></a>
+      {% endfor %}
+    </div>
+</nav>
+<div class="sample-banner"><div class="wrap">Sample data for design preview. Player names and numbers are made up.</div></div>
+{% endblock %}
+
+{% block footer %}
+<footer class="app-foot"><div class="wrap"><p><strong>Unofficial and unaffiliated.</strong> Undertow is an independent fan project, not affiliated with or endorsed by the PWHL or its teams.</p></div></footer>
+{% endblock %}
