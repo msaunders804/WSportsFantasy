@@ -35,7 +35,7 @@
     </div>
   </section>
 
-  <h2 class="section-h">Starters {{ help("These players' points count toward the score above. UTIL is a flex spot: any forward can fill it.") }}</h2>
+  <h2 class="section-h">Starters {{ help("These players' points count toward the score above. UTIL is a flex spot: any forward or defender can fill it.") }}</h2>
   <section class="slots" aria-label="Starters">
     {% for i in range(a.lineup|length) %}
       {% set slot, left = a.lineup[i] %}

@@ -97,6 +97,10 @@ def create_app() -> FastAPI:
     def thanks(request: Request) -> Response:
         return templates.TemplateResponse(request, "thanks.html", {"app_name": settings.app_name})
 
+    @app.get("/about", response_class=HTMLResponse)
+    def about(request: Request) -> Response:
+        return templates.TemplateResponse(request, "about.html", {"app_name": settings.app_name})
+
     @app.get("/privacy", response_class=HTMLResponse)
     def privacy(request: Request) -> Response:
         context = {"app_name": settings.app_name, "contact_email": settings.contact_email}
