@@ -12,7 +12,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import text
 from sqlalchemy.engine import Connection
 
+from undertow.config import get_settings
 from undertow.db import get_engine
+from undertow.db.session import session_factory
+from undertow.ingest import jobs
+from undertow.ingest.feed import Feed, FeedError, HockeyTechFeed
 
 log = logging.getLogger("undertow.worker")
 
@@ -30,15 +34,50 @@ def heartbeat() -> None:
     log.info("worker heartbeat")
 
 
-def build_scheduler() -> BackgroundScheduler:
+def build_scheduler(feed: Feed | None = None) -> BackgroundScheduler:
     scheduler = BackgroundScheduler(timezone="UTC")
     scheduler.add_job(heartbeat, "interval", minutes=5, id="heartbeat")
-    # Later phases register ingestion, scoring, waiver and draft-clock jobs here.
+    if feed is not None:
+        season_ids = get_settings().season_ids
+        sf = session_factory()
+
+        def add(fn, name: str, trigger: str, **trigger_args) -> None:
+            scheduler.add_job(
+                jobs.run_job,
+                trigger,
+                args=[sf, name, fn],
+                id=name,
+                max_instances=1,
+                coalesce=True,
+                **trigger_args,
+            )
+
+        add(
+            lambda: jobs.daily_sync(sf, feed, season_ids),
+            "daily_sync",
+            "cron",
+            hour=4,
+            minute=30,
+            timezone="America/New_York",
+        )
+        add(
+            lambda: jobs.nightly_resync(sf, feed, season_ids),
+            "nightly_resync",
+            "cron",
+            hour=5,
+            minute=0,
+            timezone="America/New_York",
+        )
+        add(lambda: jobs.poll_live(sf, feed), "poll_live", "interval", seconds=90)
+        add(lambda: jobs.reconcile_finals(sf, feed), "reconcile_finals", "interval", minutes=30)
+    # Later phases register scoring recompute, waiver processing and the draft clock here.
     return scheduler
 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    # httpx logs full request URLs at INFO, which would put the API key in the logs.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
     stop = threading.Event()
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: stop.set())
@@ -54,7 +93,12 @@ def main() -> None:
         else:
             return
         log.info("scheduler lock acquired")
-        scheduler = build_scheduler()
+        feed: Feed | None = None
+        try:
+            feed = HockeyTechFeed()
+        except FeedError as exc:
+            log.warning("ingestion jobs disabled: %s", exc)
+        scheduler = build_scheduler(feed)
         scheduler.start()
         stop.wait()
         scheduler.shutdown(wait=False)

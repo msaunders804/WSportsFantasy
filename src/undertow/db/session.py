@@ -17,6 +17,10 @@ def _sessionmaker() -> sessionmaker[Session]:
     return sessionmaker(get_engine(), expire_on_commit=False)
 
 
+def session_factory() -> sessionmaker[Session]:
+    return _sessionmaker()
+
+
 def get_session() -> Iterator[Session]:
     """FastAPI dependency: one session per request."""
     with _sessionmaker()() as session:

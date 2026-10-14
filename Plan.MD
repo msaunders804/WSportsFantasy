@@ -14,7 +14,7 @@
 - Scoring: Head-to-Head Points (ESPN-style), configurable per league.
 - Draft: live snake draft with pick timer and autopick.
 - Stack: Python. FastAPI + Jinja2 + HTMX, PostgreSQL. Server-rendered and mobile-first.
-- Hosting: cloud VPS, multi-user, public URL.
+- Hosting: Railway (web, worker and Postgres as separate services), multi-user, public URL. App name: Undertow Sports. See `docs/decisions.md`.
 - Leagues: 2 leagues, 10 teams each. The leagues are independent, and each one drafts from the full player pool.
 - Goalie wins: an OT or shootout win is worth 2/3 of a regulation win.
 - Waivers: rolling priority. Trades: commissioner veto.
@@ -39,7 +39,7 @@
             | Web App (FastAPI) |<------>|  Browser (HTMX,  |
             | Jinja2, SSE, auth |  SSE   |  SSE extension)  |
             +-------------------+        +------------------+
-                    behind Caddy (TLS), Docker Compose on VPS
+                    on Railway (TLS provided), built from one Dockerfile
 ```
 
 - **Two processes, one codebase:** `web` and `worker`. Scheduled jobs run only in `worker`. This avoids duplicate jobs when `web` runs several Uvicorn workers.
@@ -201,7 +201,7 @@ Bottom tab bar on mobile, top tabs on desktop: **Matchup | Team | Players | Leag
 - Email + password (argon2) with server-side sessions in secure HttpOnly cookies, plus CSRF protection on all state-changing requests. Join leagues by invite link.
 - Authorization checks on every endpoint: league membership, team ownership, commissioner role.
 - Rate limiting on login and on draft/transaction endpoints.
-- Docker Compose: `web`, `worker`, `postgres`, `caddy`. Secrets come from environment variables.
+- Railway project with `web`, `worker` and Postgres services from one Dockerfile; migrations run as the web pre-deploy command. Docker Compose is for local development only. Secrets come from environment variables.
 - Nightly `pg_dump` to off-site storage, with a documented restore test.
 - Structured logging. A health page showing last successful fetch per job and feed error counts. Alert (email is enough) if live polling fails during a game window.
 
@@ -217,13 +217,13 @@ Bottom tab bar on mobile, top tabs on desktop: **Matchup | Team | Players | Leag
 
 | Phase | Scope | Target |
 |---|---|---|
-| 0 | Feed discovery spike: document endpoints, available stats, ID stability, status values. Record fixtures. Write `docs/feed.md`. | Oct 16 |
-| 1 | Project skeleton, Docker Compose, config, DB, Alembic, CI, `CLAUDE.md` conventions | Oct 19 |
-| 2 | Ingestion: teams, rosters, schedule, game stats, raw snapshots, worker scheduler | Oct 26 |
+| 0 | Feed discovery spike: document endpoints, available stats, ID stability, status values. Record fixtures. Write `docs/feed.md`. | Oct 16 (done) |
+| 1 | Project skeleton, Dockerfile, config, DB, Alembic, CI, `CLAUDE.md` conventions | Oct 19 (built, PR #1; CI file pending token scope) |
+| 2 | Ingestion: teams, rosters, schedule, game stats, raw snapshots, worker scheduler | Oct 26 (done, PR #2: adapter, tables, worker jobs, scoring engine; 2025-26 season replay clean) |
 | 3 | Auth, leagues, invites, teams, league settings, commissioner wizard | Nov 2 |
 | 4 | Players tab, rankings from 2025-26 data, player detail | Nov 6 |
 | 5 | Live snake draft room (core MVP risk; budget the most time here) | Nov 16 |
-| 6 | Hardening, deploy to VPS, mock draft with real users | Nov 20 |
+| 6 | Hardening, deploy to Railway, mock draft with real users | Nov 20 |
 | 7 | Scoring engine, lineups and locks, matchup generation, Matchup tab with SSE | Dec 3 |
 | 8 | Free agents and waivers | Dec 13 |
 | 9 | Trades, activity feed, standings polish | Jan 2027 |

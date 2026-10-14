@@ -30,3 +30,22 @@ The schedule can still change (postponements), so playoff round boundaries must 
 - Local dev Postgres is published on host port 5433 because 5432 is already used on the shared dev box.
 - Baseline Alembic revision is empty on purpose; tables arrive with Phase 2 once the schema is checked against the fixtures.
 - Tailwind and Alpine are deferred until the first real page (Phase 3). Pages are unstyled for now.
+
+## 2026-10-12: Phase 2 ingestion and scoring choices
+- Primary keys of real-hockey tables are the HockeyTech IDs. Players found only in a box score get a bare row (insert-if-missing); roster sync is authoritative and overwrites.
+- Game start time comes from `GameDateISO8601` (has a real offset). The feed's `date_time_played` is local time labelled `Z` and is ignored.
+- Raw snapshots store the decoded JSON (JSONP stripped) with a SHA-256 of the canonical form; a response identical to the latest for the same URL is not stored again. Snapshot URLs never contain the API key.
+- Shutout is derived: the team's only goalie to play, with 0 goals against. Goalie decision is one per (game, goalie) from `goalieLog` (W > OTL > SOL > L when stints differ). REG/OT/SO comes from the game's final status text.
+- PP/SH points and GWG are derived from the goal list, which already excludes shootout goals.
+- Conference (East/West) is a small data file keyed by feed team code (`data/conferences.json`), since the feed has no conference. Note LV is `VGS` in the feed.
+- Scoring uses exact `Fraction` arithmetic so the 2/3 OT-win multiplier stays exact. `ScoringConfig.from_dict` treats a missing key as 0 (not scored), so league settings must always store the full `to_dict()`.
+- Not yet built: `player_team_history` (needs mid-season move data), roster injury/LTIR status (not in the feed), and worker job registration for the syncs.
+
+## 2026-10-13: Worker jobs and season replay
+- Jobs (all in `worker`, each recorded in `job_run`, failures never stop the scheduler): `daily_sync` 04:30 ET (seasons, teams, schedule, rosters), `nightly_resync` 05:00 ET (schedule, then re-fetch the last 7 days of games), `poll_live` every 90 s, `reconcile_finals` every 30 min. Ingestion jobs are only registered when `HOCKEYTECH_KEY` is set. Seasons to sync come from `INGEST_SEASON_IDS` (comma-separated, default `11`).
+- The live poll makes no requests unless a game is inside its window (10 min before start to 5 h after). It also picks up games the schedule already calls final but whose box score we never captured (`final_at` is null), so a schedule sync that flips a game to final cannot cause a missed box score.
+- `game.final_at` is stamped the first time we see a box score final; `reconcile_count` tracks the +6 h and +24 h follow-up fetches.
+- Season replay (`python -m undertow.ingest.replay`) drives these same jobs on a simulated clock, caching every response under `data/replay_cache/` (gitignored). The first run hits the live feed (throttled, about 130 requests); later runs are offline. Integrity checks: one W and one matching loss decision per game (L, OTL or SOL by result type), skater goals per team equal the team score minus the shootout-winning goal, and the opposing goalies' goals against match too.
+- Not built: scoring recompute (needs leagues, Phase 7) and email alerts when polling fails during a game window (needs the email provider). `job_run` has the data for both.
+- Replay findings that changed the code: box scores say `Final OT1` (schedule: `Final OT`), so result type is matched loosely; empty-net goals are stored per skater (`en_goals`) because they are not charged to the goalie; an empty goalie result means no decision. Details in `docs/feed.md`.
+- Logging: the `httpx` logger is set to WARNING in both entry points because it logs full request URLs (including the API key) at INFO.
