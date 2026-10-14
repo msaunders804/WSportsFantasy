@@ -31,6 +31,11 @@
   function drafted() { var d = {}; st.picks.forEach(function (id) { d[id] = true; }); return d; }
   function onClock() { return st.s && !st.s.complete && st.s.on_clock === ME; }
   function fmtTime(s) { return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+  function ordinal(n) {
+    var v = n % 100;
+    if (v >= 11 && v <= 13) return n + "th";
+    return n + (["th", "st", "nd", "rd"][n % 10] || "th");
+  }
   function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
 
   /* ---------- server ---------- */
@@ -261,7 +266,7 @@
       var info = el("div"), nm = el("div", "nm", p.name);
       if (recIds[p.id]) nm.appendChild(el("span", "recbadge", "Recommended"));
       info.appendChild(nm);
-      info.appendChild(el("div", "meta", p.pos + " · " + p.team + " · " + p.gp + " GP · " + p.pos_rank + (p.pos === "F" ? "th F" : p.pos === "D" ? "th D" : "th G")));
+      info.appendChild(el("div", "meta", p.pos + " · " + p.team + " · " + p.gp + " GP · " + ordinal(p.pos_rank) + " " + p.pos));
       li.appendChild(info);
       var fp = el("div", "fp"); fp.appendChild(el("strong", null, p.fpg.toFixed(1))); fp.appendChild(el("small", "muted", " pts/g"));
       li.appendChild(fp);
