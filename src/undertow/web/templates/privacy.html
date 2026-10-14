@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Privacy | Undertow Fantasy{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap page">
+    <h1>Privacy</h1>
+    <p class="muted">Short version: we collect little and use it only to run Undertow.</p>
+    <h2>What we collect</h2>
+    <ul>
+      <li>Your email address, and your first name and fantasy experience if you choose to share them.</li>
+      <li>Which post or link brought you here (for example a social platform), if the link included that information.</li>
+      <li>When you ticked the box agreeing to be emailed.</li>
+    </ul>
+    <h2>What we do with it</h2>
+    <ul>
+      <li>Send your league invite and Undertow updates.</li>
+      <li>Understand which posts bring people in.</li>
+      <li>We don't sell your information or share it for advertising.</li>
+    </ul>
+    <h2>Fonts</h2>
+    <p>This site loads its fonts from Google Fonts, which means Google can see that your browser requested them.</p>
+    <h2>Your choices</h2>
+    <p>
+      You can ask us to delete your information or stop emailing you at any time.
+      {% if contact_email %}Email <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.{% else %}Message us on any Undertow social account.{% endif %}
+    </p>
+    <p class="muted">Undertow is an independent fan project, unaffiliated with the PWHL or its teams.</p>
+  </div>
+</section>
+{% endblock %}

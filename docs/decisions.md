@@ -49,3 +49,22 @@ The schedule can still change (postponements), so playoff round boundaries must 
 - Not built: scoring recompute (needs leagues, Phase 7) and email alerts when polling fails during a game window (needs the email provider). `job_run` has the data for both.
 - Replay findings that changed the code: box scores say `Final OT1` (schedule: `Final OT`), so result type is matched loosely; empty-net goals are stored per skater (`en_goals`) because they are not charged to the goalie; an empty goalie result means no decision. Details in `docs/feed.md`.
 - Logging: the `httpx` logger is set to WARNING in both entry points because it logs full request URLs (including the API key) at INFO.
+
+## 2026-10-14: Railway service settings are set in the dashboard
+- First deploy: Railway did not apply `railway.toml` to the services (the web service showed no pre-deploy command or healthcheck), so migrations never ran and the worker failed with `relation "game" does not exist`. Fix: set the values in each service's dashboard settings, which take precedence over the file.
+- `web`: Pre-deploy Command `alembic upgrade head`, Healthcheck Path `/healthz`. Start command is left blank so the Dockerfile `CMD` (uvicorn) is used.
+- `worker`: Start Command `python -m undertow.worker.main`. Pre-deploy Command and Healthcheck Path stay empty (no HTTP server; migrations run from `web` only so they cannot race).
+- `railway.toml` is kept as documentation of the intended web settings. If a new service or environment is created, re-check these fields by hand, and confirm in the deploy log that the pre-deploy step ran.
+- Variables: `HOCKEYTECH_KEY` and `HOCKEYTECH_USER_AGENT` are set on `worker` only (nothing in `web` touches the feed). `DATABASE_URL` uses the `postgresql+psycopg://` scheme on the private (internal) host on both services.
+- Branching: one branch per phase, each PR opened directly against `main` (stacked PRs merged into each other's branches left Phase 2 off `main` until a follow-up PR).
+
+## 2026-10-14: Landing page and waitlist
+- Brand foundation is in [brand.md](brand.md); design tokens live in `web/static/tokens.css` and every page styles from them. Dark is the default theme, with a light toggle remembered in `localStorage`.
+- The landing page is for Undertow Fantasy only (the wider Undertow Sports site is a separate project). Wordmark only for now (no logo). It carries an "unofficial and unaffiliated" marker in the footer of every page.
+- League marks: the brand owner decided official PWHL logos and photos may be used, with no monetisation. The landing page uses none of them (team names only as text), and the social posts are organic (no paid ads). Keep any league marks in one asset folder and one template partial so they can be removed in one change.
+- The "sample screen" in the page is a CSS mock labelled as a sample, with placeholder names. Replace it with real screenshots or a demo video once the draft room exists.
+- Signups go to `waitlist_signup` (migration 0005): email (lower-cased, unique, so repeats are a silent no-op), optional first name and fantasy experience, `utm_*` from the link, and `consented_at`. The form posts, then redirects to `/thanks` (same answer for duplicates, so the list cannot be probed for who has signed up).
+- Spam: a hidden honeypot field (silently accepted and dropped) and an in-memory limit of 5 posts per 10 minutes per client IP (first `X-Forwarded-For` entry). The limiter resets on restart and is per process, which is fine for one web instance. No CSRF token on this form since there is no session yet; accounts (Phase 3) add CSRF.
+- Form bodies are parsed with the standard library (`urllib.parse.parse_qs`, 8 KB cap) so the page needs no `python-multipart` dependency. Phase 3 will add it for login forms.
+- No alerts or admin page yet (deferred). Read signups in Railway's Postgres Data tab. `CONTACT_EMAIL` (optional env var) is shown on the privacy page; until set, the page says to message the social accounts.
+- Fonts (Sora, Inter) load from Google Fonts, which the privacy page discloses. Self-host them later if that matters.

@@ -1,4 +1,5 @@
-# Config for the `web` service. The `worker` service uses the same image with its own
+# Intended config for the `web` service. Railway did not apply this file on first deploy, so the
+# same values are also set in the dashboard (see docs/decisions.md, 2026-10-14). The `worker` service uses the same image with its own
 # start command set in the Railway dashboard: `python -m undertow.worker.main`.
 [build]
 builder = "DOCKERFILE"
