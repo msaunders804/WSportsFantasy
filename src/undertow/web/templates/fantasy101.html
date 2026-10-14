@@ -9,74 +9,96 @@
     <p class="muted">Never played fantasy sports before? This page is for you. Here's everything about how our PWHL leagues work, in plain English.</p>
 
     <h2>The basics</h2>
-    <p>You draft a roster of real PWHL players. Each week, your starting lineup goes head-to-head against another team in your league. Whoever's players score more fantasy points that week wins the matchup — same idea as a regular-season schedule, just with your team instead of a real one.</p>
+    <p>You draft a roster of real PWHL players. Each week, your starting lineup goes head-to-head against another team in your league. Whoever's players score more fantasy points that week wins the matchup. Same idea as a regular-season schedule, just with your team instead of a real one.</p>
     <p>Undertow is running two 10-team leagues for the 2026-27 season. Every rule on this page is how those two leagues actually work.</p>
 
-    <h2>Your roster</h2>
-    <p>12 players total: 7 starters, 4 bench, 1 injured reserve (IR) spot.</p>
-    <table>
-      <thead><tr><th scope="col">Slot</th><th scope="col">What goes there</th></tr></thead>
-      <tbody>
-        <tr><td>3 × F</td><td>Forwards only</td></tr>
-        <tr><td>2 × D</td><td>Defenders only</td></tr>
-        <tr><td>1 × UTIL</td><td>A flex spot — any forward or defender</td></tr>
-        <tr><td>1 × G</td><td>Goalie</td></tr>
-        <tr><td>4 × BN</td><td>Bench. Any position, scores nothing until you move them into a starting slot.</td></tr>
-        <tr><td>1 × IR</td><td>For an injured player. Doesn't count against your 12 roster spots.</td></tr>
-      </tbody>
-    </table>
-    <p class="muted">You can roster at most 2 goalies at a time — the PWHL only has 12 starting goalies league-wide, so we cap it to keep the position from getting cornered.</p>
+    <div class="callout">
+      <h2>Key dates</h2>
+      <ul>
+        <li><span class="step-date">Oct 30</span> Sign-ups close</li>
+        <li><span class="step-date">By Nov 5</span> Leagues assigned, invites emailed</li>
+        <li><span class="step-date">Week of Nov 10</span> Live snake draft</li>
+        <li><span class="step-date accent">Dec 5</span> Season opens, Week 1 begins</li>
+      </ul>
+    </div>
 
-    <h2>Draft day</h2>
-    <p>A live snake draft: Team 1 picks first in round 1, then Team 2, Team 3, and so on; the order reverses each round, so whoever picked last in round 1 picks first in round 2. Everyone gets a timer for each pick. If it runs out, autopick takes the best player left on your queue (or our default rankings if your queue is empty), respecting your open roster slots. You can practice the whole thing beforehand in the <a href="/preview/draft">draft room</a>.</p>
+    <details class="rule" data-c="primary">
+      <summary>Your roster</summary>
+      <p>12 players total: 7 starters, 4 bench, 1 injured reserve (IR) spot.</p>
+      <table>
+        <thead><tr><th scope="col">Slot</th><th scope="col">What goes there</th></tr></thead>
+        <tbody>
+          <tr><td><span class="slot-badge" data-pos="F">3 F</span></td><td>Forwards only</td></tr>
+          <tr><td><span class="slot-badge" data-pos="D">2 D</span></td><td>Defenders only</td></tr>
+          <tr><td><span class="slot-badge" data-pos="UTIL">1 UTIL</span></td><td>A flex spot: any forward or defender</td></tr>
+          <tr><td><span class="slot-badge" data-pos="G">1 G</span></td><td>Goalie</td></tr>
+          <tr><td><span class="slot-badge" data-pos="BN">4 BN</span></td><td>Bench. Any position, scores nothing until you move them into a starting slot.</td></tr>
+          <tr><td><span class="slot-badge" data-pos="IR">1 IR</span></td><td>For an injured player. Doesn't count against your 12 roster spots.</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">You can roster at most 2 goalies at a time. The PWHL only has 12 starting goalies league-wide, so we cap it to keep the position from getting cornered.</p>
+    </details>
 
-    <h2>Scoring</h2>
-    <p>Every stat your players rack up in real PWHL games turns into fantasy points automatically.</p>
-    <table>
-      <thead><tr><th scope="col">Skaters</th><th scope="col" class="num">Pts</th></tr></thead>
-      <tbody>
-        <tr><td>Goal</td><td class="num">2</td></tr>
-        <tr><td>Assist</td><td class="num">1</td></tr>
-        <tr><td>Power-play point</td><td class="num">0.5</td></tr>
-        <tr><td>Short-handed point</td><td class="num">0.5</td></tr>
-        <tr><td>Shot on goal</td><td class="num">0.1</td></tr>
-        <tr><td>Hit</td><td class="num">0.1</td></tr>
-        <tr><td>Blocked shot</td><td class="num">0.5</td></tr>
-      </tbody>
-    </table>
-    <table>
-      <thead><tr><th scope="col">Goalies</th><th scope="col" class="num">Pts</th></tr></thead>
-      <tbody>
-        <tr><td>Win (regulation)</td><td class="num">4</td></tr>
-        <tr><td>Win (OT or shootout)</td><td class="num">2.667</td></tr>
-        <tr><td>Overtime loss</td><td class="num">1</td></tr>
-        <tr><td>Save</td><td class="num">0.2</td></tr>
-        <tr><td>Shutout</td><td class="num">3</td></tr>
-        <tr><td>Goal against</td><td class="num">−2</td></tr>
-      </tbody>
-    </table>
-    <p class="muted">An overtime or shootout win scores 2/3 of a regulation win, matching the PWHL's own standings points. We store every score as an exact fraction and only round for display, so nothing gets lost to rounding in a close week.</p>
+    <details class="rule" data-c="accent">
+      <summary>Draft day</summary>
+      <p>Our live snake draft is the week of <strong>Nov 10</strong>. Team 1 picks first in round 1, then Team 2, Team 3, and so on; the order reverses each round, so whoever picked last in round 1 picks first in round 2. Everyone gets a timer for each pick. If it runs out, autopick takes the best player left on your queue (or our default rankings if your queue is empty), respecting your open roster slots. You can practice the whole thing beforehand in the <a href="/preview/draft">draft room</a>.</p>
+    </details>
 
-    <h2>Setting your lineup</h2>
-    <p>A player locks the moment their own game starts — you can move anyone around freely up until then, even mid-week. Only your starters score; bench players rack up stats too, but they don't count until you start them. Your Team page always shows how many games each player has left that week, which is the best signal for who to start.</p>
+    <details class="rule" data-c="positive">
+      <summary>Scoring</summary>
+      <p>Every stat your players rack up in real PWHL games turns into fantasy points automatically.</p>
+      <table>
+        <thead><tr><th scope="col">Skaters</th><th scope="col" class="num">Pts</th></tr></thead>
+        <tbody>
+          <tr><td>Goal</td><td class="num pos">2</td></tr>
+          <tr><td>Assist</td><td class="num pos">1</td></tr>
+          <tr><td>Power-play point</td><td class="num pos">0.5</td></tr>
+          <tr><td>Short-handed point</td><td class="num pos">0.5</td></tr>
+          <tr><td>Shot on goal</td><td class="num pos">0.1</td></tr>
+          <tr><td>Hit</td><td class="num pos">0.1</td></tr>
+          <tr><td>Blocked shot</td><td class="num pos">0.5</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th scope="col">Goalies</th><th scope="col" class="num">Pts</th></tr></thead>
+        <tbody>
+          <tr><td>Win (regulation)</td><td class="num pos">4</td></tr>
+          <tr><td>Win (OT or shootout)</td><td class="num pos">2.667</td></tr>
+          <tr><td>Overtime loss</td><td class="num pos">1</td></tr>
+          <tr><td>Save</td><td class="num pos">0.2</td></tr>
+          <tr><td>Shutout</td><td class="num pos">3</td></tr>
+          <tr><td>Goal against</td><td class="num neg">−2</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">An overtime or shootout win scores 2/3 of a regulation win, matching the PWHL's own standings points. We store every score as an exact fraction and only round for display, so nothing gets lost to rounding in a close week.</p>
+    </details>
 
-    <h2>Free agents, waivers and trades</h2>
-    <ul>
-      <li><strong>Free agents</strong> (unowned players) can be added instantly, unless their game has already started.</li>
-      <li><strong>Waivers:</strong> drop a player and they sit on waivers for 48 hours before anyone can grab them as a free agent. Waiver priority starts as the reverse of the draft order; winning a claim sends you to the back of the line. First-come-first-served after that — no bidding.</li>
-      <li><strong>Trades</strong> get a 24-hour review window before they go through, and the commissioner can veto one if something looks off. There's no league-wide vote. The trade deadline is the end of Week 11.</li>
-    </ul>
+    <details class="rule" data-c="primary">
+      <summary>Setting your lineup</summary>
+      <p>A player locks the moment their own game starts. You can move anyone around freely up until then, even mid-week. Only your starters score; bench players rack up stats too, but they don't count until you start them. Your Team page always shows how many games each player has left that week, which is the best signal for who to start.</p>
+    </details>
 
-    <h2>The season and playoffs</h2>
-    <p>The fantasy season runs entirely inside the PWHL's regular season — we never use PWHL playoff games, since only 8 of 12 teams qualify and most fantasy rosters would stop scoring.</p>
-    <ul>
-      <li><strong>Weeks 1–12 (Dec 5 – Feb 28):</strong> fantasy regular season. Fantasy weeks run Monday to Sunday.</li>
-      <li><strong>Weeks 13–18 (Mar 8 – Apr 18):</strong> fantasy playoffs, in three two-week rounds. Each matchup is the combined score over both weeks.</li>
-      <li>The top 6 of each 10-team league make the playoffs. Seeds 1 and 2 get a bye into round 2; round 1 is 3 vs. 6 and 4 vs. 5.</li>
-      <li>Playoff seeding ties are broken by: record, then total points scored, then head-to-head record, then a coin flip.</li>
-    </ul>
+    <details class="rule" data-c="accent">
+      <summary>Free agents, waivers and trades</summary>
+      <ul>
+        <li><strong>Free agents</strong> (unowned players) can be added instantly, unless their game has already started.</li>
+        <li><strong>Waivers:</strong> drop a player and they sit on waivers for 48 hours before anyone can grab them as a free agent. Waiver priority starts as the reverse of the draft order; winning a claim sends you to the back of the line. First-come-first-served after that (no bidding).</li>
+        <li><strong>Trades</strong> get a 24-hour review window before they go through, and the commissioner can veto one if something looks off. There's no league-wide vote. The trade deadline is the end of Week 11.</li>
+      </ul>
+    </details>
 
-    <p class="muted">Still have questions? Check the <a href="/#faq">general FAQ</a> on the homepage, or <a href="mailto:dev@undertowsports.com">email us</a> — we're happy to walk through anything.</p>
+    <details class="rule" data-c="positive">
+      <summary>The season and playoffs</summary>
+      <p>The fantasy season runs entirely inside the PWHL's regular season. We never use PWHL playoff games, since only 8 of 12 teams qualify and most fantasy rosters would stop scoring.</p>
+      <ul>
+        <li><strong>Weeks 1–12 (Dec 5 – Feb 28):</strong> fantasy regular season. Fantasy weeks run Monday to Sunday.</li>
+        <li><strong>Weeks 13–18 (Mar 8 – Apr 18):</strong> fantasy playoffs, in three two-week rounds. Each matchup is the combined score over both weeks.</li>
+        <li>The top 6 of each 10-team league make the playoffs. Seeds 1 and 2 get a bye into round 2; round 1 is 3 vs. 6 and 4 vs. 5.</li>
+        <li>Playoff seeding ties are broken by: record, then total points scored, then head-to-head record, then a coin flip.</li>
+      </ul>
+    </details>
+
+    <p class="muted">Still have questions? Check the <a href="/#faq">general FAQ</a> on the homepage, or <a href="mailto:dev@undertowsports.com">email us</a>. We're happy to walk through anything.</p>
   </div>
 </section>
 {% endblock %}
