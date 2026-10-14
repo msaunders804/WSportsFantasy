@@ -28,8 +28,10 @@
   </ul>
   <h2 class="section-h">Injured reserve</h2>
   <ul class="tlist">
-    {% for p in ir %}{{ row("IR", p, false) }}{% endfor %}
+    {% for p in ir %}{{ row("IR", p, false) }}{% else %}
+    <li class="trow empty-slot"><span class="slot-tag">IR</span><span class="muted">Empty</span></li>
+    {% endfor %}
   </ul>
-  <p class="legend muted">🔒 locked once a player's game starts.</p>
+  <p class="legend muted">🔒 locked once a player has no games left this week.</p>
 </div>
 {% endblock %}

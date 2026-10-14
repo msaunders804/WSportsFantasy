@@ -1,0 +1,498 @@
+{
+  "source": "2025-26 PWHL regular season (HockeyTech season 8)",
+  "league": {
+    "name": "League One",
+    "week": 4,
+    "weeks": 18,
+    "range": "Dec 15 to Dec 21"
+  },
+  "my_team": {
+    "name": "Tidebreakers",
+    "owner": "You",
+    "record": "2-1",
+    "score": 24.5
+  },
+  "opp_team": {
+    "name": "Rink Rats",
+    "owner": "Jordan",
+    "record": "1-2",
+    "score": 32.4
+  },
+  "my_lineup": [
+    [
+      "F",
+      {
+        "name": "Kelly Pannek",
+        "pos": "F",
+        "team": "MIN",
+        "status": "yet",
+        "line": "1G 1 SOG 1 BLK · then Sun 2:00 PM",
+        "pts": 2.6,
+        "games": 2,
+        "next": "Sun 2:00 PM"
+      }
+    ],
+    [
+      "F",
+      {
+        "name": "Kendall Coyne Schofield",
+        "pos": "F",
+        "team": "MIN",
+        "status": "yet",
+        "line": "1G 4 SOG 1 BLK · then Sun 2:00 PM",
+        "pts": 2.9,
+        "games": 2,
+        "next": "Sun 2:00 PM"
+      }
+    ],
+    [
+      "F",
+      {
+        "name": "Britta Curl-Salemme",
+        "pos": "F",
+        "team": "MIN",
+        "status": "yet",
+        "line": "1G 1A 1 SOG 2 BLK · then Sun 2:00 PM",
+        "pts": 4.2,
+        "games": 2,
+        "next": "Sun 2:00 PM"
+      }
+    ],
+    [
+      "D",
+      {
+        "name": "Haley Winn",
+        "pos": "D",
+        "team": "BOS",
+        "status": "yet",
+        "line": "1A 2 SOG · then Sun 5:00 PM",
+        "pts": 3.5,
+        "games": 3,
+        "next": "Sun 5:00 PM"
+      }
+    ],
+    [
+      "D",
+      {
+        "name": "Maggie Flaherty",
+        "pos": "D",
+        "team": "MTL",
+        "status": "final",
+        "line": "2 SOG · 2 gm",
+        "pts": 0.9,
+        "games": 2,
+        "next": ""
+      }
+    ],
+    [
+      "UTIL",
+      {
+        "name": "Taylor Fox",
+        "pos": "F",
+        "team": "MIN",
+        "status": "yet",
+        "line": "2A 2 SOG 1 BLK · then Sun 2:00 PM",
+        "pts": 2.7,
+        "games": 2,
+        "next": "Sun 2:00 PM"
+      }
+    ],
+    [
+      "G",
+      {
+        "name": "Ann-Renée Desbiens",
+        "pos": "G",
+        "team": "MTL",
+        "status": "final",
+        "line": "W (SO) · 35 SV · 1 GA",
+        "pts": 7.7,
+        "games": 2,
+        "next": ""
+      }
+    ]
+  ],
+  "opp_lineup": [
+    [
+      "F",
+      {
+        "name": "Marie-Philip Poulin",
+        "pos": "F",
+        "team": "MTL",
+        "status": "final",
+        "line": "1G 3 SOG · 2 gm",
+        "pts": 3.5,
+        "games": 2,
+        "next": ""
+      }
+    ],
+    [
+      "F",
+      {
+        "name": "Sarah Nurse",
+        "pos": "F",
+        "team": "VAN",
+        "status": "yet",
+        "line": "No game this week",
+        "pts": null,
+        "games": 2,
+        "next": ""
+      }
+    ],
+    [
+      "F",
+      {
+        "name": "Sarah Fillier",
+        "pos": "F",
+        "team": "NY",
+        "status": "final",
+        "line": "1A 4 SOG · 2 gm",
+        "pts": 2.1,
+        "games": 2,
+        "next": ""
+      }
+    ],
+    [
+      "D",
+      {
+        "name": "Sophie Jaques",
+        "pos": "D",
+        "team": "VAN",
+        "status": "final",
+        "line": "1G 3 SOG 4 BLK · 2 gm",
+        "pts": 4.5,
+        "games": 2,
+        "next": ""
+      }
+    ],
+    [
+      "D",
+      {
+        "name": "Megan Keller",
+        "pos": "D",
+        "team": "BOS",
+        "status": "yet",
+        "line": "1A 2 SOG · then Sun 5:00 PM",
+        "pts": 3.3,
+        "games": 3,
+        "next": "Sun 5:00 PM"
+      }
+    ],
+    [
+      "UTIL",
+      {
+        "name": "Kristýna Kaltounková",
+        "pos": "F",
+        "team": "NY",
+        "status": "final",
+        "line": "2G 5 SOG 1 BLK · 2 gm",
+        "pts": 6.4,
+        "games": 2,
+        "next": ""
+      }
+    ],
+    [
+      "G",
+      {
+        "name": "Aerin Frankel",
+        "pos": "G",
+        "team": "BOS",
+        "status": "yet",
+        "line": "L · 25 SV · 3 GA · then Sun 5:00 PM",
+        "pts": 12.6,
+        "games": 3,
+        "next": "Sun 5:00 PM"
+      }
+    ]
+  ],
+  "bench": [
+    {
+      "name": "Grace Zumwinkle",
+      "pos": "F",
+      "team": "MIN",
+      "status": "yet",
+      "line": "3 SOG 2 BLK · then Sun 2:00 PM",
+      "pts": 1.3,
+      "games": 2,
+      "next": "Sun 2:00 PM"
+    },
+    {
+      "name": "Jessie Eldridge",
+      "pos": "F",
+      "team": "BOS",
+      "status": "yet",
+      "line": "Next Sun 5:00 PM",
+      "pts": null,
+      "games": 3,
+      "next": "Sun 5:00 PM"
+    },
+    {
+      "name": "Claire Thompson",
+      "pos": "D",
+      "team": "VAN",
+      "status": "final",
+      "line": "1A 1 SOG · 2 gm",
+      "pts": 3.9,
+      "games": 2,
+      "next": ""
+    },
+    {
+      "name": "Raygan Kirk",
+      "pos": "G",
+      "team": "TOR",
+      "status": "final",
+      "line": "SOL · 30 SV · 1 GA",
+      "pts": 5.0,
+      "games": 2,
+      "next": ""
+    }
+  ],
+  "players": [
+    [
+      "Ann-Renée Desbiens",
+      "G",
+      "MTL",
+      6.2,
+      154.7,
+      25,
+      false
+    ],
+    [
+      "Aerin Frankel",
+      "G",
+      "BOS",
+      6.2,
+      160.5,
+      26,
+      false
+    ],
+    [
+      "Maddie Rooney",
+      "G",
+      "MIN",
+      3.1,
+      49.5,
+      16,
+      true
+    ],
+    [
+      "Kelly Pannek",
+      "F",
+      "MIN",
+      2.6,
+      77.0,
+      30,
+      false
+    ],
+    [
+      "Marie-Philip Poulin",
+      "F",
+      "MTL",
+      2.3,
+      43.6,
+      19,
+      false
+    ],
+    [
+      "Sarah Nurse",
+      "F",
+      "VAN",
+      2.2,
+      41.7,
+      19,
+      false
+    ],
+    [
+      "Kendall Coyne Schofield",
+      "F",
+      "MIN",
+      2.1,
+      48.7,
+      23,
+      false
+    ],
+    [
+      "Sophie Jaques",
+      "D",
+      "VAN",
+      2.1,
+      63.2,
+      30,
+      false
+    ],
+    [
+      "Haley Winn",
+      "D",
+      "BOS",
+      2.1,
+      61.9,
+      30,
+      false
+    ],
+    [
+      "Megan Keller",
+      "D",
+      "BOS",
+      1.9,
+      56.3,
+      30,
+      false
+    ],
+    [
+      "Laura Stacey",
+      "F",
+      "MTL",
+      1.9,
+      55.8,
+      30,
+      true
+    ],
+    [
+      "Alex Carpenter",
+      "F",
+      "SEA",
+      1.8,
+      54.2,
+      30,
+      true
+    ],
+    [
+      "Blayre Turnbull",
+      "F",
+      "TOR",
+      1.8,
+      54.1,
+      30,
+      true
+    ],
+    [
+      "Nicole Gosling",
+      "D",
+      "MTL",
+      1.5,
+      44.7,
+      30,
+      true
+    ],
+    [
+      "Anna Wilgren",
+      "D",
+      "SEA",
+      1.4,
+      42.8,
+      30,
+      true
+    ]
+  ],
+  "standings": [
+    [
+      "Rink Rats",
+      "Jordan",
+      "3-0",
+      118.2
+    ],
+    [
+      "Tidebreakers",
+      "You",
+      "2-1",
+      109.4
+    ],
+    [
+      "Blue Line Club",
+      "Sam",
+      "2-1",
+      104.8
+    ],
+    [
+      "Neutral Zone",
+      "Alex",
+      "2-1",
+      101.3
+    ],
+    [
+      "Power Play Pals",
+      "Riley",
+      "2-1",
+      99.0
+    ],
+    [
+      "Five Hole",
+      "Casey",
+      "1-2",
+      96.5
+    ],
+    [
+      "Top Shelf",
+      "Morgan",
+      "1-2",
+      93.1
+    ],
+    [
+      "Icing Illusions",
+      "Taylor",
+      "1-2",
+      90.7
+    ],
+    [
+      "Zamboni Dreams",
+      "Quinn",
+      "0-3",
+      84.2
+    ],
+    [
+      "Backcheckers",
+      "Drew",
+      "0-3",
+      80.6
+    ]
+  ],
+  "schedule": [
+    [
+      "Tidebreakers",
+      24.5,
+      "Rink Rats",
+      32.4
+    ],
+    [
+      "Blue Line Club",
+      29.0,
+      "Neutral Zone",
+      33.5
+    ],
+    [
+      "Power Play Pals",
+      22.8,
+      "Five Hole",
+      19.4
+    ],
+    [
+      "Top Shelf",
+      17.3,
+      "Icing Illusions",
+      20.1
+    ],
+    [
+      "Zamboni Dreams",
+      12.0,
+      "Backcheckers",
+      14.6
+    ]
+  ],
+  "activity": [
+    [
+      "Today 9:12 AM",
+      "Jordan added Maddie Rooney (G)."
+    ],
+    [
+      "Today 8:40 AM",
+      "Sam claimed Laura Stacey (F) off waivers."
+    ],
+    [
+      "Yesterday",
+      "Taylor and Casey proposed a trade. Commissioner review open."
+    ],
+    [
+      "Yesterday",
+      "You set Kelly Pannek in your lineup."
+    ]
+  ]
+}

@@ -78,3 +78,21 @@ def test_preview_hidden_in_prod_unless_enabled(monkeypatch):
     finally:
         monkeypatch.undo()
         get_settings.cache_clear()
+
+
+def test_preview_data_is_internally_consistent():
+    from undertow.web import preview_data as d
+
+    assert [slot for slot, _ in d.MY_LINEUP] == ["F", "F", "F", "D", "D", "UTIL", "G"]
+    assert [slot for slot, _ in d.OPP_LINEUP] == [slot for slot, _ in d.MY_LINEUP]
+    # The scoreboard total is the sum of the lineup's points, rounded for display.
+    for team, lineup in ((d.MY_TEAM, d.MY_LINEUP), (d.OPP_TEAM, d.OPP_LINEUP)):
+        assert team["score"] == pytest.approx(sum(p["pts"] or 0 for _, p in lineup), abs=0.11)
+    for _, p in d.MY_LINEUP + d.OPP_LINEUP:
+        assert p["pos"] in {"F", "D", "G"}
+        assert p["status"] in {"final", "yet"}
+    # Nobody is on injured reserve: we do not invent injuries for real players.
+    assert d.IR == []
+    names = [p["name"] for _, p in d.MY_LINEUP + d.OPP_LINEUP] + [p["name"] for p in d.BENCH]
+    assert len(names) == len(set(names))
+    assert any(row[6] for row in d.PLAYERS) and not all(row[6] for row in d.PLAYERS)

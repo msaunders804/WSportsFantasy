@@ -14,7 +14,7 @@
       <span class="owner muted">{{ me.owner }} · {{ me.record }}</span>
       <span class="big lead">{{ "%.1f"|format(me.score) }}</span>
     </div>
-    <div class="vs"><span class="live-dot"></span>Live</div>
+    <div class="vs">vs</div>
     <div class="side right">
       <span class="tname">{{ opp.name }}</span>
       <span class="owner muted">{{ opp.owner }} · {{ opp.record }}</span>
@@ -39,6 +39,6 @@
       </div>
     {% endfor %}
   </section>
-  <p class="legend muted"><span class="chip-dot final"></span>Final <span class="chip-dot live"></span>Live <span class="chip-dot yet"></span>Yet to play</p>
+  <p class="legend muted"><span class="chip-dot final"></span>Done for the week <span class="chip-dot yet"></span>Games to come</p>
 </div>
 {% endblock %}

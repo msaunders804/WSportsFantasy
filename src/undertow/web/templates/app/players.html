@@ -13,11 +13,11 @@
     <span class="muted sortlbl">Sort: FP/game</span>
   </div>
   <ul class="plist" id="plist">
-    {% for name, pos, team, fpg, fp, owned, avail in players %}
+    {% for name, pos, team, fpg, fp, gp, avail in players %}
     <li class="prow" data-pos="{{ pos }}" data-avail="{{ 1 if avail else 0 }}" data-name="{{ name|lower }}">
       <div class="tinfo">
         <span class="pl-name">{{ name }}</span>
-        <span class="pl-meta muted">{{ pos }} · {{ team }} · {{ owned }}% owned</span>
+        <span class="pl-meta muted">{{ pos }} · {{ team }} · {{ gp }} GP</span>
       </div>
       <div class="fp"><strong>{{ "%.1f"|format(fpg) }}</strong><small class="muted">FP/G</small></div>
       <div class="fp"><strong>{{ "%.1f"|format(fp) }}</strong><small class="muted">Season</small></div>
