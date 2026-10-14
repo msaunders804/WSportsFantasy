@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     base_url: str = "http://localhost:8000"
     # Shown on the privacy page for questions and deletion requests.
     contact_email: str = ""
+    # Serve the /preview design mockups even in prod (they are always on outside prod).
+    preview_enabled: bool = False
 
     hockeytech_key: str = ""
     hockeytech_client_code: str = "pwhl"

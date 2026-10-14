@@ -18,22 +18,27 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@500;700&display=swap">
   <link rel="stylesheet" href="/static/tokens.css">
   <link rel="stylesheet" href="/static/site.css">
+  {% block head_extra %}{% endblock %}
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+  {% block header %}
   <div class="wrap">
     <header class="bar">
       <a class="wordmark" href="/" aria-label="Undertow Fantasy home">under<span>tow</span><small>Fantasy</small></a>
       <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch between dark and light theme">Light mode</button>
     </header>
   </div>
+  {% endblock %}
   <main id="main">{% block content %}{% endblock %}</main>
+  {% block footer %}
   <footer>
     <div class="wrap">
       <p><strong>Unofficial and unaffiliated.</strong> Undertow Sports is an independent fan project. It is not affiliated with, endorsed by, or sponsored by the PWHL or any of its teams. Team names and logos belong to their owners.</p>
       <p>Built by women for women's sports. <a href="/privacy">Privacy</a></p>
     </div>
   </footer>
+  {% endblock %}
   <script>
     (function () {
       var btn = document.getElementById("theme-toggle");

@@ -68,3 +68,9 @@ The schedule can still change (postponements), so playoff round boundaries must 
 - Form bodies are parsed with the standard library (`urllib.parse.parse_qs`, 8 KB cap) so the page needs no `python-multipart` dependency. Phase 3 will add it for login forms.
 - No alerts or admin page yet (deferred). Read signups in Railway's Postgres Data tab. `CONTACT_EMAIL` (optional env var) is shown on the privacy page; until set, the page says to message the social accounts.
 - Fonts (Sora, Inter) load from Google Fonts, which the privacy page discloses. Self-host them later if that matters.
+
+## 2026-10-14: App shell and tab mockups (/preview)
+- The four tabs (Matchup, Team, Players, League) are real Jinja templates under `web/templates/app/`, styled by `static/app.css` from the same tokens as the landing page. Mobile: fixed bottom tab bar; desktop (800px and up): tabs under the header. These templates are the design that later phases wire to real data.
+- Until then they render at `/preview/{matchup,team,players,league}` on sample data from `web/preview_data.py`. Player names, teams and points there are invented, and every preview page carries a "sample data" banner. The previews are always on outside prod, and in prod only when `PREVIEW_ENABLED=true`. They are `noindex`.
+- Matchup shows both lineups slot by slot with status (final, live, yet to play) and the stat line. Team shows the lineup, bench and IR with games this week and a lock indicator. Players has search, position and availability filters (client-side for the demo). League has the invite link, standings, this week's matchups and the activity feed.
+- Lesson: `backdrop-filter` on the sticky header made the `position: fixed` bottom tabs position relative to the header. The tabs are now a sibling of the header, not a child.

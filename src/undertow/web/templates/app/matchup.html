@@ -1,0 +1,44 @@
+{% extends "app/base.html" %}
+{% block title %}Matchup | Undertow Fantasy{% endblock %}
+{% block content %}
+<div class="wrap view">
+  <div class="weekbar">
+    <button class="icon-btn" type="button" aria-label="Previous week">‹</button>
+    <div><strong>Week {{ league.week }}</strong> <span class="muted">· {{ league.range }}</span></div>
+    <button class="icon-btn" type="button" aria-label="Next week">›</button>
+  </div>
+
+  <section class="scoreboard" aria-label="Score">
+    <div class="side">
+      <span class="tname">{{ me.name }}</span>
+      <span class="owner muted">{{ me.owner }} · {{ me.record }}</span>
+      <span class="big lead">{{ "%.1f"|format(me.score) }}</span>
+    </div>
+    <div class="vs"><span class="live-dot"></span>Live</div>
+    <div class="side right">
+      <span class="tname">{{ opp.name }}</span>
+      <span class="owner muted">{{ opp.owner }} · {{ opp.record }}</span>
+      <span class="big">{{ "%.1f"|format(opp.score) }}</span>
+    </div>
+  </section>
+
+  <section class="slots" aria-label="Lineups">
+    {% for i in range(me_lineup|length) %}
+      {% set slot, mine = me_lineup[i] %}
+      {% set _, theirs = opp_lineup[i] %}
+      <div class="slot-row">
+        {% for p, cls in [(mine, ""), (theirs, "right")] %}
+        {% if loop.last %}<span class="slot-tag">{{ slot }}</span>{% endif %}
+        <div class="pl {{ cls }} st-{{ p.status }}">
+          <span class="pl-name">{{ p.name }}</span>
+          <span class="pl-meta muted">{{ p.pos }} · {{ p.team }}</span>
+          <span class="pl-line muted">{{ p.line }}</span>
+          <span class="pl-pts">{% if p.pts is not none %}{{ "%.1f"|format(p.pts) }}{% else %}–{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+  <p class="legend muted"><span class="chip-dot final"></span>Final <span class="chip-dot live"></span>Live <span class="chip-dot yet"></span>Yet to play</p>
+</div>
+{% endblock %}
