@@ -10,7 +10,13 @@
   <meta property="og:description" content="Friendly PWHL fantasy leagues for the 2026-27 season. New to fantasy? You're who we built this for.">
   <meta property="og:type" content="website">
   <script>
-    try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+    try {
+      var t = localStorage.getItem("theme");
+      if (t !== "light" && t !== "dark") {
+        t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+      }
+      document.documentElement.dataset.theme = t;
+    } catch (e) {}
   </script>
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ v }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
