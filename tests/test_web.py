@@ -27,6 +27,17 @@ def test_static_pages_have_unofficial_marker(path):
     assert "Unofficial and unaffiliated" in resp.text
 
 
+def test_asset_links_are_relative_so_https_proxies_cannot_break_them():
+    # Behind Railway's TLS proxy an absolute url_for() link came out as http:// and was blocked
+    # as mixed content, leaving the page unstyled.
+    resp = TestClient(app, base_url="http://x.up.railway.app").get(
+        "/", headers={"x-forwarded-proto": "https"}
+    )
+    assert 'href="/static/tokens.css"' in resp.text
+    assert 'href="/static/site.css"' in resp.text
+    assert "http://x.up.railway.app" not in resp.text
+
+
 def test_static_assets_served():
     client = TestClient(app)
     assert client.get("/static/tokens.css").status_code == 200
