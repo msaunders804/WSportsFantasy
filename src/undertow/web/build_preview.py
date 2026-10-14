@@ -265,6 +265,7 @@ def build(season_id: int) -> dict:
     rosters, taken = draft(pool)
     owner_of = {p.id: slug for slug, r in rosters.items() for pos in r.values() for p in pos}
     team_name = {slug: name for slug, name, *_ in TEAMS}
+    owner_name = {slug: owner for slug, _, owner, *_ in TEAMS}
 
     def entry(p: Player, now: datetime) -> dict:
         """One player's week: points so far, the latest line, and what is still to come."""
@@ -453,6 +454,33 @@ def build(season_id: int) -> dict:
             "log": log,
         }
 
+    # The draft room ranks players on last season's full results (what Phase 4 will do for real).
+    draft_pool = []
+    for pid, entries in played.items():
+        p = players.get(pid)
+        if p and p.position and len(entries) >= MIN_GP:
+            total = float(sum(e["pts"] for e in entries))
+            draft_pool.append(
+                {
+                    "id": pid,
+                    "name": f"{p.first_name} {p.last_name}",
+                    "pos": p.position,
+                    "team": code(p.pro_team_id),
+                    "fpg": round(total / len(entries), 2),
+                    "gp": len(entries),
+                    "total": round(total, 1),
+                }
+            )
+    draft_pool.sort(key=lambda r: -r["fpg"])
+    draft_info = {
+        "order": [
+            {"slug": slug, "name": team_name[slug], "owner": owner_name[slug]}
+            for slug in DRAFT_ORDER
+        ],
+        "me": DRAFT_ORDER.index(MY_SLUG),
+        "pool": draft_pool,
+    }
+
     my_forwards = [p for p in rosters[MY_SLUG]["F"]]
     featured = max(my_forwards, key=lambda p: by_id[p.id]["fpg"]).id
     last_day = end - timedelta(days=1)
@@ -467,6 +495,7 @@ def build(season_id: int) -> dict:
         "my_team": MY_SLUG,
         "featured_player": featured,
         "teams": teams_out,
+        "draft": draft_info,
         "matchups": [{"id": i, "a": a, "b": b} for i, (a, b) in enumerate(MATCHUPS, start=1)],
         "players": players_tab,
         "player_pages": player_pages,

@@ -2,6 +2,12 @@
 
 Things the owner wants, written down so they are not lost. Scope and rules stay in [Plan.MD](../Plan.MD); design decisions in [decisions.md](decisions.md). Add new items at the top of each section.
 
+## Draft room: what the demo does not do yet (Phase 5 makes it real)
+- **Real, shared draft:** the demo keeps the pick list in one browser. Phase 5 needs picks as single database transactions with constraints, a server-side clock, live updates to everyone (SSE), reconnects, commissioner controls and a draft-order screen. The pure rules in `services/draft.py` carry over.
+- **Recommendation realism (wanted, "dedicated time"):** today it is value over replacement from last season's points per game, shrunk toward the position average, weighted by roster needs. Still to do: injuries and the games each team plays (some teams have lighter schedules), players with no PWHL history (rookies, expansion teams), real average draft position from the first leagues, tuning the shrinkage and replacement levels, goalie platoons, bye-week and schedule strength, and checking the picks against what experienced players expect. Revisit once the first mock draft has run.
+- **Queue:** drag to reorder (up/down buttons today). Pick trades, draft grades, a "you reached" or "great value" note after each pick, and a pause for the commissioner.
+- **Beginner help:** a short first-time tour of the board, and a plain-language note when someone ignores a recommendation in a way that leaves a gap (for example no goalie).
+
 ## Profile page (wanted)
 - A profile page where a manager can **change their team name**, **add a team photo**, and **give their players nicknames**.
 - Where it shows up: the team photo replaces the initials circle on the Matchup scoreboard (the placeholder is in `app/_macros.html`, `avatar`); the team name shows everywhere a team appears; nicknames show next to or in place of the player's name on Matchup and Team.

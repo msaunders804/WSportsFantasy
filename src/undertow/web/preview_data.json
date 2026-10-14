@@ -1570,6 +1570,1845 @@
    ]
   }
  },
+ "draft": {
+  "order": [
+   {
+    "slug": "blue-line-club",
+    "name": "Blue Line Club",
+    "owner": "Sam"
+   },
+   {
+    "slug": "rink-rats",
+    "name": "Rink Rats",
+    "owner": "Jordan"
+   },
+   {
+    "slug": "neutral-zone",
+    "name": "Neutral Zone",
+    "owner": "Alex"
+   },
+   {
+    "slug": "tidebreakers",
+    "name": "Tidebreakers",
+    "owner": "You"
+   },
+   {
+    "slug": "power-play-pals",
+    "name": "Power Play Pals",
+    "owner": "Riley"
+   },
+   {
+    "slug": "five-hole",
+    "name": "Five Hole",
+    "owner": "Casey"
+   },
+   {
+    "slug": "top-shelf",
+    "name": "Top Shelf",
+    "owner": "Morgan"
+   },
+   {
+    "slug": "icing-illusions",
+    "name": "Icing Illusions",
+    "owner": "Taylor"
+   },
+   {
+    "slug": "zamboni-dreams",
+    "name": "Zamboni Dreams",
+    "owner": "Quinn"
+   },
+   {
+    "slug": "backcheckers",
+    "name": "Backcheckers",
+    "owner": "Drew"
+   }
+  ],
+  "me": 3,
+  "pool": [
+   {
+    "id": 28,
+    "name": "Ann-Renée Desbiens",
+    "pos": "G",
+    "team": "MTL",
+    "fpg": 6.19,
+    "gp": 25,
+    "total": 154.7
+   },
+   {
+    "id": 6,
+    "name": "Aerin Frankel",
+    "pos": "G",
+    "team": "BOS",
+    "fpg": 6.17,
+    "gp": 26,
+    "total": 160.5
+   },
+   {
+    "id": 222,
+    "name": "Gwyneth Philips",
+    "pos": "G",
+    "team": "OTT",
+    "fpg": 3.78,
+    "gp": 28,
+    "total": 105.9
+   },
+   {
+    "id": 211,
+    "name": "Raygan Kirk",
+    "pos": "G",
+    "team": "TOR",
+    "fpg": 3.54,
+    "gp": 23,
+    "total": 81.5
+   },
+   {
+    "id": 123,
+    "name": "Maddie Rooney",
+    "pos": "G",
+    "team": "MIN",
+    "fpg": 3.1,
+    "gp": 16,
+    "total": 49.5
+   },
+   {
+    "id": 41,
+    "name": "Abbey Levy",
+    "pos": "G",
+    "team": "BOS",
+    "fpg": 2.93,
+    "gp": 3,
+    "total": 8.8
+   },
+   {
+    "id": 23,
+    "name": "Kelly Pannek",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 2.57,
+    "gp": 30,
+    "total": 77.0
+   },
+   {
+    "id": 48,
+    "name": "Sandra Abstreiter",
+    "pos": "G",
+    "team": "MTL",
+    "fpg": 2.49,
+    "gp": 5,
+    "total": 12.5
+   },
+   {
+    "id": 22,
+    "name": "Nicole Hensley",
+    "pos": "G",
+    "team": "MIN",
+    "fpg": 2.39,
+    "gp": 13,
+    "total": 31.1
+   },
+   {
+    "id": 31,
+    "name": "Marie-Philip Poulin",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 2.29,
+    "gp": 19,
+    "total": 43.6
+   },
+   {
+    "id": 75,
+    "name": "Sarah Nurse",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 2.19,
+    "gp": 19,
+    "total": 41.7
+   },
+   {
+    "id": 20,
+    "name": "Kendall Coyne Schofield",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 2.12,
+    "gp": 23,
+    "total": 48.7
+   },
+   {
+    "id": 11,
+    "name": "Sophie Jaques",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 2.11,
+    "gp": 30,
+    "total": 63.2
+   },
+   {
+    "id": 189,
+    "name": "Britta Curl-Salemme",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 2.11,
+    "gp": 30,
+    "total": 63.3
+   },
+   {
+    "id": 205,
+    "name": "Sarah Fillier",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 2.07,
+    "gp": 29,
+    "total": 60.1
+   },
+   {
+    "id": 246,
+    "name": "Haley Winn",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 2.06,
+    "gp": 30,
+    "total": 61.9
+   },
+   {
+    "id": 21,
+    "name": "Taylor Fox",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 2.05,
+    "gp": 30,
+    "total": 61.5
+   },
+   {
+    "id": 64,
+    "name": "Kristen Campbell",
+    "pos": "G",
+    "team": "VAN",
+    "fpg": 2.04,
+    "gp": 13,
+    "total": 26.5
+   },
+   {
+    "id": 59,
+    "name": "Emerance Maschmeyer",
+    "pos": "G",
+    "team": "VAN",
+    "fpg": 2.03,
+    "gp": 19,
+    "total": 38.5
+   },
+   {
+    "id": 245,
+    "name": "Kristýna Kaltounková",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 2.02,
+    "gp": 21,
+    "total": 42.5
+   },
+   {
+    "id": 58,
+    "name": "Brianne Jenner",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 1.99,
+    "gp": 30,
+    "total": 59.7
+   },
+   {
+    "id": 25,
+    "name": "Grace Zumwinkle",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 1.93,
+    "gp": 29,
+    "total": 56.0
+   },
+   {
+    "id": 36,
+    "name": "Jessie Eldridge",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.9,
+    "gp": 30,
+    "total": 56.9
+   },
+   {
+    "id": 228,
+    "name": "Kayle Osborne",
+    "pos": "G",
+    "team": "NY",
+    "fpg": 1.89,
+    "gp": 27,
+    "total": 50.9
+   },
+   {
+    "id": 12,
+    "name": "Megan Keller",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 1.88,
+    "gp": 30,
+    "total": 56.3
+   },
+   {
+    "id": 72,
+    "name": "Rebecca Leslie",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 1.87,
+    "gp": 30,
+    "total": 56.1
+   },
+   {
+    "id": 32,
+    "name": "Laura Stacey",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 1.86,
+    "gp": 30,
+    "total": 55.8
+   },
+   {
+    "id": 34,
+    "name": "Alex Carpenter",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.81,
+    "gp": 30,
+    "total": 54.2
+   },
+   {
+    "id": 76,
+    "name": "Blayre Turnbull",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 1.8,
+    "gp": 30,
+    "total": 54.1
+   },
+   {
+    "id": 79,
+    "name": "Maggie Flaherty",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 1.78,
+    "gp": 30,
+    "total": 53.5
+   },
+   {
+    "id": 63,
+    "name": "Daryl Watts",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 1.73,
+    "gp": 27,
+    "total": 46.7
+   },
+   {
+    "id": 89,
+    "name": "Hannah Miller",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 1.72,
+    "gp": 30,
+    "total": 51.7
+   },
+   {
+    "id": 155,
+    "name": "Corinne Schroeder",
+    "pos": "G",
+    "team": "SEA",
+    "fpg": 1.71,
+    "gp": 17,
+    "total": 29.1
+   },
+   {
+    "id": 169,
+    "name": "Claire Thompson",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 1.7,
+    "gp": 28,
+    "total": 47.6
+   },
+   {
+    "id": 42,
+    "name": "Abby Roque",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 1.7,
+    "gp": 29,
+    "total": 49.2
+   },
+   {
+    "id": 181,
+    "name": "Hannah Bilka",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.69,
+    "gp": 14,
+    "total": 23.6
+   },
+   {
+    "id": 210,
+    "name": "Julia Gosling",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.63,
+    "gp": 30,
+    "total": 48.8
+   },
+   {
+    "id": 44,
+    "name": "Ella Shelton",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 1.61,
+    "gp": 30,
+    "total": 48.4
+   },
+   {
+    "id": 15,
+    "name": "Alina Müller",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.61,
+    "gp": 30,
+    "total": 48.2
+   },
+   {
+    "id": 13,
+    "name": "Hilary Knight",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.6,
+    "gp": 22,
+    "total": 35.1
+   },
+   {
+    "id": 78,
+    "name": "Susanna Tapani",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.59,
+    "gp": 30,
+    "total": 47.6
+   },
+   {
+    "id": 61,
+    "name": "Hayley Scamurra",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 1.56,
+    "gp": 30,
+    "total": 46.9
+   },
+   {
+    "id": 280,
+    "name": "Casey O'Brien",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 1.56,
+    "gp": 28,
+    "total": 43.7
+   },
+   {
+    "id": 253,
+    "name": "Nicole Gosling",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 1.49,
+    "gp": 30,
+    "total": 44.7
+   },
+   {
+    "id": 195,
+    "name": "Dominique Petrie",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 1.46,
+    "gp": 10,
+    "total": 14.6
+   },
+   {
+    "id": 203,
+    "name": "Anna Wilgren",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 1.43,
+    "gp": 30,
+    "total": 42.8
+   },
+   {
+    "id": 198,
+    "name": "Jenn Gardiner",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 1.39,
+    "gp": 30,
+    "total": 41.6
+   },
+   {
+    "id": 196,
+    "name": "Cayla Barnes",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 1.38,
+    "gp": 30,
+    "total": 41.4
+   },
+   {
+    "id": 224,
+    "name": "Danielle Serdachny",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.38,
+    "gp": 30,
+    "total": 41.3
+   },
+   {
+    "id": 24,
+    "name": "Lee Stecklein",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 1.38,
+    "gp": 28,
+    "total": 38.5
+   },
+   {
+    "id": 256,
+    "name": "Olivia Mobley",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.36,
+    "gp": 10,
+    "total": 13.6
+   },
+   {
+    "id": 83,
+    "name": "Erin Ambrose",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 1.35,
+    "gp": 21,
+    "total": 28.3
+   },
+   {
+    "id": 236,
+    "name": "Kendall Cooper",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 1.34,
+    "gp": 30,
+    "total": 40.2
+   },
+   {
+    "id": 50,
+    "name": "Ashton Bell",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 1.33,
+    "gp": 30,
+    "total": 40.0
+   },
+   {
+    "id": 62,
+    "name": "Aneta Tejralová",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 1.33,
+    "gp": 23,
+    "total": 30.5
+   },
+   {
+    "id": 229,
+    "name": "Maja Nylén Persson",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 1.33,
+    "gp": 30,
+    "total": 40.0
+   },
+   {
+    "id": 9,
+    "name": "Taylor Girard",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 1.33,
+    "gp": 17,
+    "total": 22.6
+   },
+   {
+    "id": 65,
+    "name": "Jesse Compher",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 1.32,
+    "gp": 30,
+    "total": 39.7
+   },
+   {
+    "id": 242,
+    "name": "Rory Guilday",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 1.3,
+    "gp": 30,
+    "total": 39.1
+   },
+   {
+    "id": 240,
+    "name": "Fanuza Kadirova",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 1.3,
+    "gp": 28,
+    "total": 36.4
+   },
+   {
+    "id": 223,
+    "name": "Ronja Savolainen",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 1.29,
+    "gp": 30,
+    "total": 38.7
+   },
+   {
+    "id": 250,
+    "name": "Hannah Murphy",
+    "pos": "G",
+    "team": "SEA",
+    "fpg": 1.28,
+    "gp": 12,
+    "total": 15.4
+   },
+   {
+    "id": 98,
+    "name": "Maureen Murphy",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 1.26,
+    "gp": 21,
+    "total": 26.4
+   },
+   {
+    "id": 67,
+    "name": "Renata Fast",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 1.26,
+    "gp": 26,
+    "total": 32.8
+   },
+   {
+    "id": 57,
+    "name": "Gabbie Hughes",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 1.25,
+    "gp": 28,
+    "total": 35.0
+   },
+   {
+    "id": 138,
+    "name": "Mikyla Grant-Mentis",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.24,
+    "gp": 25,
+    "total": 30.9
+   },
+   {
+    "id": 87,
+    "name": "Jaime Bourbonnais",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 1.24,
+    "gp": 28,
+    "total": 34.6
+   },
+   {
+    "id": 17,
+    "name": "Theresa Schafzahl",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 1.21,
+    "gp": 30,
+    "total": 36.4
+   },
+   {
+    "id": 149,
+    "name": "Jill Saulnier",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.2,
+    "gp": 25,
+    "total": 30.0
+   },
+   {
+    "id": 241,
+    "name": "Sarah Wozniewicz",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 1.2,
+    "gp": 30,
+    "total": 35.9
+   },
+   {
+    "id": 167,
+    "name": "Sidney Morin",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 1.19,
+    "gp": 30,
+    "total": 35.7
+   },
+   {
+    "id": 73,
+    "name": "Emma Maltais",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 1.19,
+    "gp": 30,
+    "total": 35.8
+   },
+   {
+    "id": 191,
+    "name": "Katy Knoll",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 1.17,
+    "gp": 30,
+    "total": 35.2
+   },
+   {
+    "id": 230,
+    "name": "Allyson Simpson",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 1.16,
+    "gp": 30,
+    "total": 34.7
+   },
+   {
+    "id": 188,
+    "name": "Mae Batherson",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 1.15,
+    "gp": 30,
+    "total": 34.5
+   },
+   {
+    "id": 114,
+    "name": "Abby Boreen",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 1.14,
+    "gp": 30,
+    "total": 34.2
+   },
+   {
+    "id": 52,
+    "name": "Zoe Boyd",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 1.12,
+    "gp": 12,
+    "total": 13.4
+   },
+   {
+    "id": 285,
+    "name": "Maddi Wheeler",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 1.11,
+    "gp": 29,
+    "total": 32.2
+   },
+   {
+    "id": 259,
+    "name": "Abby Newhook",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.11,
+    "gp": 29,
+    "total": 32.3
+   },
+   {
+    "id": 161,
+    "name": "Tereza Vanišová",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 1.1,
+    "gp": 30,
+    "total": 33.1
+   },
+   {
+    "id": 30,
+    "name": "Kristin O'Neill",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 1.1,
+    "gp": 30,
+    "total": 33.0
+   },
+   {
+    "id": 71,
+    "name": "Jocelyne Larocque",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 1.08,
+    "gp": 30,
+    "total": 32.4
+   },
+   {
+    "id": 247,
+    "name": "Abby Hustler",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 1.08,
+    "gp": 30,
+    "total": 32.4
+   },
+   {
+    "id": 209,
+    "name": "Izzy Daniel",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 1.06,
+    "gp": 28,
+    "total": 29.8
+   },
+   {
+    "id": 68,
+    "name": "Kali Flanagan",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 1.04,
+    "gp": 30,
+    "total": 31.1
+   },
+   {
+    "id": 2,
+    "name": "Emily Brown",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 1.03,
+    "gp": 30,
+    "total": 30.9
+   },
+   {
+    "id": 84,
+    "name": "Kati Tabin",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 1.03,
+    "gp": 30,
+    "total": 30.9
+   },
+   {
+    "id": 201,
+    "name": "Lina Ljungblom",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 1.03,
+    "gp": 21,
+    "total": 21.7
+   },
+   {
+    "id": 249,
+    "name": "Anne Cherkowski",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 1.02,
+    "gp": 28,
+    "total": 28.6
+   },
+   {
+    "id": 183,
+    "name": "Shay Maloney",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 1.02,
+    "gp": 30,
+    "total": 30.5
+   },
+   {
+    "id": 97,
+    "name": "Liz Schepers",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.98,
+    "gp": 29,
+    "total": 28.5
+   },
+   {
+    "id": 40,
+    "name": "Paetyn Levis",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.97,
+    "gp": 30,
+    "total": 29.0
+   },
+   {
+    "id": 26,
+    "name": "Claire Dalton",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.97,
+    "gp": 30,
+    "total": 29.1
+   },
+   {
+    "id": 53,
+    "name": "Emily Clark",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.97,
+    "gp": 30,
+    "total": 29.2
+   },
+   {
+    "id": 180,
+    "name": "Sydney Bard",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 0.95,
+    "gp": 30,
+    "total": 28.6
+   },
+   {
+    "id": 5,
+    "name": "Jessica DiGirolamo",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 0.93,
+    "gp": 29,
+    "total": 27.1
+   },
+   {
+    "id": 51,
+    "name": "Amanda Boulier",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 0.93,
+    "gp": 30,
+    "total": 28.0
+   },
+   {
+    "id": 190,
+    "name": "Klára Hymlárová",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.92,
+    "gp": 29,
+    "total": 26.6
+   },
+   {
+    "id": 129,
+    "name": "Mellissa Channell-Watkins",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 0.91,
+    "gp": 30,
+    "total": 27.2
+   },
+   {
+    "id": 208,
+    "name": "Megan Carter",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 0.89,
+    "gp": 30,
+    "total": 26.8
+   },
+   {
+    "id": 4,
+    "name": "Shiann Darkangelo",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.89,
+    "gp": 30,
+    "total": 26.8
+   },
+   {
+    "id": 100,
+    "name": "Natalie Spooner",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.89,
+    "gp": 30,
+    "total": 26.8
+   },
+   {
+    "id": 16,
+    "name": "Jamie Lee Rattray",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.89,
+    "gp": 30,
+    "total": 26.6
+   },
+   {
+    "id": 74,
+    "name": "Allie Munroe",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 0.88,
+    "gp": 19,
+    "total": 16.8
+   },
+   {
+    "id": 283,
+    "name": "Nicole Vallario",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 0.87,
+    "gp": 11,
+    "total": 9.6
+   },
+   {
+    "id": 227,
+    "name": "Gabby Rosenthal",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.85,
+    "gp": 26,
+    "total": 22.1
+   },
+   {
+    "id": 99,
+    "name": "Mariah Keopple",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 0.85,
+    "gp": 29,
+    "total": 24.7
+   },
+   {
+    "id": 47,
+    "name": "Micah Zandee-Hart",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 0.85,
+    "gp": 29,
+    "total": 24.6
+   },
+   {
+    "id": 56,
+    "name": "Savannah Harmon",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 0.85,
+    "gp": 30,
+    "total": 25.6
+   },
+   {
+    "id": 220,
+    "name": "Mannon McMahon",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.85,
+    "gp": 30,
+    "total": 25.4
+   },
+   {
+    "id": 38,
+    "name": "Brooke Hobson",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 0.85,
+    "gp": 23,
+    "total": 19.6
+   },
+   {
+    "id": 60,
+    "name": "Jincy Roese",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 0.85,
+    "gp": 28,
+    "total": 23.9
+   },
+   {
+    "id": 88,
+    "name": "Kateřina Mrázová",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.84,
+    "gp": 30,
+    "total": 25.3
+   },
+   {
+    "id": 49,
+    "name": "Lexie Adzija",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.83,
+    "gp": 30,
+    "total": 25.0
+   },
+   {
+    "id": 286,
+    "name": "Peyton Hemp",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.83,
+    "gp": 30,
+    "total": 24.8
+   },
+   {
+    "id": 18,
+    "name": "Sophie Shirley",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.82,
+    "gp": 22,
+    "total": 18.1
+   },
+   {
+    "id": 272,
+    "name": "Skylar Irving",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.81,
+    "gp": 27,
+    "total": 21.9
+   },
+   {
+    "id": 274,
+    "name": "Natálie Mlýnková",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.81,
+    "gp": 30,
+    "total": 24.3
+   },
+   {
+    "id": 252,
+    "name": "Michelle Karvinen",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.79,
+    "gp": 30,
+    "total": 23.6
+   },
+   {
+    "id": 185,
+    "name": "Daniela Pejšová",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.76,
+    "gp": 27,
+    "total": 20.4
+   },
+   {
+    "id": 315,
+    "name": "Lauren Messier",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.74,
+    "gp": 5,
+    "total": 3.7
+   },
+   {
+    "id": 8,
+    "name": "Loren Gabel",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.74,
+    "gp": 16,
+    "total": 11.9
+   },
+   {
+    "id": 66,
+    "name": "Maggie Connors",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.73,
+    "gp": 30,
+    "total": 21.9
+   },
+   {
+    "id": 101,
+    "name": "Alexa Vasko",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.71,
+    "gp": 30,
+    "total": 21.4
+   },
+   {
+    "id": 243,
+    "name": "Ella Huber",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.69,
+    "gp": 30,
+    "total": 20.6
+   },
+   {
+    "id": 221,
+    "name": "Anna Meixner",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.68,
+    "gp": 30,
+    "total": 20.5
+   },
+   {
+    "id": 199,
+    "name": "Dara Greig",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.67,
+    "gp": 29,
+    "total": 19.5
+   },
+   {
+    "id": 305,
+    "name": "Nina Jobst-Smith",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 0.67,
+    "gp": 20,
+    "total": 13.3
+   },
+   {
+    "id": 115,
+    "name": "Michela Cava",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.66,
+    "gp": 30,
+    "total": 19.8
+   },
+   {
+    "id": 157,
+    "name": "Catherine Dubois",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.66,
+    "gp": 24,
+    "total": 15.8
+   },
+   {
+    "id": 206,
+    "name": "Elle Hartje",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.66,
+    "gp": 29,
+    "total": 19.0
+   },
+   {
+    "id": 294,
+    "name": "Lyndie Lobdell",
+    "pos": "D",
+    "team": "SEA",
+    "fpg": 0.66,
+    "gp": 25,
+    "total": 16.4
+   },
+   {
+    "id": 244,
+    "name": "Emma Gentry",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.66,
+    "gp": 27,
+    "total": 17.7
+   },
+   {
+    "id": 39,
+    "name": "Alexandra Labelle",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.64,
+    "gp": 28,
+    "total": 18.0
+   },
+   {
+    "id": 156,
+    "name": "Gabrielle David",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.64,
+    "gp": 9,
+    "total": 5.8
+   },
+   {
+    "id": 200,
+    "name": "Anna Kjellbin",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 0.63,
+    "gp": 30,
+    "total": 19.0
+   },
+   {
+    "id": 219,
+    "name": "Stephanie Markowski",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 0.61,
+    "gp": 30,
+    "total": 18.2
+   },
+   {
+    "id": 128,
+    "name": "Kaitlin Willoughby",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.6,
+    "gp": 29,
+    "total": 17.4
+   },
+   {
+    "id": 108,
+    "name": "Samantha Isbell",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.6,
+    "gp": 8,
+    "total": 4.8
+   },
+   {
+    "id": 85,
+    "name": "Elaine Chuli",
+    "pos": "G",
+    "team": "TOR",
+    "fpg": 0.6,
+    "gp": 8,
+    "total": 4.8
+   },
+   {
+    "id": 104,
+    "name": "Denisa Křížová",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.59,
+    "gp": 30,
+    "total": 17.7
+   },
+   {
+    "id": 255,
+    "name": "Riley Brengman",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.59,
+    "gp": 28,
+    "total": 16.4
+   },
+   {
+    "id": 35,
+    "name": "Jade Downie-Landry",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.59,
+    "gp": 23,
+    "total": 13.6
+   },
+   {
+    "id": 142,
+    "name": "Natalie Snodgrass",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.57,
+    "gp": 29,
+    "total": 16.6
+   },
+   {
+    "id": 277,
+    "name": "Anna Bargman",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.57,
+    "gp": 29,
+    "total": 16.5
+   },
+   {
+    "id": 182,
+    "name": "Hadley Hartmetz",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.57,
+    "gp": 27,
+    "total": 15.3
+   },
+   {
+    "id": 264,
+    "name": "Brooke Becker",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 0.53,
+    "gp": 27,
+    "total": 14.2
+   },
+   {
+    "id": 271,
+    "name": "Tamara Giaquinto",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 0.53,
+    "gp": 12,
+    "total": 6.4
+   },
+   {
+    "id": 90,
+    "name": "Natalie Buchbinder",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 0.52,
+    "gp": 25,
+    "total": 12.9
+   },
+   {
+    "id": 207,
+    "name": "Lauren Bernard",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 0.48,
+    "gp": 30,
+    "total": 14.4
+   },
+   {
+    "id": 316,
+    "name": "Clara Van Wieren",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.48,
+    "gp": 29,
+    "total": 13.9
+   },
+   {
+    "id": 289,
+    "name": "Kathryn Reilly",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 0.48,
+    "gp": 25,
+    "total": 11.9
+   },
+   {
+    "id": 313,
+    "name": "Sara Hjalmarsson",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.47,
+    "gp": 30,
+    "total": 14.0
+   },
+   {
+    "id": 212,
+    "name": "Laura Kluge",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.46,
+    "gp": 25,
+    "total": 11.4
+   },
+   {
+    "id": 317,
+    "name": "Kiara Zanon",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.45,
+    "gp": 30,
+    "total": 13.4
+   },
+   {
+    "id": 239,
+    "name": "Anna Shokhina",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.45,
+    "gp": 28,
+    "total": 12.6
+   },
+   {
+    "id": 301,
+    "name": "Katie Chan",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.41,
+    "gp": 17,
+    "total": 7.0
+   },
+   {
+    "id": 232,
+    "name": "Rylind MacKinnon",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.41,
+    "gp": 28,
+    "total": 11.4
+   },
+   {
+    "id": 102,
+    "name": "Claire Butorac",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.4,
+    "gp": 30,
+    "total": 12.0
+   },
+   {
+    "id": 1,
+    "name": "Hannah Brandt",
+    "pos": "F",
+    "team": "BOS",
+    "fpg": 0.4,
+    "gp": 30,
+    "total": 12.1
+   },
+   {
+    "id": 118,
+    "name": "Emma Greco",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 0.39,
+    "gp": 30,
+    "total": 11.6
+   },
+   {
+    "id": 194,
+    "name": "Kaitlyn O'Donohoe",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.39,
+    "gp": 9,
+    "total": 3.5
+   },
+   {
+    "id": 273,
+    "name": "Maya Labad",
+    "pos": "F",
+    "team": "MTL",
+    "fpg": 0.38,
+    "gp": 6,
+    "total": 2.3
+   },
+   {
+    "id": 320,
+    "name": "Nadia Mattivi",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 0.38,
+    "gp": 6,
+    "total": 2.3
+   },
+   {
+    "id": 192,
+    "name": "Brooke McQuigge",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.36,
+    "gp": 30,
+    "total": 10.7
+   },
+   {
+    "id": 269,
+    "name": "Vanessa Upson",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.35,
+    "gp": 28,
+    "total": 9.7
+   },
+   {
+    "id": 86,
+    "name": "Emma Woods",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.33,
+    "gp": 30,
+    "total": 9.8
+   },
+   {
+    "id": 293,
+    "name": "Sydney Langseth",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.32,
+    "gp": 16,
+    "total": 5.1
+   },
+   {
+    "id": 248,
+    "name": "Anna Segedi",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.31,
+    "gp": 27,
+    "total": 8.3
+   },
+   {
+    "id": 263,
+    "name": "Peyton Anderson",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.29,
+    "gp": 28,
+    "total": 8.2
+   },
+   {
+    "id": 292,
+    "name": "Jada Habisch",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.29,
+    "gp": 11,
+    "total": 3.2
+   },
+   {
+    "id": 310,
+    "name": "Madison Samoskevich",
+    "pos": "D",
+    "team": "VAN",
+    "fpg": 0.28,
+    "gp": 27,
+    "total": 7.5
+   },
+   {
+    "id": 204,
+    "name": "Emmy Fecteau",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.28,
+    "gp": 28,
+    "total": 7.7
+   },
+   {
+    "id": 306,
+    "name": "Darcie Lappan",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.27,
+    "gp": 12,
+    "total": 3.2
+   },
+   {
+    "id": 91,
+    "name": "Brooke Bryant",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.27,
+    "gp": 23,
+    "total": 6.1
+   },
+   {
+    "id": 147,
+    "name": "Savannah Norcross",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.27,
+    "gp": 23,
+    "total": 6.2
+   },
+   {
+    "id": 217,
+    "name": "Taylor House",
+    "pos": "F",
+    "team": "OTT",
+    "fpg": 0.27,
+    "gp": 29,
+    "total": 7.8
+   },
+   {
+    "id": 132,
+    "name": "Jessica Kondas",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 0.27,
+    "gp": 14,
+    "total": 3.8
+   },
+   {
+    "id": 162,
+    "name": "Madison Bizal",
+    "pos": "D",
+    "team": "MIN",
+    "fpg": 0.26,
+    "gp": 16,
+    "total": 4.1
+   },
+   {
+    "id": 254,
+    "name": "Mia Biotti",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.26,
+    "gp": 13,
+    "total": 3.4
+   },
+   {
+    "id": 251,
+    "name": "Dayle Ross",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 0.24,
+    "gp": 16,
+    "total": 3.8
+   },
+   {
+    "id": 37,
+    "name": "Élizabeth Giguère",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.24,
+    "gp": 13,
+    "total": 3.1
+   },
+   {
+    "id": 237,
+    "name": "Jenna Buglioni",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.23,
+    "gp": 18,
+    "total": 4.1
+   },
+   {
+    "id": 291,
+    "name": "Lily Delianedis",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.23,
+    "gp": 24,
+    "total": 5.5
+   },
+   {
+    "id": 116,
+    "name": "Clair DeGeorge",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.2,
+    "gp": 26,
+    "total": 5.3
+   },
+   {
+    "id": 140,
+    "name": "Malia Schneider",
+    "pos": "F",
+    "team": "VAN",
+    "fpg": 0.2,
+    "gp": 3,
+    "total": 0.6
+   },
+   {
+    "id": 45,
+    "name": "Kayla Vespa",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.18,
+    "gp": 30,
+    "total": 5.3
+   },
+   {
+    "id": 131,
+    "name": "Olivia Knowles",
+    "pos": "D",
+    "team": "NY",
+    "fpg": 0.17,
+    "gp": 3,
+    "total": 0.5
+   },
+   {
+    "id": 54,
+    "name": "Kristin Della Rovere",
+    "pos": "F",
+    "team": "TOR",
+    "fpg": 0.14,
+    "gp": 5,
+    "total": 0.7
+   },
+   {
+    "id": 295,
+    "name": "Marah Wagner",
+    "pos": "F",
+    "team": "SEA",
+    "fpg": 0.12,
+    "gp": 20,
+    "total": 2.5
+   },
+   {
+    "id": 126,
+    "name": "Samantha Cogan",
+    "pos": "F",
+    "team": "MIN",
+    "fpg": 0.12,
+    "gp": 6,
+    "total": 0.7
+   },
+   {
+    "id": 46,
+    "name": "Olivia Zafuto",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.08,
+    "gp": 6,
+    "total": 0.5
+   },
+   {
+    "id": 279,
+    "name": "Kira Juodikis",
+    "pos": "F",
+    "team": "NY",
+    "fpg": 0.07,
+    "gp": 4,
+    "total": 0.3
+   },
+   {
+    "id": 311,
+    "name": "Hanna Baskin",
+    "pos": "D",
+    "team": "TOR",
+    "fpg": 0.05,
+    "gp": 11,
+    "total": 0.5
+   },
+   {
+    "id": 288,
+    "name": "Vita Poniatovskaia",
+    "pos": "D",
+    "team": "OTT",
+    "fpg": 0.04,
+    "gp": 7,
+    "total": 0.3
+   },
+   {
+    "id": 202,
+    "name": "Kelly Ann Nadeau",
+    "pos": "D",
+    "team": "MTL",
+    "fpg": 0.02,
+    "gp": 6,
+    "total": 0.1
+   },
+   {
+    "id": 214,
+    "name": "Noemi Neubauerová",
+    "pos": "D",
+    "team": "BOS",
+    "fpg": 0.0,
+    "gp": 3,
+    "total": 0.0
+   },
+   {
+    "id": 282,
+    "name": "Callie Shanahan",
+    "pos": "G",
+    "team": "NY",
+    "fpg": -0.88,
+    "gp": 4,
+    "total": -3.5
+   }
+  ]
+ },
  "matchups": [
   {
    "id": 1,

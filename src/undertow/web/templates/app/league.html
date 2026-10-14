@@ -3,6 +3,11 @@
 {% block title %}League | Undertow Fantasy{% endblock %}
 {% block content %}
 <div class="wrap view">
+  <a class="draft-cta" href="/preview/draft">
+    <span><strong>Draft room</strong><span class="muted"> Try a practice draft with last season's real stats</span></span>
+    <span class="chev" aria-hidden="true">›</span>
+  </a>
+
   <h2 class="section-h">Week {{ league.week }} matchups {{ help("Tap any matchup to see both teams' starters, bench and current scores.") }}</h2>
   <ul class="games-list">
     {% for m in matchups %}

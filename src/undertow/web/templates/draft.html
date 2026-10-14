@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% from "app/_macros.html" import help %}
+{% block title %}Draft room | Undertow Fantasy{% endblock %}
+{% block head_extra %}
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/draft.css">
+{% endblock %}
+
+{% block header %}
+<header class="dr-top">
+  <a class="dr-exit" href="/preview/league">‹ Exit</a>
+  <div class="dr-title"><strong>League One draft</strong><span class="muted">Practice draft · {{ n_teams }} teams · {{ rounds }} rounds</span></div>
+  <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch between dark and light theme">Light mode</button>
+</header>
+<div class="sample-banner"><div class="wrap">Practice draft. Players and stats are real 2025-26 PWHL numbers; the other teams are made up and drafted by the computer.</div></div>
+{% endblock %}
+
+{% block content %}
+<main class="dr" id="dr" data-state="intro" data-tab="board">
+  <section class="dr-intro card" id="intro">
+    <h1>Welcome to the draft</h1>
+    <p class="lede">A draft is how everyone builds their team, taking turns choosing players. You'll go fourth. The computer drafts for the other nine teams.</p>
+    <ol class="dr-steps">
+      <li><strong>Snake order.</strong> Round 1 goes 1 to 10. Round 2 reverses, 10 back to 1, so the team that picks last also picks first in the next round. {{ help("Fairer than the same order every round. You pick 4th in round 1, then 17th overall, because round 2 runs backwards.") }}</li>
+      <li><strong>Build a balanced team.</strong> You need 4 forwards (one is the flex UTIL spot), 2 defenders and 1 goalie to start, plus 4 on the bench. {{ help("Starters score points for you each week. Bench players score nothing, but they cover injuries and byes.") }}</li>
+      <li><strong>Not sure? Tap Recommended.</strong> We suggest a pick and explain why. Turn on auto-draft and we'll pick for you. {{ help("Auto-draft takes the top player in your queue first. If your queue is empty, it uses our recommendation. It also kicks in if your clock runs out.") }}</li>
+    </ol>
+    <button class="btn" type="button" id="start">Start the practice draft</button>
+    <p class="fine">Rankings use last season's results. Nothing here is saved.</p>
+  </section>
+
+  <div class="dr-live" id="live" hidden>
+    <section class="dr-clock" id="clock" aria-live="polite"></section>
+    <section class="dr-rec" id="rec" hidden></section>
+    <section class="dr-feed" id="feed" aria-label="Latest picks"></section>
+
+    <nav class="dr-tabs" aria-label="Draft sections" id="tabs">
+      <button type="button" data-tab="board" aria-pressed="true">Board</button>
+      <button type="button" data-tab="players" aria-pressed="false">Players</button>
+      <button type="button" data-tab="queue" aria-pressed="false">Queue <span class="count" id="queue-count"></span></button>
+      <button type="button" data-tab="team" aria-pressed="false">My team</button>
+    </nav>
+
+    <div class="dr-grid">
+      <section class="panel" data-panel="board" aria-label="Draft board">
+        <div class="board-note muted">Your column is highlighted. {{ help("Each column is a team and each row is a round. Arrows show the direction: → runs left to right, ← right to left. The glowing cell is the pick on the clock.") }}</div>
+        <div class="board-scroll" id="board-scroll"><table class="board" id="board"></table></div>
+      </section>
+
+      <div class="side">
+        <section class="panel" data-panel="players" aria-label="Available players">
+          <label class="sr" for="q">Search players</label>
+          <input id="q" class="search" type="search" placeholder="Search players" autocomplete="off">
+          <div class="chips" role="group" aria-label="Filter by position">
+            <button class="chip" type="button" data-pos="all" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-pos="F" aria-pressed="false">F</button>
+            <button class="chip" type="button" data-pos="D" aria-pressed="false">D</button>
+            <button class="chip" type="button" data-pos="G" aria-pressed="false">G</button>
+            <span class="grow"></span>
+            <span class="muted sortlbl">Ranked by our rating {{ help("Our rating compares each player with a typical replacement at their position, using last season's points per game. It is a starting point, not a promise.", "right") }}</span>
+          </div>
+          <ul class="dr-list" id="plist"></ul>
+          <p class="muted empty" id="pempty" hidden>No players match.</p>
+        </section>
+
+        <section class="panel" data-panel="queue" aria-label="Your queue">
+          <p class="muted">Star players to line them up here. {{ help("If your time runs out, or auto-draft is on, we pick the first player in this list who is still available.") }}</p>
+          <ol class="dr-queue" id="queue"></ol>
+          <p class="muted empty" id="qempty">Nothing queued yet. Tap the star next to a player.</p>
+        </section>
+
+        <section class="panel" data-panel="team" aria-label="My team">
+          <div id="needs" class="needs"></div>
+          <ul class="slotlist" id="slots"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="sheet-back" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <p class="muted" id="sheet-pos"></p>
+    <h2 id="sheet-title"></h2>
+    <p class="muted" id="sheet-why"></p>
+    <div class="sheet-actions">
+      <button class="mini" type="button" id="sheet-cancel">Cancel</button>
+      <button class="btn" type="button" id="sheet-ok">Confirm pick</button>
+    </div>
+  </div>
+</div>
+
+<script id="draft-data" type="application/json">{{ data | tojson }}</script>
+<script src="/static/draft.js" defer></script>
+<script src="/static/help.js" defer></script>
+{% endblock %}
+
+{% block footer %}
+<footer class="app-foot"><div class="wrap"><p><strong>Unofficial and unaffiliated.</strong> Undertow is an independent fan project, not affiliated with or endorsed by the PWHL or its teams.</p></div></footer>
+{% endblock %}

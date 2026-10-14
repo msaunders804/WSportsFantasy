@@ -21,3 +21,4 @@ FEATURED_PLAYER_ID = _DATA["featured_player"]
 STANDINGS = _DATA["standings"]
 ACTIVITY = _DATA["activity"]
 IR: list = []  # empty on purpose: we do not invent injuries for real players
+DRAFT = _DATA["draft"]  # {order: [{slug, name, owner}], me: index, pool: [player dicts]}
