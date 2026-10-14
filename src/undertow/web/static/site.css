@@ -22,7 +22,10 @@ a { color: var(--primary); }
 .skip:focus { left: var(--gutter); top: var(--space-2); background: var(--surface); padding: var(--space-2); z-index: 10; }
 
 /* Top bar */
-.bar { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) 0; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); padding: var(--space-4) 0; }
+.bar-actions { display: flex; align-items: center; gap: var(--space-3); }
+.nav-link { color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.nav-link:hover { color: var(--primary); }
 .wordmark { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--text); text-decoration: none; }
 .wordmark-mark { flex: none; width: 30px; height: 30px; }
 .wordmark-mark .mark-w2 { fill: var(--accent); opacity: 0.9; }
@@ -70,6 +73,8 @@ section.block { padding: var(--space-6) 0; }
 .steps li { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-5); counter-increment: step; }
 .steps li::before { content: counter(step); display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--on-primary); font-family: var(--font-heading); font-weight: 700; margin-bottom: var(--space-3); }
 .steps p { color: var(--text-muted); margin: 0; }
+.step-date { display: inline-block; background: color-mix(in srgb, var(--primary) 16%, var(--surface)); color: var(--primary); font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin: 0 0 var(--space-2); }
+.step-date.accent { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); color: var(--accent); }
 
 /* App screenshots: a one-at-a-time slideshow. Swipe, or use the arrows/dots below. */
 .shots-frame { max-width: 300px; margin: var(--space-5) auto 0; }
@@ -110,7 +115,34 @@ footer p { margin-bottom: var(--space-2); }
 .page th, .page td { padding: 8px 10px; text-align: left; font-size: 0.92rem; border-bottom: 1px solid var(--border); }
 .page th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .page td.num, .page th.num { text-align: right; }
+.page td.pos { color: var(--positive); font-weight: 700; }
+.page td.neg { color: var(--negative); font-weight: 700; }
 .page .crumb-back { display: block; margin-bottom: var(--space-3); font-size: 0.9rem; }
+
+/* Key-dates callout (Fantasy 101) */
+.callout { background: color-mix(in srgb, var(--primary) 8%, var(--surface)); border: 1px solid var(--primary); border-radius: var(--radius); padding: var(--space-4); margin: var(--space-4) 0; }
+.callout h2 { margin-top: 0; }
+.callout ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
+.callout li { display: flex; align-items: center; gap: var(--space-3); font-size: 0.95rem; }
+.callout .step-date { margin: 0; }
+
+/* Fantasy 101's rule sections: a bigger, colored take on the plain FAQ dropdown */
+.rule { border-left-width: 4px; padding: var(--space-4); margin-bottom: var(--space-4); }
+.rule[data-c="primary"] { border-left-color: var(--primary); }
+.rule[data-c="accent"] { border-left-color: var(--accent); }
+.rule[data-c="positive"] { border-left-color: var(--positive); }
+.rule summary { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; }
+.rule[open] summary { margin-bottom: var(--space-3); }
+.rule p:not(.muted) { color: var(--text); }
+.rule table { margin-top: var(--space-3); }
+
+/* Roster slot badges, color-coded by position */
+.slot-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; }
+.slot-badge[data-pos="F"] { background: color-mix(in srgb, var(--primary) 18%, var(--surface-2)); color: var(--primary); }
+.slot-badge[data-pos="D"] { background: color-mix(in srgb, var(--positive) 18%, var(--surface-2)); color: var(--positive); }
+.slot-badge[data-pos="UTIL"] { background: color-mix(in srgb, var(--accent) 18%, var(--surface-2)); color: var(--accent); }
+.slot-badge[data-pos="G"] { background: color-mix(in srgb, var(--focus) 22%, var(--surface-2)); color: var(--focus); }
+.slot-badge[data-pos="BN"], .slot-badge[data-pos="IR"] { background: var(--surface-2); color: var(--text-muted); }
 
 /* About page: profile photo (or initials) beside the bio */
 .profile { display: flex; gap: var(--space-4); align-items: flex-start; margin-top: var(--space-4); }
