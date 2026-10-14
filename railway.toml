@@ -1,0 +1,11 @@
+# Config for the `web` service. The `worker` service uses the same image with its own
+# start command set in the Railway dashboard: `python -m undertow.worker.main`.
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+# Run migrations before each release; keep this on web only so they never race.
+preDeployCommand = "alembic upgrade head"
+healthcheckPath = "/healthz"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"

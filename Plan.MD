@@ -106,7 +106,7 @@ The PWHL publishes stats through **HockeyTech**, the same platform the AHL uses.
 - `league_member` (league, user, role: owner/commissioner/co-commissioner)
 - `roster_entry` (fantasy_team, player, acquired_via, acquired_at, released_at). Rosters are history, not a mutable list.
 - `lineup_slot` (fantasy_team, date, slot, player). Locked per player at that player's game start.
-- `matchup_week` (league, week_no, start_date, end_date, is_playoff)
+- `matchup_week` (league, week_no, start_date, end_date, is_playoff, round_no for playoffs). A playoff round covers two consecutive `matchup_week` rows and has one `matchup`.
 - `matchup` (league, week, home_team, away_team, home_pts, away_pts, status: scheduled/live/final/finalized, winner)
 - `draft` (league, type: snake, rounds, pick_seconds, status, order JSON)
 - `draft_pick` (draft, overall_no, round, fantasy_team, player, picked_at, is_autopick). Unique constraint on (draft, overall_no) and (draft, player).
@@ -156,15 +156,17 @@ The whole fantasy season, including fantasy playoffs, runs **inside the PWHL reg
 - Fantasy weeks run Monday to Sunday. **Week 1 = Dec 5 to Dec 13** (opening weekend merged into the first full week).
 - The All-Star break week has no games and is **skipped**. Any holiday break with few or no games is merged into an adjacent week.
 - That gives 18 playable weeks:
-  - **Weeks 1 to 15: fantasy regular season**, ending about Mar 28.
-  - **Weeks 16 to 18: fantasy playoffs** (Mar 29 to Apr 18), one week per round.
-- Playoff format for 10 teams: top 6 qualify. Seeds 1 and 2 get a first-round bye. Round 1: 3 vs 6, 4 vs 5. Round 2: semifinals with reseeding. Week 18: championship plus a 3rd-place game.
-- Late-season risk: PWHL teams that have clinched or been eliminated may rest players, especially goalies, in April. Before Week 1, check games per PWHL team in Weeks 16 to 18 and flag any big imbalance. If the commissioner wants a buffer, the setting "playoffs end one week before the PWHL regular season ends" shifts everything one week earlier (14 regular-season weeks).
+  - **Weeks 1 to 12: fantasy regular season**, ending Sun Feb 28. The empty All-Star week (Mar 1-7) is skipped.
+  - **Weeks 13 to 18: fantasy playoffs** (Mar 8 to Apr 18), **three 2-week rounds**: Round 1 = Weeks 13-14 (Mar 8-21), Round 2 = Weeks 15-16 (Mar 22-Apr 4), Round 3 = Weeks 17-18 (Apr 5-18). **Decided Oct 12, 2026**: single-week rounds left some PWHL teams with 0 games in a round (Week 16 has 6 games league-wide). Two-week rounds give every PWHL team 2 to 4 games per round, the most even of every layout tested. See `docs/decisions.md`.
+- A playoff matchup spans both weeks of its round. Lineups, locks and transactions stay daily/per-game as usual, and the matchup total is the sum over the whole round.
+- Playoff format for 10 teams: top 6 qualify. Seeds 1 and 2 get a Round 1 bye. Round 1: 3 vs 6, 4 vs 5. Round 2: semifinals with reseeding. Round 3: championship plus a 3rd-place game.
+- Round boundaries are **config, not code**. A check script re-runs the games-per-team-per-round analysis whenever schedule sync detects a change (postponement, Takeover Tour move) and warns the commissioner if any PWHL team falls below 2 games in a round.
+- Late-season risk: PWHL teams that have clinched or been eliminated may rest players, especially goalies, in April. Round 3 covers the last two weeks, so flag it for the commissioner before Week 1.
 
 ### 4.5 Matchup Generation ("randomized matchup logic")
 1. Shuffle teams using a seeded RNG. Store the seed so the schedule is reproducible and auditable.
 2. Generate a round robin with the circle method. Repeat cycles until all regular-season weeks are filled.
-3. Constraints: no team plays the same opponent in consecutive weeks. Opponent counts differ by at most 1. With 10 teams and 15 weeks, each team plays everyone once (9 weeks) and 6 opponents a second time.
+3. Constraints: no team plays the same opponent in consecutive weeks. Opponent counts differ by at most 1. With 10 teams and 12 regular-season weeks, each team plays everyone once (9 weeks) and 3 opponents a second time. Because that is unequal, schedule strength matters for seeding; consider showing strength of schedule in the UI.
 4. League size must be even. Reject odd sizes at league creation, so no bye or median logic is needed.
 5. Commissioner can regenerate before Week 1 only.
 6. Playoff seeding: record, then total points for, then head-to-head, then a seeded coin flip.
@@ -181,7 +183,7 @@ The whole fantasy season, including fantasy playoffs, runs **inside the PWHL reg
 - Dropped players go on waivers for 48 h (setting).
 - Waiver type: **rolling priority only**. Initial order is the reverse of the draft order. A team that wins a claim moves to the back. Do not build FAAB.
 - Free agents are added instantly unless their game has started.
-- Trades: 24 h review period with **commissioner veto**. No league voting. Trade deadline defaults to the end of Week 13. A commissioner who is also a team owner cannot approve or veto their own trade; the league co-commissioner handles those (one co-commissioner per league).
+- Trades: 24 h review period with **commissioner veto**. No league voting. Trade deadline defaults to the end of Week 11. A commissioner who is also a team owner cannot approve or veto their own trade; the league co-commissioner handles those (one co-commissioner per league).
 - Lineup or roster changes must never put a team over roster limits; validate on the server.
 
 ## 5. UI (Sleeper-style tabs, mobile-first)
