@@ -1,6 +1,6 @@
 # Manual To-Dos (things only you can do)
 
-Updated Oct 12, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions already made are in [docs/decisions.md](docs/decisions.md).
+Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions already made are in [docs/decisions.md](docs/decisions.md).
 
 ## Done
 - Hosting: **Railway** (web, worker, Postgres as separate services). App name: **Undertow Sports**.
@@ -29,8 +29,18 @@ Updated Oct 12, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 13. **Feed risk:** the HockeyTech feed is unofficial and unlicensed for this use. Decide whether you accept that for a small private app, whether to contact the PWHL, and whether you want a manual stat-entry fallback for commissioners if the feed breaks.
 14. **Clean the fixtures (optional):** the recorded fixtures contain the public site key in their `Parameters` block. Say so if you want it scrubbed.
 
+## Before sharing the landing page link (before the first social post)
+- [ ] **Use your own domain.** Railway web service → Settings → Networking → Custom Domain; add the CNAME it gives you at your DNS host; wait for TLS. Then set `BASE_URL` to the new domain and share that link, not the `*.up.railway.app` one.
+- [ ] **Set up domain email forwarding** (for example `hello@yourdomain` into your inbox) at your registrar or with Cloudflare Email Routing. This is receiving mail; sending invite emails later needs an email provider (item 8).
+- [ ] **Update the feed User-Agent to the Undertow address:** on the `worker` service set `HOCKEYTECH_USER_AGENT` to something like `UndertowSports/0.1 (contact: hello@yourdomain)`, then redeploy the worker.
+- [ ] **Set `CONTACT_EMAIL`** on the `web` service to the same address, so the privacy page shows it instead of "message us on social".
+- [ ] **Hide the design previews:** delete (or set to `false`) `PREVIEW_ENABLED` on the `web` service, redeploy, and confirm `/preview/matchup` returns a 404.
+- [ ] Confirm the landing page claims are true (for example "free to join") and the "unofficial and unaffiliated" footer is on every page.
+- [ ] Delete test rows from the `waitlist_signup` table.
+
 ## Launch checklist (Phase 6, Nov 20)
-- [ ] DNS points at Railway and TLS works.
+- [ ] DNS points at Railway and TLS works (see the custom domain item above).
+- [ ] `PREVIEW_ENABLED` is not set on `web` in production.
 - [ ] Production secrets set.
 - [ ] Restore test from off-site backup done.
 - [ ] Invite links sent to managers.
