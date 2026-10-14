@@ -69,7 +69,8 @@
     <h2>A peek at the app</h2>
     <p class="muted">Clear, calm and quick. It only says what you need, when you need it. These are sample screens: the players and stats are real 2025-26 PWHL numbers, and the teams are made up.</p>
   </div>
-  <ul class="shots" aria-label="App screenshots">
+  <div class="shots-frame">
+    <ul class="shots" id="shots" aria-label="App screenshots">
       <li>
         <figure>
           <img src="/static/demo/draft-recommendation.webp?v={{ v }}" alt="Draft room on a phone: it is your turn, with a recommended player, a plain-English reason, and a Draft button." width="390" height="844" loading="lazy">
@@ -106,8 +107,15 @@
           <figcaption><strong>League</strong><span>Standings and every matchup in your league, one tap away.</span></figcaption>
         </figure>
       </li>
-  </ul>
+    </ul>
+  </div>
+  <div class="shots-controls">
+    <button class="shots-nav prev" type="button" aria-label="Previous screenshot">‹</button>
+    <div class="shots-dots" id="shots-dots" role="tablist" aria-label="Choose a screenshot"></div>
+    <button class="shots-nav next" type="button" aria-label="Next screenshot">›</button>
+  </div>
 </section>
+<script src="/static/shots.js?v={{ v }}" defer></script>
 
 <section class="block">
   <div class="wrap page">
