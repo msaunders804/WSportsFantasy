@@ -1,0 +1,9 @@
+{# A small "?" that explains something on hover, focus or tap. Never leave a user guessing. #}
+{% macro help(text, align="") %}
+<span class="help {{ align }}"><button type="button" class="help-btn" aria-label="What does this mean?" aria-expanded="false">?</button><span class="help-tip" role="tooltip">{{ text }}</span></span>
+{% endmacro %}
+
+{# Team picture placeholder: initials now, an uploaded photo once profiles exist. #}
+{% macro avatar(name) %}
+<span class="avatar" aria-hidden="true">{% for w in name.split()[:2] %}{{ w[0] }}{% endfor %}</span>
+{% endmacro %}

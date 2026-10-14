@@ -1,0 +1,53 @@
+{% extends "app/base.html" %}
+{% from "app/_macros.html" import help %}
+{% block title %}{{ player.name }} | Undertow Fantasy{% endblock %}
+{% block content %}
+<div class="wrap view">
+  <p class="crumb"><a href="/preview/team">‹ Back to your team</a></p>
+
+  <header class="pcard">
+    <div class="jersey" aria-hidden="true">{% if player.jersey %}{{ player.jersey }}{% else %}–{% endif %}</div>
+    <div>
+      <h1 class="pname">{{ player.name }}</h1>
+      <p class="muted pmeta">{{ player.pos }} · {{ player.team_name or player.team }}</p>
+      <p class="owner-pill {% if player.mine %}mine{% endif %}">
+        {% if player.mine %}On your team{% elif player.owner %}On {{ player.owner }}{% else %}Available{% endif %}
+      </p>
+    </div>
+  </header>
+  <p class="muted rankline">{{ player.rank }}.{% if player.trend %} <span class="why"><span class="tag hot">Trending</span>{{ player.trend }}</span>{% endif %}</p>
+
+  <h2 class="section-h">Season so far {{ help("Totals through last week, scored with the league's scoring rules. FP is fantasy points. FP/G is fantasy points per game.") }}</h2>
+  <dl class="statgrid">
+    {% for label, value in player.stats %}
+    <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
+    {% endfor %}
+  </dl>
+
+  <h2 class="section-h">Week by week {{ help("How many fantasy points this player scored in each earlier week. Taller bars mean bigger weeks.") }}</h2>
+  {% set top = (player.weekly | map(attribute="fp") | max) if player.weekly else 1 %}
+  <ul class="weeks">
+    {% for w in player.weekly | reverse %}
+    <li>
+      <div class="wk"><strong>Week {{ w.week }}</strong><small class="muted">{{ w.range }}</small></div>
+      <div class="wk-line muted">{{ w.gp }} gm · {{ w.line }}</div>
+      <div class="wbar" aria-hidden="true"><span style="width: {{ ((w.fp / top * 100) if top > 0 and w.fp > 0 else 0)|round|int }}%"></span></div>
+      <div class="wk-fp">{{ "%.1f"|format(w.fp) }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <h2 class="section-h">Recent games</h2>
+  <ul class="log">
+    {% for g in player.log %}
+    <li><span class="muted">{{ g.date }}</span><span>{{ g.opp }}</span><span class="muted logline">{{ g.line }}</span><strong>{{ "%.1f"|format(g.pts) }}</strong></li>
+    {% endfor %}
+  </ul>
+
+  <h2 class="section-h">Headlines</h2>
+  <div class="card soon">
+    <p><strong>Headlines for {{ player.name }} will show up here.</strong></p>
+    <p class="muted">We're building this: news from around the web, plus our own notes on the numbers and the story behind them.</p>
+  </div>
+</div>
+{% endblock %}

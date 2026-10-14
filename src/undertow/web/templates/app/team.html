@@ -1,13 +1,14 @@
 {% extends "app/base.html" %}
+{% from "app/_macros.html" import help %}
 {% block title %}Team | Undertow Fantasy{% endblock %}
 {% macro row(slot, p, locked) %}
 <li class="trow">
   <span class="slot-tag">{{ slot }}</span>
   <div class="tinfo">
-    <span class="pl-name">{{ p.name }}</span>
+    <a class="pl-name" href="/preview/player/{{ p.id }}">{{ p.name }}</a>
     <span class="pl-meta muted">{{ p.pos }} · {{ p.team }}{% if p.next %} · Next {{ p.next }}{% endif %}</span>
   </div>
-  <span class="games" title="Games this week">{{ p.games }} <small>gm</small></span>
+  <span class="games">{{ p.games }}</span>
   {% if locked %}<span class="lock" aria-label="Locked">🔒</span>{% else %}<button class="mini" type="button">Move</button>{% endif %}
 </li>
 {% endmacro %}
@@ -15,23 +16,33 @@
 <div class="wrap view">
   <div class="weekbar">
     <button class="icon-btn" type="button" aria-label="Previous week">‹</button>
-    <div><strong>{{ me.name }}</strong> <span class="muted">· Week {{ league.week }}</span></div>
+    <div><strong>{{ team.name }}</strong> <span class="muted">· Week {{ league.week }}</span></div>
     <button class="icon-btn" type="button" aria-label="Next week">›</button>
   </div>
-  <h2 class="section-h">Lineup</h2>
+
+  <h2 class="section-h">Lineup {{ help("Your starters. Their points count toward this week's matchup. Tap a name to see the player's page.") }}</h2>
+  <div class="thead" aria-hidden="false">
+    <span>Slot</span>
+    <span>Player</span>
+    <span class="games-h">Games {{ help("Games this week: how many games this player's team plays from Monday to Sunday. More games means more chances to score. Zero means they sit this week out.", "right") }}</span>
+    <span></span>
+  </div>
   <ul class="tlist">
     {% for slot, p in lineup %}{{ row(slot, p, p.status == "final") }}{% endfor %}
   </ul>
-  <h2 class="section-h">Bench</h2>
+
+  <h2 class="section-h">Bench {{ help("Bench players score nothing for you. Swap one into the lineup before their game starts if they are hot.") }}</h2>
   <ul class="tlist">
     {% for p in bench %}{{ row("BN", p, false) }}{% endfor %}
   </ul>
-  <h2 class="section-h">Injured reserve</h2>
+
+  <h2 class="section-h">Injured reserve {{ help("A spot for hurt players, so they do not use up a roster spot while they recover.") }}</h2>
   <ul class="tlist">
     {% for p in ir %}{{ row("IR", p, false) }}{% else %}
     <li class="trow empty-slot"><span class="slot-tag">IR</span><span class="muted">Empty</span></li>
     {% endfor %}
   </ul>
-  <p class="legend muted">🔒 locked once a player has no games left this week.</p>
+
+  <p class="legend muted">🔒 Locked {{ help("Once a player has no games left this week, their spot is locked. You can still move players who have a game coming up.") }}</p>
 </div>
 {% endblock %}

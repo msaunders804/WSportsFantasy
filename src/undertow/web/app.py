@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib.parse import parse_qs
 
-from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -87,43 +87,64 @@ def create_app() -> FastAPI:
 
     if settings.preview_enabled or not settings.is_prod:
         # Design mockups on sample data (see preview_data.py). Replaced by real pages later.
-        def preview(request: Request, tab: str, **extra) -> Response:
+        def preview(request: Request, template: str, tab: str, **extra) -> Response:
             context = {"league": sample.LEAGUE, "active": tab, "app_name": settings.app_name}
-            return templates.TemplateResponse(request, f"app/{tab}.html", context | extra)
+            return templates.TemplateResponse(request, f"app/{template}.html", context | extra)
+
+        def matchup_page(request: Request, n: int) -> Response:
+            if not 1 <= n <= len(sample.MATCHUPS):
+                raise HTTPException(status_code=404)
+            m = sample.MATCHUPS[n - 1]
+            a, b = sample.TEAMS[m["a"]], sample.TEAMS[m["b"]]
+            mine = sample.MY_SLUG in (m["a"], m["b"])
+            return preview(request, "matchup", "matchup", a=a, b=b, n=n, mine=mine)
 
         @app.get("/preview/matchup", response_class=HTMLResponse)
         def preview_matchup(request: Request) -> Response:
-            return preview(
-                request,
-                "matchup",
-                me=sample.MY_TEAM,
-                opp=sample.OPP_TEAM,
-                me_lineup=sample.MY_LINEUP,
-                opp_lineup=sample.OPP_LINEUP,
-            )
+            return matchup_page(request, 1)
+
+        @app.get("/preview/matchup/{n}", response_class=HTMLResponse)
+        def preview_matchup_n(request: Request, n: int) -> Response:
+            return matchup_page(request, n)
 
         @app.get("/preview/team", response_class=HTMLResponse)
         def preview_team(request: Request) -> Response:
+            team = sample.TEAMS[sample.MY_SLUG]
             return preview(
                 request,
                 "team",
-                me=sample.MY_TEAM,
-                lineup=sample.MY_LINEUP,
-                bench=sample.BENCH,
+                "team",
+                team=team,
+                lineup=team["lineup"],
+                bench=team["bench"],
                 ir=sample.IR,
             )
 
         @app.get("/preview/players", response_class=HTMLResponse)
         def preview_players(request: Request) -> Response:
-            return preview(request, "players", players=sample.PLAYERS)
+            # Trending first: that is the default sort the page opens with.
+            rows = sorted(sample.PLAYERS, key=lambda r: -r[7])
+            return preview(request, "players", "players", players=rows)
+
+        @app.get("/preview/player/{pid}", response_class=HTMLResponse)
+        def preview_player(request: Request, pid: int) -> Response:
+            page = sample.PLAYER_PAGES.get(str(pid))
+            if page is None:
+                raise HTTPException(status_code=404)
+            return preview(request, "player", "team", player=page)
 
         @app.get("/preview/league", response_class=HTMLResponse)
         def preview_league(request: Request) -> Response:
+            rows = [
+                {"n": m["id"], "a": sample.TEAMS[m["a"]], "b": sample.TEAMS[m["b"]]}
+                for m in sample.MATCHUPS
+            ]
             return preview(
                 request,
                 "league",
+                "league",
                 standings=sample.STANDINGS,
-                schedule=sample.SCHEDULE,
+                matchups=rows,
                 activity=sample.ACTIVITY,
             )
 
