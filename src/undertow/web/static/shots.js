@@ -17,7 +17,6 @@
     var b = document.createElement("button");
     b.type = "button";
     b.className = "dot";
-    b.setAttribute("role", "tab");
     b.setAttribute("aria-label", "Screenshot " + (i + 1) + " of " + slides.length);
     b.addEventListener("click", function () { go(i); });
     dotsWrap.appendChild(b);

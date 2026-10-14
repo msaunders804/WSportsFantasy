@@ -33,12 +33,14 @@
   --bg: #f5f9fd;
   --surface: #ffffff;
   --surface-2: #eaf2fb;
-  --border: #c9d9ea;
+  /* Darkened from #c9d9ea (~1.4:1 on white) to meet 3:1 for interactive-component boundaries (WCAG 1.4.11). */
+  --border: #7489a6;
   --text: #0a1628;
   --text-muted: #4a6078;
   --primary: #1769d1;
   --on-primary: #ffffff;
-  --accent: #e85a38;
+  /* Darkened from #e85a38: white button text on the un-darkened value was 3.5:1, below the 4.5:1 normal-text minimum. */
+  --accent: #c54d30;
   --positive: #0f8f6b;
   --negative: #c93a4b;
   --focus: #b45309;

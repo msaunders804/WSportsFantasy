@@ -10,7 +10,13 @@
   <meta property="og:description" content="Friendly PWHL fantasy leagues for the 2026-27 season. New to fantasy? You're who we built this for.">
   <meta property="og:type" content="website">
   <script>
-    try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+    try {
+      var t = localStorage.getItem("theme");
+      if (t !== "light" && t !== "dark") {
+        t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+      }
+      document.documentElement.dataset.theme = t;
+    } catch (e) {}
   </script>
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ v }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +44,7 @@
   <footer>
     <div class="wrap">
       <p><strong>Unofficial and unaffiliated.</strong> Undertow Sports is an independent fan project. It is not affiliated with, endorsed by, or sponsored by the PWHL or any of its teams. Team names and logos belong to their owners.</p>
-      <p>Built by women for women's sports. <a href="/privacy">Privacy</a> · <a href="mailto:dev@undertowsports.com">Contact us</a></p>
+      <p>Built by women for women's sports. <a href="/about">Who we are</a> · <a href="/fantasy-101">Fantasy 101</a> · <a href="/privacy">Privacy</a> · <a href="mailto:dev@undertowsports.com">Contact us</a></p>
     </div>
   </footer>
   {% endblock %}
