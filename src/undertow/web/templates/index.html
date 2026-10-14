@@ -64,20 +64,49 @@
   </div>
 </section>
 
-<section class="block">
-  <div class="wrap showcase">
-    <div>
-      <h2>Clear, calm and quick.</h2>
-      <p class="muted">The app only says what you need, when you need it. No wall of text, no guessing what to tap next.</p>
-      <p class="muted">The screen on the right is a sample of the draft room while we build it. The final design will change.</p>
-    </div>
-    <div class="phone" role="img" aria-label="Sample draft room screen showing a pick confirmation">
-      <span class="tag">Sample screen</span>
-      <div class="clock"><span>Round 3 · Pick 4</span><span>0:42</span></div>
-      <div class="pick"><span class="muted">You're picking</span><strong>Player Name</strong><span class="muted">F · Team</span></div>
-      <span class="btn" aria-hidden="true">Confirm pick</span>
-    </div>
+<section class="block" id="peek">
+  <div class="wrap">
+    <h2>A peek at the app</h2>
+    <p class="muted">Clear, calm and quick. It only says what you need, when you need it. These are sample screens: the players and stats are real 2025-26 PWHL numbers, and the teams are made up.</p>
   </div>
+  <ul class="shots" aria-label="App screenshots">
+      <li>
+        <figure>
+          <img src="/static/demo/draft-recommendation.webp?v={{ v }}" alt="Draft room on a phone: it is your turn, with a recommended player, a plain-English reason, and a Draft button." width="390" height="844" loading="lazy">
+          <figcaption><strong>Draft room</strong><span>Not sure who to pick? We recommend a player and tell you why.</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <img src="/static/demo/draft-board.webp?v={{ v }}" alt="Draft board showing each team as a column, picks colour-coded by position, and your column highlighted." width="390" height="844" loading="lazy">
+          <figcaption><strong>Draft board</strong><span>A snake board with your column highlighted, so you always know where you are.</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <img src="/static/demo/matchup.webp?v={{ v }}" alt="Matchup screen with two team scores and starters for each team, slot by slot." width="390" height="844" loading="lazy">
+          <figcaption><strong>Matchup</strong><span>Both lineups side by side, with the bench underneath so you can see what you left out.</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <img src="/static/demo/team.webp?v={{ v }}" alt="Team screen with the lineup and an open help tip explaining the games column." width="390" height="844" loading="lazy">
+          <figcaption><strong>Your team</strong><span>Tap any question mark to see what a term means. You'll never be left guessing.</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <img src="/static/demo/players.webp?v={{ v }}" alt="Players screen sorted by trending, with Hot tags and the reason for each player." width="390" height="844" loading="lazy">
+          <figcaption><strong>Players</strong><span>See who's hot right now, from scoring streaks to goalies fresh off a shutout.</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <img src="/static/demo/league.webp?v={{ v }}" alt="League screen with this week's matchups and the standings." width="390" height="844" loading="lazy">
+          <figcaption><strong>League</strong><span>Standings and every matchup in your league, one tap away.</span></figcaption>
+        </figure>
+      </li>
+  </ul>
 </section>
 
 <section class="block">
