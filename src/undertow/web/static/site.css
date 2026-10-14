@@ -103,6 +103,11 @@ footer p { margin-bottom: var(--space-2); }
 /* Simple text pages */
 .page { padding: var(--space-5) 0 var(--space-6); max-width: 40rem; }
 .page ul { padding-left: 1.2em; }
+.page table { width: 100%; border-collapse: collapse; margin: var(--space-3) 0 var(--space-4); }
+.page th, .page td { padding: 8px 10px; text-align: left; font-size: 0.92rem; border-bottom: 1px solid var(--border); }
+.page th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.page td.num, .page th.num { text-align: right; }
+.page .crumb-back { display: inline-block; margin-bottom: var(--space-3); font-size: 0.9rem; }
 
 @media (min-width: 800px) {
   .hero .wrap { grid-template-columns: 1.15fr 1fr; align-items: center; }
