@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head_extra %}
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/app.css?v={{ v }}">
 {% endblock %}
 
 {% macro icon(name) %}
@@ -32,6 +32,6 @@
 {% endblock %}
 
 {% block footer %}
-<script src="/static/help.js" defer></script>
+<script src="/static/help.js?v={{ v }}" defer></script>
 <footer class="app-foot"><div class="wrap"><p><strong>Unofficial and unaffiliated.</strong> Undertow is an independent fan project, not affiliated with or endorsed by the PWHL or its teams.</p></div></footer>
 {% endblock %}

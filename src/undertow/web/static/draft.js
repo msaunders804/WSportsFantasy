@@ -58,7 +58,7 @@
     if (s.on_clock === ME) {
       st.busy = false;
       startTimer();
-      if (st.auto) { await sleep(700); if (run === st.run && st.s === s) autoPick(""); }
+      if (st.auto) { await sleep(700); if (run === st.run && st.s === s && st.auto) autoPick(""); }
       return;
     }
     stopTimer();

@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -18,6 +19,21 @@ from undertow.web.ratelimit import RateLimiter
 
 WEB_DIR = Path(__file__).parent
 templates = Jinja2Templates(directory=WEB_DIR / "templates")
+
+
+def static_version() -> str:
+    """Short hash of every static file, appended to asset URLs (`?v=`) so a changed file is
+    always fetched fresh and never served from a browser's stale cache after a deploy."""
+    h = hashlib.sha256()
+    static = WEB_DIR / "static"
+    for path in sorted(static.rglob("*")):
+        if path.is_file():
+            h.update(path.relative_to(static).as_posix().encode())
+            h.update(path.read_bytes())
+    return h.hexdigest()[:10]
+
+
+templates.env.globals["v"] = static_version()
 
 MAX_FORM_BYTES = 8192
 UTM_FIELDS = ("utm_source", "utm_medium", "utm_campaign")

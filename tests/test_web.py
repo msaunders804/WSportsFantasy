@@ -33,8 +33,8 @@ def test_asset_links_are_relative_so_https_proxies_cannot_break_them():
     resp = TestClient(app, base_url="http://x.up.railway.app").get(
         "/", headers={"x-forwarded-proto": "https"}
     )
-    assert 'href="/static/tokens.css"' in resp.text
-    assert 'href="/static/site.css"' in resp.text
+    assert 'href="/static/tokens.css?v=' in resp.text
+    assert 'href="/static/site.css?v=' in resp.text
     assert "http://x.up.railway.app" not in resp.text
 
 
@@ -178,3 +178,33 @@ def test_league_has_no_invite_and_links_every_matchup():
     assert "Invite" not in resp.text and "invite" not in resp.text
     for n in range(1, 6):
         assert f'href="/preview/matchup/{n}"' in resp.text
+
+
+def test_landing_shows_app_screenshots_and_every_image_exists():
+    import re
+
+    client = TestClient(app)
+    html = client.get("/").text
+    assert "A peek at the app" in html
+    images = re.findall(r'src="(/static/demo/[^"]+)"', html)
+    assert len(images) >= 5
+    for src in images:
+        resp = client.get(src)
+        assert resp.status_code == 200 and resp.headers["content-type"] == "image/webp", src
+    # Every screenshot has real alt text, and the sample-data note is on the page.
+    assert all(alt.strip() for alt in re.findall(r'<img [^>]*alt="([^"]*)"', html))
+    assert "made up" in html
+
+
+def test_static_asset_urls_carry_a_content_version():
+    import re
+
+    client = TestClient(app)
+    versions = set()
+    for path in ("/", "/preview/matchup", "/preview/draft", "/privacy"):
+        html = client.get(path).text
+        links = re.findall(r'(?:href|src)="(/static/[^"]+)"', html)
+        assert links and all("?v=" in link for link in links), path
+        versions |= {link.split("?v=")[1] for link in links}
+    assert len(versions) == 1  # one version for the whole deploy
+    assert client.get("/static/site.css?v=anything").status_code == 200

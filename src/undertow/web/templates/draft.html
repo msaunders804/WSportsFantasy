@@ -3,8 +3,8 @@
 {% block title %}Draft room | Undertow Fantasy{% endblock %}
 {% block head_extra %}
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="/static/app.css">
-  <link rel="stylesheet" href="/static/draft.css">
+  <link rel="stylesheet" href="/static/app.css?v={{ v }}">
+  <link rel="stylesheet" href="/static/draft.css?v={{ v }}">
 {% endblock %}
 
 {% block header %}
@@ -92,8 +92,8 @@
 </div>
 
 <script id="draft-data" type="application/json">{{ data | tojson }}</script>
-<script src="/static/draft.js" defer></script>
-<script src="/static/help.js" defer></script>
+<script src="/static/draft.js?v={{ v }}" defer></script>
+<script src="/static/help.js?v={{ v }}" defer></script>
 {% endblock %}
 
 {% block footer %}
