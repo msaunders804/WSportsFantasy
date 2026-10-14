@@ -22,3 +22,11 @@ Searched every layout of 3 playoff rounds of 1 to 3 weeks each, ending Apr 18 or
 - Alternative if you want a longer regular season: 14 weeks with rounds of 2, 1, 1 weeks (Mar 22 start). Same worst-round spread but Week 17-18 rounds have a team with only 1 game.
 
 The schedule can still change (postponements), so playoff round boundaries must be config, and a check script should re-run this analysis whenever the schedule sync detects changes.
+
+## 2026-10-12: Phase 1 tooling choices
+- Package management with `uv` (lockfile committed, Python pinned to 3.12 via `.python-version` to match the Docker image).
+- Single Docker image for both services. `web` is the default command; `worker` overrides the start command to `python -m undertow.worker.main`. Migrations run as Railway's `preDeployCommand` on `web` only, so they cannot race.
+- Worker takes a Postgres session-level advisory lock before starting APScheduler, so an accidental second worker instance idles instead of duplicating jobs.
+- Local dev Postgres is published on host port 5433 because 5432 is already used on the shared dev box.
+- Baseline Alembic revision is empty on purpose; tables arrive with Phase 2 once the schema is checked against the fixtures.
+- Tailwind and Alpine are deferred until the first real page (Phase 3). Pages are unstyled for now.
