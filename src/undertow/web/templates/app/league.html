@@ -20,7 +20,7 @@
 
   <h2 class="section-h">Week {{ league.week }} matchups</h2>
   <ul class="games-list">
-    {% for a, sa, b, sb, st in schedule %}
+    {% for a, sa, b, sb in schedule %}
     <li><span class="g-team {% if sa > sb %}lead{% endif %}">{{ a }}</span><span class="g-score">{{ "%.1f"|format(sa) }}</span><span class="muted">vs</span><span class="g-score">{{ "%.1f"|format(sb) }}</span><span class="g-team right {% if sb > sa %}lead{% endif %}">{{ b }}</span></li>
     {% endfor %}
   </ul>
