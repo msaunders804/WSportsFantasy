@@ -107,3 +107,7 @@ The schedule can still change (postponements), so playoff round boundaries must 
 
 ## 2026-10-15: Signup supports requesting a friend's league placement
 - The landing signup form has an optional "Signing up with a friend? Their email" field (`commissioner_note`, free text up to 300 chars, migration 0006). It is stored as-is and read manually when placing people into the two leagues this season; there is no automated matching yet, since leagues are hand-assembled by Undertow for 2026-27 (see the League tab entry above). FAQ entry added explaining it.
+
+## 2026-10-15: A bolder, two-tone brand mark
+- Compared against a competitor (pdubfantasy.com): calm and uncluttered is right for the in-app screens, but the brand itself read as safe/generic next to their loud purple hero and distinctive logotype. Decision: spend personality on a few deliberate moments (logo, hero, primary CTA) rather than spreading it everywhere, keeping the flat-list app screens as they are.
+- The wordmark now carries a small two-tone wave mark (blue wave, orange crest behind it, using `--primary`/`--accent`) in the header on every page and in `favicon.svg` — the smallest instance of the logo now shows the same wave. Landing hero gained a third wave layer in orange behind the existing two blue ones, with all three layers bumped in opacity. The primary button (`.btn`, used for every main CTA including the draft room's) is now a blue-to-orange gradient instead of flat blue.
