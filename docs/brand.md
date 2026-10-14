@@ -28,6 +28,7 @@ Bro-ish, focused on men's sports, a gatekeeper, spammy, fake, or exaggerated. No
 - **Voice (fixed):** friendly, human, clear. Not robotic. Plain words, no jargon without a quick explanation. Transparent about what we know and don't know.
 - **Tone (varies):** celebratory when things go well, kind and straightforward when they don't, never mocking.
 - **Product UI:** say only what's needed. Extra text appears only when it helps.
+- **Explain as we go:** never leave a user guessing. Anything that is not obvious (a column like "Games", a slot like UTIL, a sort like Trending) gets a small "?" tip on hover, focus or tap, written in plain words.
 - Sample lines (to be refined):
   - Draft pick confirm: "Round 3, Pick 4: Select **Player Name** (F). Confirm?"
   - Pick made: "Locked in. **Player Name** is yours."

@@ -28,9 +28,28 @@
       {% endfor %}
     </div>
 </nav>
-<div class="sample-banner"><div class="wrap">Sample data for design preview. Player names and numbers are made up.</div></div>
+<div class="sample-banner"><div class="wrap">Sample data for design preview. Players and stats are real 2025-26 PWHL numbers; the teams, managers and standings are made up.</div></div>
 {% endblock %}
 
 {% block footer %}
+<script>
+  (function () {
+    function closeAll(except) {
+      document.querySelectorAll(".help.open").forEach(function (h) {
+        if (h !== except) { h.classList.remove("open"); h.querySelector(".help-btn").setAttribute("aria-expanded", "false"); }
+      });
+    }
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest(".help-btn");
+      if (!btn) { closeAll(null); return; }
+      e.preventDefault(); e.stopPropagation();
+      var h = btn.parentElement, open = !h.classList.contains("open");
+      closeAll(h);
+      h.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(null); });
+  })();
+</script>
 <footer class="app-foot"><div class="wrap"><p><strong>Unofficial and unaffiliated.</strong> Undertow is an independent fan project, not affiliated with or endorsed by the PWHL or its teams.</p></div></footer>
 {% endblock %}

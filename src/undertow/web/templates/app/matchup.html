@@ -1,44 +1,64 @@
 {% extends "app/base.html" %}
+{% from "app/_macros.html" import help, avatar %}
 {% block title %}Matchup | Undertow Fantasy{% endblock %}
+{% macro pcard(p, cls="") %}
+<div class="pl {{ cls }} st-{{ p.status }}">
+  <a class="pl-name" href="/preview/player/{{ p.id }}">{{ p.name }}</a>
+  <span class="pl-meta muted">{{ p.pos }} · {{ p.team }}</span>
+  <span class="pl-line muted">{{ p.line }}</span>
+  {% if p.flag %}<span class="flag">{{ p.flag }}</span>{% endif %}
+  <span class="pl-pts">{% if p.pts is not none %}{{ "%.1f"|format(p.pts) }}{% else %}–{% endif %}</span>
+</div>
+{% endmacro %}
 {% block content %}
 <div class="wrap view">
   <div class="weekbar">
-    <button class="icon-btn" type="button" aria-label="Previous week">‹</button>
-    <div><strong>Week {{ league.week }}</strong> <span class="muted">· {{ league.range }}</span></div>
-    <button class="icon-btn" type="button" aria-label="Next week">›</button>
+    {% if mine %}<button class="icon-btn" type="button" aria-label="Previous week">‹</button>
+    {% else %}<a class="icon-btn" href="/preview/league" aria-label="Back to the league">‹</a>{% endif %}
+    <div><strong>Week {{ league.week }}</strong> <span class="muted">· {{ league.range }}{% if not mine %} · League matchup{% endif %}</span></div>
+    {% if mine %}<button class="icon-btn" type="button" aria-label="Next week">›</button>{% else %}<span class="icon-btn ghost" aria-hidden="true"></span>{% endif %}
   </div>
 
   <section class="scoreboard" aria-label="Score">
     <div class="side">
-      <span class="tname">{{ me.name }}</span>
-      <span class="owner muted">{{ me.owner }} · {{ me.record }}</span>
-      <span class="big lead">{{ "%.1f"|format(me.score) }}</span>
+      {{ avatar(a.name) }}
+      <span class="tname">{{ a.name }}</span>
+      <span class="owner muted">{{ "You" if mine else a.owner }} · {{ a.record }}</span>
+      <span class="big{% if a.score > b.score %} lead{% endif %}">{{ "%.1f"|format(a.score) }}</span>
     </div>
-    <div class="vs"><span class="live-dot"></span>Live</div>
+    <div class="vs">vs</div>
     <div class="side right">
-      <span class="tname">{{ opp.name }}</span>
-      <span class="owner muted">{{ opp.owner }} · {{ opp.record }}</span>
-      <span class="big">{{ "%.1f"|format(opp.score) }}</span>
+      {{ avatar(b.name) }}
+      <span class="tname">{{ b.name }}</span>
+      <span class="owner muted">{{ b.owner }} · {{ b.record }}</span>
+      <span class="big{% if b.score > a.score %} lead{% endif %}">{{ "%.1f"|format(b.score) }}</span>
     </div>
   </section>
 
-  <section class="slots" aria-label="Lineups">
-    {% for i in range(me_lineup|length) %}
-      {% set slot, mine = me_lineup[i] %}
-      {% set _, theirs = opp_lineup[i] %}
+  <h2 class="section-h">Starters {{ help("These players' points count toward the score above. UTIL is a flex spot: any forward can fill it.") }}</h2>
+  <section class="slots" aria-label="Starters">
+    {% for i in range(a.lineup|length) %}
+      {% set slot, left = a.lineup[i] %}
+      {% set _, right = b.lineup[i] %}
       <div class="slot-row">
-        {% for p, cls in [(mine, ""), (theirs, "right")] %}
-        {% if loop.last %}<span class="slot-tag">{{ slot }}</span>{% endif %}
-        <div class="pl {{ cls }} st-{{ p.status }}">
-          <span class="pl-name">{{ p.name }}</span>
-          <span class="pl-meta muted">{{ p.pos }} · {{ p.team }}</span>
-          <span class="pl-line muted">{{ p.line }}</span>
-          <span class="pl-pts">{% if p.pts is not none %}{{ "%.1f"|format(p.pts) }}{% else %}–{% endif %}</span>
-        </div>
-        {% endfor %}
+        {{ pcard(left) }}
+        <span class="slot-tag">{{ slot }}</span>
+        {{ pcard(right, "right") }}
       </div>
     {% endfor %}
   </section>
-  <p class="legend muted"><span class="chip-dot final"></span>Final <span class="chip-dot live"></span>Live <span class="chip-dot yet"></span>Yet to play</p>
+
+  <h2 class="section-h">Bench {{ help("Bench players do not count toward the score. We show their points anyway, so you can see what you left out.") }}</h2>
+  <section class="slots bench" aria-label="Bench">
+    {% for i in range(a.bench|length) %}
+      <div class="slot-row">
+        {{ pcard(a.bench[i]) }}
+        <span class="slot-tag">BN</span>
+        {{ pcard(b.bench[i], "right") }}
+      </div>
+    {% endfor %}
+  </section>
+  <p class="bench-sum"><strong>{{ "%.1f"|format(a.bench_score) }}</strong><span>Points left on the bench</span><strong>{{ "%.1f"|format(b.bench_score) }}</strong></p>
+  <p class="legend muted"><span class="chip-dot final"></span>Done for the week {{ help("All of this player's games this week are finished.") }} <span class="chip-dot yet"></span>Games to come</p>
 </div>
 {% endblock %}

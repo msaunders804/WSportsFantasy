@@ -1,4 +1,5 @@
 {% extends "app/base.html" %}
+{% from "app/_macros.html" import help %}
 {% block title %}Players | Undertow Fantasy{% endblock %}
 {% block content %}
 <div class="wrap view">
@@ -9,15 +10,20 @@
     <button class="chip" type="button" data-pos="{{ key }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ label }}</button>
     {% endfor %}
     <button class="chip" type="button" id="avail" aria-pressed="false">Available</button>
-    <span class="grow"></span>
-    <span class="muted sortlbl">Sort: FP/game</span>
+  </div>
+  <div class="sortbar" role="group" aria-label="Sort players">
+    <span class="muted sortlbl">Sort</span>
+    <span class="chip-wrap"><button class="chip small" type="button" data-sort="trend" aria-pressed="true">Trending</button>{{ help("Players on a roll right now: scoring more than usual lately, or goalies fresh off a shutout. Based on their last 3 games compared with their season average.") }}</span>
+    <span class="chip-wrap"><button class="chip small" type="button" data-sort="fpg" aria-pressed="false">FP/game</button>{{ help("Fantasy points per game: the points a player has averaged each game this season.") }}</span>
+    <button class="chip small" type="button" data-sort="fp" aria-pressed="false">Season</button>
   </div>
   <ul class="plist" id="plist">
-    {% for name, pos, team, fpg, fp, owned, avail in players %}
-    <li class="prow" data-pos="{{ pos }}" data-avail="{{ 1 if avail else 0 }}" data-name="{{ name|lower }}">
+    {% for name, pos, team, fpg, fp, gp, avail, trend, why, pid in players %}
+    <li class="prow" data-pos="{{ pos }}" data-avail="{{ 1 if avail else 0 }}" data-name="{{ name|lower }}" data-trend="{{ trend }}" data-fpg="{{ fpg }}" data-fp="{{ fp }}">
       <div class="tinfo">
-        <span class="pl-name">{{ name }}</span>
-        <span class="pl-meta muted">{{ pos }} · {{ team }} · {{ owned }}% owned</span>
+        <a class="pl-name" href="/preview/player/{{ pid }}">{{ name }}</a>
+        <span class="pl-meta muted">{{ pos }} · {{ team }} · {{ gp }} GP</span>
+        {% if why %}<span class="why">{% if trend >= 1 %}<span class="tag hot">Hot</span>{% endif %}{{ why }}</span>{% endif %}
       </div>
       <div class="fp"><strong>{{ "%.1f"|format(fpg) }}</strong><small class="muted">FP/G</small></div>
       <div class="fp"><strong>{{ "%.1f"|format(fp) }}</strong><small class="muted">Season</small></div>
@@ -29,13 +35,17 @@
 </div>
 <script>
   (function () {
-    var rows = Array.prototype.slice.call(document.querySelectorAll(".prow"));
-    var chips = Array.prototype.slice.call(document.querySelectorAll("[data-pos]")).filter(function (c) { return c.tagName === "BUTTON"; });
+    var list = document.getElementById("plist");
+    var rows = Array.prototype.slice.call(list.querySelectorAll(".prow"));
+    var posChips = Array.prototype.slice.call(document.querySelectorAll("[data-pos]")).filter(function (c) { return c.tagName === "BUTTON"; });
+    var sortChips = Array.prototype.slice.call(document.querySelectorAll("[data-sort]"));
     var avail = document.getElementById("avail"), q = document.getElementById("q"), empty = document.getElementById("empty");
-    var pos = "all";
+    var pos = "all", sort = "trend";
     function apply() {
       var text = q.value.trim().toLowerCase(), shown = 0;
+      rows.sort(function (a, b) { return parseFloat(b.dataset[sort]) - parseFloat(a.dataset[sort]); });
       rows.forEach(function (r) {
+        list.appendChild(r);
         var ok = (pos === "all" || r.dataset.pos === pos) &&
           (avail.getAttribute("aria-pressed") !== "true" || r.dataset.avail === "1") &&
           (!text || r.dataset.name.indexOf(text) !== -1);
@@ -43,10 +53,17 @@
       });
       empty.hidden = shown !== 0;
     }
-    chips.forEach(function (c) {
+    posChips.forEach(function (c) {
       c.addEventListener("click", function () {
         pos = c.dataset.pos;
-        chips.forEach(function (o) { o.setAttribute("aria-pressed", o === c ? "true" : "false"); });
+        posChips.forEach(function (o) { o.setAttribute("aria-pressed", o === c ? "true" : "false"); });
+        apply();
+      });
+    });
+    sortChips.forEach(function (c) {
+      c.addEventListener("click", function (e) {
+        sort = c.dataset.sort;
+        sortChips.forEach(function (o) { o.setAttribute("aria-pressed", o === c ? "true" : "false"); });
         apply();
       });
     });
