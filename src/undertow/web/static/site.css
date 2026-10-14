@@ -66,17 +66,26 @@ section.block { padding: var(--space-6) 0; }
 .steps li::before { content: counter(step); display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--on-primary); font-family: var(--font-heading); font-weight: 700; margin-bottom: var(--space-3); }
 .steps p { color: var(--text-muted); margin: 0; }
 
-/* App screenshots: swipeable row of phone screens */
-.shots { list-style: none; margin: var(--space-5) 0 0; padding: var(--space-2) var(--gutter) var(--space-4); display: flex; gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); -webkit-overflow-scrolling: touch; }
-.shots li { flex: none; width: min(74vw, 260px); scroll-snap-align: start; }
+/* App screenshots: a one-at-a-time slideshow. Swipe, or use the arrows/dots below. */
+.shots-frame { max-width: 300px; margin: var(--space-5) auto 0; }
+.shots { list-style: none; margin: 0; padding: var(--space-2) 0 var(--space-4); display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.shots::-webkit-scrollbar { display: none; }
+.shots li { flex: none; width: 100%; scroll-snap-align: start; }
 .shots figure { margin: 0; }
 .shots img { display: block; width: 100%; height: auto; border-radius: 26px; border: 1px solid var(--border); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); background: var(--surface); }
-.shots figcaption { margin-top: var(--space-3); display: grid; gap: 2px; font-size: 0.88rem; }
+.shots figcaption { margin-top: var(--space-3); display: grid; gap: 2px; font-size: 0.88rem; text-align: center; }
 .shots figcaption strong { font-family: var(--font-heading); font-size: 1rem; }
 .shots figcaption span { color: var(--text-muted); }
-@media (min-width: 1100px) {
-  .shots { padding-left: calc((100vw - 1040px) / 2 + var(--gutter)); scroll-padding-left: calc((100vw - 1040px) / 2 + var(--gutter)); }
-  .shots li { width: 260px; }
+.shots-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-4); margin-top: var(--space-2); }
+.shots-nav { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.shots-nav:hover { color: var(--primary); border-color: var(--primary); }
+.shots-nav:disabled { opacity: 0.35; cursor: default; }
+.shots-nav:disabled:hover { color: var(--text); border-color: var(--border); }
+.shots-dots { display: flex; gap: 8px; }
+.dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: var(--border); cursor: pointer; }
+.dot[aria-current="true"] { background: var(--primary); width: 20px; }
+@media (min-width: 640px) {
+  .shots-frame { max-width: 340px; }
 }
 
 details { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-3); }
