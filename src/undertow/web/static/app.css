@@ -172,3 +172,7 @@ a.icon-btn { display: inline-grid; place-items: center; text-decoration: none; }
 .games-list .g-team, .games-list .g-score { font-size: 0.95rem; }
 .g-score { text-align: right; min-width: 3ch; }
 .g-score.lead { color: var(--primary); }
+
+.draft-cta { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); background: color-mix(in srgb, var(--primary) 14%, var(--surface)); border: 1px solid var(--primary); border-radius: var(--radius); padding: var(--space-4); color: var(--text); text-decoration: none; margin-bottom: var(--space-2); }
+.draft-cta .muted { display: block; font-size: 0.85rem; }
+.draft-cta .chev { font-size: 1.6rem; color: var(--primary); }

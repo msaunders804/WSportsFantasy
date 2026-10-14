@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from undertow.config import get_settings
 from undertow.db import get_session
 from undertow.services import waitlist
+from undertow.web import draft_preview
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
@@ -87,6 +88,8 @@ def create_app() -> FastAPI:
 
     if settings.preview_enabled or not settings.is_prod:
         # Design mockups on sample data (see preview_data.py). Replaced by real pages later.
+        app.include_router(draft_preview.router)
+
         def preview(request: Request, template: str, tab: str, **extra) -> Response:
             context = {"league": sample.LEAGUE, "active": tab, "app_name": settings.app_name}
             return templates.TemplateResponse(request, f"app/{template}.html", context | extra)

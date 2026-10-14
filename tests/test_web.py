@@ -72,6 +72,11 @@ def test_preview_hidden_in_prod_unless_enabled(monkeypatch):
     get_settings.cache_clear()
     try:
         assert TestClient(create_app()).get("/preview/matchup").status_code == 404
+        assert TestClient(create_app()).get("/preview/draft").status_code == 404
+        assert (
+            TestClient(create_app()).post("/preview/draft/step", json={"picks": []}).status_code
+            == 404
+        )
         monkeypatch.setenv("PREVIEW_ENABLED", "true")
         get_settings.cache_clear()
         assert TestClient(create_app()).get("/preview/matchup").status_code == 200
