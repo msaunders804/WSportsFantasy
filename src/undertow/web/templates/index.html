@@ -1,5 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>{{ app_name }}</h1>
-<p>PWHL fantasy leagues. Coming soon.</p>
+<section class="hero">
+  <div class="wave" aria-hidden="true">
+    <svg class="w2" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,160 C240,100 480,220 720,160 C960,100 1200,220 1440,160 L1440,320 L0,320 Z"/></svg>
+    <svg class="w1" viewBox="0 0 1440 320" preserveAspectRatio="none"><path d="M0,200 C240,140 480,260 720,200 C960,140 1200,260 1440,200 L1440,320 L0,320 Z"/></svg>
+  </div>
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">PWHL fantasy · 2026-27 season</span>
+      <h1>Fantasy hockey for people who love women's hockey.</h1>
+      <p class="lede">Two friendly PWHL leagues are forming before opening night on Dec 5. New to fantasy? You're exactly who we built this for, and we'll explain everything as you go.</p>
+    </div>
+
+    <form class="card" id="join" method="post" action="/signup" novalidate>
+      <h2>Get on the list</h2>
+      <p class="muted">We'll email you your league invite when spots open.</p>
+      {% if errors.form %}<div class="alert" role="alert">{{ errors.form }}</div>{% endif %}
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required value="{{ form.email or '' }}"{% if errors.email %} aria-invalid="true" aria-describedby="email-err"{% endif %}>
+        {% if errors.email %}<p class="err" id="email-err">{{ errors.email }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="first_name">First name <span class="muted">(optional)</span></label>
+        <input id="first_name" name="first_name" type="text" autocomplete="given-name" maxlength="100" value="{{ form.first_name or '' }}">
+      </div>
+      <div class="field">
+        <label for="experience">Have you played fantasy before? <span class="muted">(optional)</span></label>
+        <select id="experience" name="experience">
+          <option value="">Choose one</option>
+          {% for value, label in experience_choices.items() %}
+          <option value="{{ value }}"{% if form.experience == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="check" for="consent">
+          <input id="consent" name="consent" type="checkbox"{% if form.consent == 'on' %} checked{% endif %}{% if errors.consent %} aria-invalid="true"{% endif %}>
+          <span>Yes, email me about my league invite and Undertow updates. I can unsubscribe any time.</span>
+        </label>
+        {% if errors.consent %}<p class="err">{{ errors.consent }}</p>{% endif %}
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for="website">Leave this empty</label>
+        <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      {% for name, value in utm.items() %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+      <button class="btn" type="submit">Join the list</button>
+      <p class="fine">We only use your email for Undertow. <a href="/privacy">How we handle your info</a></p>
+    </form>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="muted">No spreadsheets, no jargon. Here's the whole season in three steps.</p>
+    <ol class="steps">
+      <li><h3>Join a league</h3><p>Two leagues of 10 teams each. You'll get an invite link and set up your team in about a minute.</p></li>
+      <li><h3>Draft your team</h3><p>A live snake draft with a pick timer and tips along the way. Never drafted before? We'll walk you through it.</p></li>
+      <li><h3>Play head-to-head</h3><p>Each week your players' real PWHL games score points against another team in your league. The numbers move, and so do the stories.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap showcase">
+    <div>
+      <h2>Clear, calm and quick.</h2>
+      <p class="muted">The app only says what you need, when you need it. No wall of text, no guessing what to tap next.</p>
+      <p class="muted">The screen on the right is a sample of the draft room while we build it. The final design will change.</p>
+    </div>
+    <div class="phone" role="img" aria-label="Sample draft room screen showing a pick confirmation">
+      <span class="tag">Sample screen</span>
+      <div class="clock"><span>Round 3 · Pick 4</span><span>0:42</span></div>
+      <div class="pick"><span class="muted">You're picking</span><strong>Player Name</strong><span class="muted">F · Team</span></div>
+      <span class="btn" aria-hidden="true">Confirm pick</span>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap page">
+    <h2>Questions</h2>
+    <details><summary>I've never played fantasy. Is this for me?</summary><p>Yes, that's who we built it for. We explain each step as it comes up, and you don't need to know hockey stats to start.</p></details>
+    <details><summary>Is it free?</summary><p>Yes. It's free to join and play.</p></details>
+    <details><summary>Is this the official PWHL game?</summary><p>No. Undertow is an independent fan project with no affiliation with the PWHL or its teams.</p></details>
+    <details><summary>What do you do with my email?</summary><p>We use it to send your league invite and Undertow updates, and nothing else. <a href="/privacy">Read the details.</a></p></details>
+    <p style="margin-top: var(--space-5)"><a class="btn" href="#join">Get on the list</a></p>
+  </div>
+</section>
 {% endblock %}

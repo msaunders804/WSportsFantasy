@@ -8,6 +8,7 @@ from undertow.models.hockey import (
     Season,
     SkaterGameStats,
 )
+from undertow.models.waitlist import WaitlistSignup
 
 __all__ = [
     "Game",
@@ -18,4 +19,5 @@ __all__ = [
     "RawSnapshot",
     "Season",
     "SkaterGameStats",
+    "WaitlistSignup",
 ]

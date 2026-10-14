@@ -1,0 +1,46 @@
+/* Undertow design tokens. Source of truth: docs/brand.md. Dark is the default theme. */
+:root {
+  --bg: #0a1628;
+  --surface: #132540;
+  --surface-2: #1a3050;
+  --border: #25405f;
+  --text: #eaf3fc;
+  --text-muted: #9db4cc;
+  --primary: #2f9bff;
+  --on-primary: #06101f;
+  --accent: #ff7a59;
+  --positive: #2ed3a0;
+  --negative: #ff6b7a;
+  --focus: #ffd166;
+
+  --font-heading: "Sora", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --gutter: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 40px;
+  --space-7: 64px;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f5f9fd;
+  --surface: #ffffff;
+  --surface-2: #eaf2fb;
+  --border: #c9d9ea;
+  --text: #0a1628;
+  --text-muted: #4a6078;
+  --primary: #1769d1;
+  --on-primary: #ffffff;
+  --accent: #e85a38;
+  --positive: #0f8f6b;
+  --negative: #c93a4b;
+  --focus: #b45309;
+  color-scheme: light;
+}

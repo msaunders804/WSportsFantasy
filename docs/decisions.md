@@ -57,3 +57,14 @@ The schedule can still change (postponements), so playoff round boundaries must 
 - `railway.toml` is kept as documentation of the intended web settings. If a new service or environment is created, re-check these fields by hand, and confirm in the deploy log that the pre-deploy step ran.
 - Variables: `HOCKEYTECH_KEY` and `HOCKEYTECH_USER_AGENT` are set on `worker` only (nothing in `web` touches the feed). `DATABASE_URL` uses the `postgresql+psycopg://` scheme on the private (internal) host on both services.
 - Branching: one branch per phase, each PR opened directly against `main` (stacked PRs merged into each other's branches left Phase 2 off `main` until a follow-up PR).
+
+## 2026-10-14: Landing page and waitlist
+- Brand foundation is in [brand.md](brand.md); design tokens live in `web/static/tokens.css` and every page styles from them. Dark is the default theme, with a light toggle remembered in `localStorage`.
+- The landing page is for Undertow Fantasy only (the wider Undertow Sports site is a separate project). Wordmark only for now (no logo). It carries an "unofficial and unaffiliated" marker in the footer of every page.
+- League marks: the brand owner decided official PWHL logos and photos may be used, with no monetisation. The landing page uses none of them (team names only as text), and the social posts are organic (no paid ads). Keep any league marks in one asset folder and one template partial so they can be removed in one change.
+- The "sample screen" in the page is a CSS mock labelled as a sample, with placeholder names. Replace it with real screenshots or a demo video once the draft room exists.
+- Signups go to `waitlist_signup` (migration 0005): email (lower-cased, unique, so repeats are a silent no-op), optional first name and fantasy experience, `utm_*` from the link, and `consented_at`. The form posts, then redirects to `/thanks` (same answer for duplicates, so the list cannot be probed for who has signed up).
+- Spam: a hidden honeypot field (silently accepted and dropped) and an in-memory limit of 5 posts per 10 minutes per client IP (first `X-Forwarded-For` entry). The limiter resets on restart and is per process, which is fine for one web instance. No CSRF token on this form since there is no session yet; accounts (Phase 3) add CSRF.
+- Form bodies are parsed with the standard library (`urllib.parse.parse_qs`, 8 KB cap) so the page needs no `python-multipart` dependency. Phase 3 will add it for login forms.
+- No alerts or admin page yet (deferred). Read signups in Railway's Postgres Data tab. `CONTACT_EMAIL` (optional env var) is shown on the privacy page; until set, the page says to message the social accounts.
+- Fonts (Sora, Inter) load from Google Fonts, which the privacy page discloses. Self-host them later if that matters.

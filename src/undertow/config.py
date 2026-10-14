@@ -17,6 +17,8 @@ class Settings(BaseSettings):
 
     app_name: str = "Undertow Sports"
     base_url: str = "http://localhost:8000"
+    # Shown on the privacy page for questions and deletion requests.
+    contact_email: str = ""
 
     hockeytech_key: str = ""
     hockeytech_client_code: str = "pwhl"
