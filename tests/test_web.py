@@ -8,7 +8,7 @@ def test_landing_renders():
     resp = TestClient(app).get("/")
     assert resp.status_code == 200
     assert 'name="viewport"' in resp.text
-    assert "Fantasy hockey for people who love women's hockey" in resp.text
+    assert "Fantasy for people who love women's hockey" in resp.text
     assert 'name="email"' in resp.text
     # The unofficial marker is on every page.
     assert "Unofficial and unaffiliated" in resp.text
