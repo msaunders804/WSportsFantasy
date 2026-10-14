@@ -11,12 +11,19 @@ from undertow.web.ratelimit import RateLimiter
 
 def test_clean_signup_normalizes_and_validates():
     data, errors = waitlist.clean_signup(
-        {"email": "  Fan@Example.COM ", "consent": "on", "experience": "new", "first_name": " Sam "}
+        {
+            "email": "  Fan@Example.COM ",
+            "consent": "on",
+            "experience": "new",
+            "first_name": " Sam ",
+            "commissioner_note": " friend@example.com ",
+        }
     )
     assert errors == {}
     assert data.email == "fan@example.com"
     assert data.first_name == "Sam"
     assert data.experience == "new"
+    assert data.commissioner_note == "friend@example.com"
 
 
 @pytest.mark.parametrize("email", ["", "nope", "a@b", "a b@c.com", "x" * 250 + "@a.com"])
@@ -34,10 +41,17 @@ def test_clean_signup_requires_consent():
 
 def test_clean_signup_drops_unknown_experience_and_truncates():
     data, _ = waitlist.clean_signup(
-        {"email": "a@b.co", "consent": "on", "experience": "bogus", "utm_source": "s" * 500}
+        {
+            "email": "a@b.co",
+            "consent": "on",
+            "experience": "bogus",
+            "utm_source": "s" * 500,
+            "commissioner_note": "n" * 500,
+        }
     )
     assert data.experience is None
     assert len(data.utm_source) == 100
+    assert len(data.commissioner_note) == 300
 
 
 def test_rate_limiter_window():
@@ -65,14 +79,22 @@ def count() -> int:
 def test_signup_stores_row_and_redirects(client):
     resp = client.post(
         "/signup",
-        data={"email": "Fan@Example.com", "consent": "on", "utm_source": "tiktok"},
+        data={
+            "email": "Fan@Example.com",
+            "consent": "on",
+            "utm_source": "tiktok",
+            "commissioner_note": "buddy@example.com",
+        },
     )
     assert resp.status_code == 303
     assert resp.headers["location"] == "/thanks"
     with Session(get_engine()) as s:
-        row = s.execute(text("SELECT email, utm_source, consented_at FROM waitlist_signup")).one()
+        row = s.execute(
+            text("SELECT email, utm_source, commissioner_note, consented_at FROM waitlist_signup")
+        ).one()
     assert row.email == "fan@example.com"
     assert row.utm_source == "tiktok"
+    assert row.commissioner_note == "buddy@example.com"
     assert row.consented_at is not None
 
 

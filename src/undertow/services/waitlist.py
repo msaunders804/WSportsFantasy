@@ -17,7 +17,13 @@ EXPERIENCE_CHOICES = {
 }
 
 _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-_MAX = {"first_name": 100, "utm_source": 100, "utm_medium": 100, "utm_campaign": 100}
+_MAX = {
+    "first_name": 100,
+    "commissioner_note": 300,
+    "utm_source": 100,
+    "utm_medium": 100,
+    "utm_campaign": 100,
+}
 
 
 @dataclass(frozen=True)
@@ -25,6 +31,7 @@ class SignupData:
     email: str
     first_name: str | None
     experience: str | None
+    commissioner_note: str | None
     utm_source: str | None
     utm_medium: str | None
     utm_campaign: str | None
@@ -53,6 +60,7 @@ def clean_signup(form: Mapping[str, str]) -> tuple[SignupData | None, dict[str, 
             email=email,
             first_name=opt("first_name"),
             experience=experience,
+            commissioner_note=opt("commissioner_note"),
             utm_source=opt("utm_source"),
             utm_medium=opt("utm_medium"),
             utm_campaign=opt("utm_campaign"),

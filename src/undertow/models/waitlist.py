@@ -17,6 +17,8 @@ class WaitlistSignup(Base):
     first_name: Mapped[str | None] = mapped_column(String(100))
     # "new", "some" or "lots": how much fantasy the person has played.
     experience: Mapped[str | None] = mapped_column(String(10))
+    # Free text for the commissioner, e.g. a friend's email to seat them in the same league.
+    commissioner_note: Mapped[str | None] = mapped_column(String(300))
     utm_source: Mapped[str | None] = mapped_column(String(100))
     utm_medium: Mapped[str | None] = mapped_column(String(100))
     utm_campaign: Mapped[str | None] = mapped_column(String(100))
