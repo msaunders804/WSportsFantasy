@@ -123,3 +123,13 @@ The schedule can still change (postponements), so playoff round boundaries must 
 ## 2026-10-16: New-signup email alerts, via Resend
 - Megan chose Resend over Postmark/SES for `TODO_MANUAL.md` item 8 (simplest setup, generous free tier). `services/notify.py` posts to the Resend API; `EMAIL_API_KEY` and `ALERT_EMAIL` were already placeholders in `.env.example`, plus a new `EMAIL_FROM` (must be on a domain verified with Resend — still Megan's manual setup step, not done yet).
 - Fires once per *new* signup only (not the quiet duplicate no-op), from the `/signup` route in a threadpool so it can't block the response. Never raises: a failed send is logged and swallowed, since a broken alert must never break the visitor's signup. With no `EMAIL_API_KEY`/`ALERT_EMAIL` set (true today, until Megan finishes the Resend setup), it's a silent no-op.
+
+## 2026-10-15: In-app chat (DECIDED by Megan; design only, nothing built)
+Full write-up of what is left to build is in [backlog.md](backlog.md#chat-decided-not-built).
+- **Scope:** a league room for each league, plus trade threads, so managers can negotiate trades inside Undertow. The draft room embeds the league room, and chat is wanted for the draft (Nov 30 to Dec 4).
+- **Moderation:** the commissioner can delete messages in their league. Undertow staff can also remove messages and handle reports. A "report message" button goes to us.
+- **Retention:** messages are kept for the season, and new members can read the history. Deletion is a soft delete (`deleted_at`), so a removed message can be audited. The privacy page must say this before launch.
+- **Editing:** an author can edit their own message for 5 minutes after posting. Edited messages show an "edited" mark. After 5 minutes a message can only be deleted, not changed.
+- **How it is built:** the same SSE and Postgres LISTEN/NOTIFY design as the draft and matchup (Plan.MD section 2). No new infrastructure and no third-party chat service. Rules live in `services/chat.py` with no HTTP code. All times are UTC.
+- **Gating:** behind a `CHAT_ENABLED` flag, off by default. It depends on auth, leagues and teams (Plan Phase 3), so chat cannot ship before those.
+- **Why trade threads are in scope:** trades are in the plan (Plan.MD transactions), and a trade offer with nowhere to discuss it pushes people to outside group chats. A trade thread belongs to one trade, is visible only to the two teams involved and the commissioner, and closes when the trade is accepted, rejected or withdrawn. Open: whether the commissioner can see trade threads or only league rooms. Assumed yes, since trades need commissioner oversight; confirm before building.
