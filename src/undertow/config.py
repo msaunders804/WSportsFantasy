@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     # Serve the /preview design mockups even in prod (they are always on outside prod).
     preview_enabled: bool = False
 
+    # Serve sign-up, login and league pages even in prod (they are always on outside prod).
+    # Keep off in prod until the launch checklist says accounts open.
+    accounts_enabled: bool = False
+
     # Resend API key for outgoing alert emails (e.g. new signups). Empty disables sending.
     email_api_key: str = ""
     # Where signup alerts go.

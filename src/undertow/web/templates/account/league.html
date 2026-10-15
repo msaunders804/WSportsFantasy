@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ league.name }} | Undertow Fantasy{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap page">
+    <h1>{{ league.name }}</h1>
+    <p class="muted">{{ teams | length }} of {{ league.size }} teams joined. Status: {{ league.status.replace("_", " ") }}.</p>
+
+    {% if errors.form %}<p class="alert" role="alert">{{ errors.form }}</p>{% endif %}
+    {% if saved %}<p class="alert" role="status">Settings saved.</p>{% endif %}
+
+    {% if invite_url %}
+    <h2>Invite link</h2>
+    <p>Anyone with this link can join until the league is full. Share it only with the people you are inviting.</p>
+    <p><input type="text" readonly value="{{ invite_url }}" aria-label="Invite link" onfocus="this.select()"></p>
+    {% endif %}
+
+    <h2>Teams</h2>
+    <table>
+      <thead><tr><th scope="col">Team</th><th scope="col">Manager</th><th scope="col">Role</th></tr></thead>
+      <tbody>
+      {% for team, manager_name, role, owner_id in teams %}
+        <tr><td>{{ team.name }}</td><td>{{ manager_name }}</td><td>{{ role.replace("_", "-") }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {% if user.is_admin and teams %}
+    <h2>Commissioners</h2>
+    <form class="card" method="post" action="/leagues/{{ league.id }}/roles">
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="role_user">Manager</label>
+        <select id="role_user" name="user_id">
+          {% for team, manager_name, role, owner_id in teams %}<option value="{{ owner_id }}">{{ manager_name }} ({{ team.name }})</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="role">Role</label>
+        <select id="role" name="role">
+          <option value="commissioner">Commissioner</option>
+          <option value="co_commissioner">Co-commissioner</option>
+          <option value="member">Member</option>
+        </select>
+        <p class="fine">A league has one commissioner and one co-commissioner. To replace one, set them back to member first.</p>
+      </div>
+      <button class="btn" type="submit">Save role</button>
+    </form>
+    {% endif %}
+
+    <h2>Settings</h2>
+    {% for w in warnings %}<p class="alert" role="note">{{ w }}</p>{% endfor %}
+    {% if editable %}
+    <form class="card" method="post" action="/leagues/{{ league.id }}/settings">
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      {% for key, label in labels.items() %}
+      <div class="field">
+        <label for="s_{{ key }}">{{ label }}</label>
+        <input id="s_{{ key }}" name="{{ key }}" type="number" min="{{ limits[key][0] }}" max="{{ limits[key][1] }}" required value="{{ settings[key] }}">
+      </div>
+      {% endfor %}
+      <button class="btn" type="submit">Save settings</button>
+    </form>
+    {% else %}
+    <table>
+      <tbody>
+      {% for key, label in labels.items() %}<tr><th scope="row">{{ label }}</th><td>{{ settings[key] }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% if manager %}<p class="fine">Settings are locked once the draft has started.</p>{% endif %}
+    {% endif %}
+    <p><a href="/leagues">Back to my leagues</a></p>
+  </div>
+</section>
+{% endblock %}

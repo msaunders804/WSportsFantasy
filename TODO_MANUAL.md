@@ -18,6 +18,12 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 6. **Domain:** choose the public hostname. Needed for secure cookies, invite links and email. A `*.up.railway.app` URL is fine for the mock draft.
 7. **Secrets** in Railway variables (never in git): `DATABASE_URL`, `SECRET_KEY`, `HOCKEYTECH_KEY`, `HOCKEYTECH_USER_AGENT` (with a contact address), email and backup credentials. `.env.example` lists every variable.
 
+## Needed before accounts open (Phase 3)
+- **Set a real `SECRET_KEY`** on `web` in Railway (a long random value, for example `openssl rand -hex 32`). The app refuses to start with accounts on and the default key. Changing it later logs everyone out of forms in progress.
+- **Run the migration:** it runs on deploy via the `preDeployCommand` (migration 0007 adds the account and league tables).
+- **Make yourself staff** after you register, in the Railway Postgres console: `UPDATE user_account SET is_admin = true WHERE email = 'you@example.com';`
+- **Leave `ACCOUNTS_ENABLED` unset** until you are ready for people to register; set it to `true` to open sign-up and login.
+
 ## Needed before the mock draft (Nov 18-20)
 8. **Email provider: Resend (decided).** Code is wired up (`services/notify.py` sends a new-signup alert); still need you to create a Resend account, verify the sending domain, and set `EMAIL_API_KEY`, `ALERT_EMAIL` and `EMAIL_FROM` in Railway. Until then, sending is a silent no-op. Also still open: pick the inbox for "live feed down" alerts (not built yet).
 9. **Off-site backup bucket** (S3, B2 or R2) with a write-only credential, and one restore test. Railway's own backups do not count.
@@ -25,7 +31,7 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 11. **Recruit 20 managers** (10 per league) and **pick a draft date for each league**. Both before Dec 5; after training camp rosters (announced from Oct 18) and ideally the week after preseason starts (Nov 22). Schedule a mock draft with real users for Nov 18-20.
 
 ## Decisions for you
-12. **Scoring table** (before Phase 7, about Nov 16): confirm against ESPN's current hockey points defaults. Roster slots (3F/2D/1UTIL/1G, 4 bench, 1 IR), 48 h waivers, 24 h trade review and the draft pick timer (60/90/120 s) are the other defaults to confirm.
+12. **Scoring table** (before Phase 7, about Nov 16): confirm against ESPN's current hockey points defaults. Roster slots (3F/2D/1UTIL/1G, 4 bench, 2 IR kept separate from the roster), 48 h waivers, 24 h trade review and the draft pick timer (60/90/120 s) are the other defaults to confirm.
 13. **Feed risk:** the HockeyTech feed is unofficial and unlicensed for this use. Decide whether you accept that for a small private app, whether to contact the PWHL, and whether you want a manual stat-entry fallback for commissioners if the feed breaks.
 14. **Clean the fixtures (optional):** the recorded fixtures contain the public site key in their `Parameters` block. Say so if you want it scrubbed.
 

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Create your account | Undertow Fantasy{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap page">
+    <h1>Create your account</h1>
+    <p class="muted">You need an account to join your league and draft your team.</p>
+    <form class="card" method="post" action="/register">
+      {% if errors.form %}<p class="alert" role="alert">{{ errors.form }}</p>{% endif %}
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="field">
+        <label for="display_name">Your name</label>
+        <input id="display_name" name="display_name" type="text" maxlength="60" autocomplete="name" required value="{{ form.display_name or '' }}">
+        {% if errors.display_name %}<p class="err">{{ errors.display_name }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required value="{{ form.email or '' }}">
+        {% if errors.email %}<p class="err">{{ errors.email }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" minlength="10" maxlength="128" autocomplete="new-password" required>
+        <p class="fine">At least 10 characters. A few random words works well.</p>
+        {% if errors.password %}<p class="err">{{ errors.password }}</p>{% endif %}
+      </div>
+      <button class="btn" type="submit">Create account</button>
+      <p class="fine">Already have one? <a href="/login{% if next %}?next={{ next | urlencode }}{% endif %}">Log in</a>. <a href="/privacy">How we handle your info</a></p>
+    </form>
+  </div>
+</section>
+{% endblock %}
