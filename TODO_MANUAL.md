@@ -71,7 +71,7 @@ Resend account is made. Nothing below is done yet. Never paste keys into chat or
   - `EMAIL_API_KEY`: the new key.
   - `EMAIL_FROM`: an address on the verified domain, for example `Undertow Fantasy <notifications@yourdomain>`.
   - `ALERT_EMAIL`: your inbox, for "new signup" alerts.
-  - `BASE_URL`: the https address people will click (it goes into the password link).
+  - `BASE_URL`: the full address people will click, **starting with `https://`** (for example `https://wsportsfantasy-production.up.railway.app`, no trailing slash needed). It goes into the emailed password link, and without the `https://` the link breaks. Change it to your own domain when that is set up.
   - `SECRET_KEY`: a long random value, for example `openssl rand -hex 32`.
 - [ ] 4. **Merge PR #24** (accounts from signups, header Log in button) so the migration runs on deploy.
 - [ ] 5. **Set `ACCOUNTS_ENABLED=true`** on `web` and redeploy.
