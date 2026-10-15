@@ -140,3 +140,13 @@ What is built: email and password accounts, login sessions, leagues with setting
 
 ## 2026-10-15: Two IR spots, kept outside the roster
 Decided by Megan. Each team has 2 injured reserve spots that are separate from the 11-player roster (7 starters plus 4 bench), so a team can own up to 13 players. This replaces the Plan's single IR spot counted inside 12 players, and settles a clash with the Fantasy 101 page. The draft stays 11 rounds. Plan.MD 4.1, Fantasy 101 and the league defaults (`roster_ir = 2`) are updated. The player-pool warning counts players on IR (10 teams use up to 130 of about 276), since an owned player is off the waiver wire. No schema change: the default lives in code.
+
+## 2026-10-15: In-app chat (DECIDED by Megan; design only, nothing built)
+Full write-up of what is left to build is in [backlog.md](backlog.md#chat-decided-not-built).
+- **Scope:** a league room for each league, plus trade threads, so managers can negotiate trades inside Undertow. The draft room embeds the league room, and chat is wanted for the draft (Nov 30 to Dec 4).
+- **Moderation:** the commissioner can delete messages in their league. Undertow staff can also remove messages and handle reports. A "report message" button goes to us.
+- **Retention:** messages are kept for the season, and new members can read the history. Deletion is a soft delete (`deleted_at`), so a removed message can be audited. The privacy page must say this before launch.
+- **Editing:** an author can edit their own message for 5 minutes after posting. Edited messages show an "edited" mark. After 5 minutes a message can only be deleted, not changed.
+- **How it is built:** the same SSE and Postgres LISTEN/NOTIFY design as the draft and matchup (Plan.MD section 2). No new infrastructure and no third-party chat service. Rules live in `services/chat.py` with no HTTP code. All times are UTC.
+- **Gating:** behind a `CHAT_ENABLED` flag, off by default. It depends on auth, leagues and teams (Plan Phase 3), so chat cannot ship before those.
+- **Why trade threads are in scope:** trades are in the plan (Plan.MD transactions), and a trade offer with nowhere to discuss it pushes people to outside group chats. A trade thread belongs to one trade, is visible only to the two teams involved and the commissioner, and closes when the trade is accepted, rejected or withdrawn. Open: whether the commissioner can see trade threads or only league rooms. Assumed yes, since trades need commissioner oversight; confirm before building.
