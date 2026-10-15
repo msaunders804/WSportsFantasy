@@ -31,7 +31,7 @@
   {% block header %}
   <div class="wrap">
     <header class="bar">
-      <a class="wordmark" href="/" aria-label="Undertow Fantasy home">
+      <a class="wordmark" href="{% if nav_user %}/home{% else %}/{% endif %}" aria-label="Undertow Fantasy home">
         <svg class="wordmark-mark" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0a1628"/><path class="mark-w2" d="M1 17 C6 11 11 22 16 17 S23 11 27 16 L27 26 L1 26 Z"/><path class="mark-w1" d="M3 15 C8 10 12 20 17 15 S24 10 26 14 L26 26 L3 26 Z"/></svg>
         <span class="wordmark-text">under<span class="tow">tow</span><small>Fantasy</small></span>
       </a>

@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from undertow import notify
 from undertow.config import get_settings
 from undertow.data import get_session
+from undertow.data.models import User
 from undertow.data.session import session_factory
 from undertow.fantasy import auth, key_dates, onboarding, waitlist
 from undertow.web import accounts, draft_preview, security
@@ -104,7 +105,10 @@ def create_app() -> FastAPI:
         return templates.TemplateResponse(request, "index.html", context, status_code=status_code)
 
     @app.get("/", response_class=HTMLResponse)
-    def index(request: Request) -> Response:
+    def index(request: Request, member: User | None = Depends(security.optional_user)) -> Response:
+        # Someone who is signed in has no use for the signup form: send them to their home.
+        if member is not None and accounts_on:
+            return RedirectResponse("/home", status_code=303)
         return landing(request)
 
     @app.post("/signup")
@@ -156,7 +160,14 @@ def create_app() -> FastAPI:
     if accounts_on:
         app.include_router(accounts.router)
 
-    if settings.preview_enabled or not settings.is_prod:
+    previews_on = settings.preview_enabled or not settings.is_prod
+    templates.env.globals["previews_enabled"] = previews_on
+    if accounts_on and not previews_on:
+        # The practice draft is the one demo members are pointed to (welcome email, home page),
+        # so it is served on its own once accounts are open. The other mockups stay hidden.
+        app.include_router(draft_preview.router)
+
+    if previews_on:
         # Design mockups on sample data (see preview_data.py). Replaced by real pages later.
         app.include_router(draft_preview.router)
 

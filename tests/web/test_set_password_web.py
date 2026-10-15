@@ -118,19 +118,19 @@ def test_full_flow_from_signup_to_the_account_page(client, emails):
     page = client.get(f"/account/set-password?token={token}")
     assert page.status_code == 200 and "Choose a password" in page.text
     resp = set_password(client, token)
-    assert resp.status_code == 303 and resp.headers["location"] == "/account"
-    account = client.get("/account")
-    assert account.status_code == 200
-    assert "Hi, Sam" in account.text and "fan@example.com" in account.text
-    assert "We'll place you in a league" in account.text
-    assert "Nov 20" in account.text and "Nov 30 to Dec 4" in account.text
+    assert resp.status_code == 303 and resp.headers["location"] == "/home"
+    home = client.get("/home")
+    assert home.status_code == 200
+    assert "Welcome, Sam!" in home.text
+    assert "We'll place you in a league" in home.text
+    assert "Nov 20" in home.text and "Nov 30 to Dec 4" in home.text
     # And they can log in normally afterwards.
     client.cookies.clear()
     login = client.post(
         "/login",
         data={"csrf": csrf(client, "/login"), "email": "fan@example.com", "password": PASSWORD},
     )
-    assert login.status_code == 303 and login.headers["location"] == "/account"
+    assert login.status_code == 303 and login.headers["location"] == "/home"
 
 
 def test_set_password_page_keeps_the_link_secret(client, emails):

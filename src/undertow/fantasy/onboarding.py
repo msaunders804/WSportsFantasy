@@ -18,7 +18,7 @@ from undertow import notify
 from undertow.config import Settings, get_settings
 from undertow.data.models import User, WaitlistSignup
 from undertow.data.session import session_factory
-from undertow.fantasy import auth
+from undertow.fantasy import auth, key_dates
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,13 @@ def welcome_signup(
         return False
     token = auth.issue_token(session, user, auth.WELCOME_LINK_TTL)
     notify.send_welcome_email(
-        settings, user.email, first_name, token, days=auth.WELCOME_LINK_TTL.days
+        settings,
+        user.email,
+        first_name,
+        token,
+        days=auth.WELCOME_LINK_TTL.days,
+        invites_by=key_dates.DATES["invites"].when,
+        draft_window=key_dates.DATES["draft"].when,
     )
     return True
 

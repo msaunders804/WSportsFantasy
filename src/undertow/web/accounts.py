@@ -1,6 +1,7 @@
 """Pages for accounts and leagues: register, log in, join by invite link, league setup."""
 
 import logging
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from fastapi.concurrency import run_in_threadpool
@@ -12,7 +13,7 @@ from undertow.config import get_settings
 from undertow.data import get_session
 from undertow.data.models import FantasyTeam, League, LeagueMember, LeagueSettings, Season, User
 from undertow.data.session import session_factory
-from undertow.fantasy import auth, league_rules, leagues, onboarding
+from undertow.fantasy import auth, draft_time, home, league_rules, leagues, onboarding
 from undertow.fantasy.league_rules import INT_LIMITS
 from undertow.web import security
 from undertow.web.ratelimit import RateLimiter
@@ -91,7 +92,7 @@ def check_csrf(request: Request, form: dict[str, str]) -> None:
 @router.get("/register", response_class=HTMLResponse)
 def register_form(request: Request, user: User | None = Depends(security.optional_user)):
     if user:
-        return redirect("/account")
+        return redirect("/home")
     return page(
         request,
         "account/register.html",
@@ -133,7 +134,7 @@ async def register(request: Request, session: Session = Depends(get_session)) ->
 @router.get("/login", response_class=HTMLResponse)
 def login_form(request: Request, user: User | None = Depends(security.optional_user)):
     if user:
-        return redirect("/account")
+        return redirect("/home")
     return page(
         request, "account/login.html", form={}, errors={}, next=request.query_params.get("next", "")
     )
@@ -220,7 +221,7 @@ async def set_password(request: Request, session: Session = Depends(get_session)
     if user is None:
         return set_password_page(request, token, 422, {"password": problem})
     session_token = await run_in_threadpool(auth.create_session, session, user)
-    return redirect("/account", session_token)
+    return redirect("/home", session_token)
 
 
 def send_link_in_background(email: str) -> None:
@@ -271,18 +272,30 @@ async def forgot(request: Request, background: BackgroundTasks) -> Response:
 # ---- the member's own page ----
 
 
-@router.get("/account", response_class=HTMLResponse)
-def my_account(
+def share_url() -> str:
+    """The link members send to friends: the public front page."""
+    return get_settings().base_url.rstrip("/") + "/"
+
+
+@router.get("/home", response_class=HTMLResponse)
+def my_home(
     request: Request,
     user: User = Depends(security.require_user),
     session: Session = Depends(get_session),
 ):
-    return page(
-        request,
-        "account/account.html",
-        user=user,
-        rows=leagues.leagues_for_user(session, user),
-    )
+    """A member's home: their league if they have one, otherwise where things stand."""
+    current = home.pick(leagues.leagues_for_user(session, user))
+    context: dict = {"user": user, "home": current, "share_url": share_url()}
+    if current.league is not None:
+        context["teams"] = league_teams(session, current.league.id)
+        context["manager"] = leagues.can_manage(session, user, current.league.id)
+        context |= draft_time_context(current.league)
+    return page(request, "account/home.html", **context)
+
+
+@router.get("/account", response_class=HTMLResponse)
+def my_account(request: Request, user: User = Depends(security.require_user)):
+    return page(request, "account/account.html", user=user, share_url=share_url())
 
 
 # ---- leagues ----
@@ -349,6 +362,34 @@ async def new_league(
     return redirect(f"/leagues/{league.id}")
 
 
+def league_teams(session: Session, league_id: int):
+    """(team, manager name, role, user id) for every team in a league, in join order."""
+    return session.execute(
+        select(FantasyTeam, User.display_name, LeagueMember.role, User.id)
+        .join(User, User.id == FantasyTeam.owner_id)
+        .join(
+            LeagueMember,
+            (LeagueMember.league_id == FantasyTeam.league_id) & (LeagueMember.user_id == User.id),
+        )
+        .where(FantasyTeam.league_id == league_id)
+        .order_by(FantasyTeam.created_at)
+    ).all()
+
+
+def draft_time_context(league: League) -> dict:
+    """The draft time as members see it: Eastern text, a countdown, and the UTC moment."""
+    if league.draft_at is None:
+        return {"draft_at": None}
+    count = draft_time.countdown(league.draft_at, datetime.now(UTC))
+    return {
+        "draft_at": league.draft_at,
+        "draft_at_iso": league.draft_at.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "draft_at_text": draft_time.format_in_zone(league.draft_at),
+        "draft_countdown": count.text,
+        "draft_started": count.started,
+    }
+
+
 def league_context(session: Session, user: User, league_id: int) -> dict:
     league = session.get(League, league_id)
     if league is None:
@@ -362,16 +403,7 @@ def league_context(session: Session, user: User, league_id: int) -> dict:
     validation = league_rules.validate_settings(
         league.size, data, active_pool=leagues.active_player_pool(session) or None
     )
-    teams = session.execute(
-        select(FantasyTeam, User.display_name, LeagueMember.role, User.id)
-        .join(User, User.id == FantasyTeam.owner_id)
-        .join(
-            LeagueMember,
-            (LeagueMember.league_id == FantasyTeam.league_id) & (LeagueMember.user_id == User.id),
-        )
-        .where(FantasyTeam.league_id == league_id)
-        .order_by(FantasyTeam.created_at)
-    ).all()
+    teams = league_teams(session, league_id)
     manager = leagues.can_manage(session, user, league_id)
     return {
         "user": user,
@@ -388,6 +420,9 @@ def league_context(session: Session, user: User, league_id: int) -> dict:
         else "",
         "errors": {},
         "saved": False,
+        "zones": draft_time.ZONES,
+        "draft_input": draft_time.to_local_input(league.draft_at),
+        **draft_time_context(league),
     }
 
 
@@ -457,6 +492,30 @@ async def league_roles(
         context["errors"] = {"form": str(exc)}
         return page(request, "account/league.html", 422, **context)
     return redirect(f"/leagues/{league_id}")
+
+
+@router.post("/leagues/{league_id}/draft-time")
+async def league_draft_time(
+    request: Request,
+    league_id: int,
+    user: User = Depends(security.require_user),
+    session: Session = Depends(get_session),
+) -> Response:
+    form = await security.read_form(request)
+    check_csrf(request, form)
+    context = await run_in_threadpool(league_context, session, user, league_id)
+    try:
+        moment = draft_time.parse_local(form.get("draft_at", ""), form.get("zone", ""))
+        await run_in_threadpool(leagues.set_draft_time, session, user, league_id, moment)
+    except leagues.PermissionDenied as exc:
+        raise HTTPException(status_code=403) from exc
+    except (ValueError, leagues.LeagueError) as exc:
+        context["errors"] = {"draft": str(exc)}
+        return page(request, "account/league.html", 422, **context)
+    session.expire_all()
+    context = await run_in_threadpool(league_context, session, user, league_id)
+    context["saved"] = True
+    return page(request, "account/league.html", **context)
 
 
 # ---- joining by invite link ----

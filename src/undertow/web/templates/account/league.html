@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ league.name }} | Undertow Fantasy{% endblock %}
+{% block head_extra %}<script src="/static/home.js?v={{ v }}" defer></script>{% endblock %}
 {% block content %}
 <section class="block">
   <div class="wrap page">
@@ -13,6 +14,28 @@
     <h2>Invite link</h2>
     <p>Anyone with this link can join until the league is full. Share it only with the people you are inviting.</p>
     <p><input type="text" readonly value="{{ invite_url }}" aria-label="Invite link" onfocus="this.select()"></p>
+    {% endif %}
+
+    <h2>Draft time</h2>
+    {% if draft_at %}<p>Starts <strong><time data-local datetime="{{ draft_at_iso }}">{{ draft_at_text }}</time></strong>{% if draft_countdown %} ({{ draft_countdown }}){% endif %}.</p>
+    {% else %}<p class="muted">Not set yet. Members see the general draft window until it is.</p>{% endif %}
+    {% if editable %}
+    <form class="card" method="post" action="/leagues/{{ league.id }}/draft-time">
+      {% if errors.draft %}<p class="alert" role="alert">{{ errors.draft }}</p>{% endif %}
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="draft_at">Draft starts</label>
+        <input id="draft_at" name="draft_at" type="datetime-local" value="{{ draft_input }}">
+        <p class="fine">Leave blank to clear it.</p>
+      </div>
+      <div class="field">
+        <label for="zone">Time zone of the time above</label>
+        <select id="zone" name="zone">
+          {% for zone, label in zones.items() %}<option value="{{ zone }}"{% if zone == "America/New_York" %} selected{% endif %}>{{ label }} ({{ zone }})</option>{% endfor %}
+        </select>
+      </div>
+      <button class="btn" type="submit">Save draft time</button>
+    </form>
     {% endif %}
 
     <h2>Teams</h2>

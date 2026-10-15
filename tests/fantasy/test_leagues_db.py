@@ -246,3 +246,40 @@ def test_default_playoff_size_never_exceeds_a_small_league(db, admin):
 def test_new_leagues_get_two_ir_spots(db, admin):
     league = new_league(db, admin, size=10)
     assert db.get(LeagueSettings, league.id).roster_ir == 2
+
+
+def test_draft_time_can_be_set_changed_and_cleared_by_a_commissioner(db, admin):
+    from datetime import UTC, datetime
+
+    league = new_league(db, admin, size=10)
+    fan = make_user(db, "fan@example.com")
+    leagues.join_league(db, fan, league.invite_code, "T")
+    leagues.set_role(db, admin, league.id, fan.id, "commissioner")
+    first = datetime(2026, 12, 1, 0, 0, tzinfo=UTC)
+    leagues.set_draft_time(db, fan, league.id, first)
+    assert db.get(League, league.id).draft_at == first
+    leagues.set_draft_time(db, admin, league.id, None)  # staff may clear it
+    assert db.get(League, league.id).draft_at is None
+    entries = db.scalars(
+        select(AuditLog).where(AuditLog.action == "league.set_draft_time").order_by(AuditLog.id)
+    ).all()
+    assert [e.after for e in entries] == [{"draft_at": first.isoformat()}, {"draft_at": None}]
+    assert entries[1].before == {"draft_at": first.isoformat()}
+
+
+def test_draft_time_refusals(db, admin):
+    from datetime import UTC, datetime
+
+    league = new_league(db, admin, size=10)
+    member = make_user(db, "m@example.com")
+    leagues.join_league(db, member, league.invite_code, "T")
+    moment = datetime(2026, 12, 1, tzinfo=UTC)
+    with pytest.raises(leagues.PermissionDenied):
+        leagues.set_draft_time(db, member, league.id, moment)
+    with pytest.raises(leagues.LeagueError, match="time zone"):
+        leagues.set_draft_time(db, admin, league.id, datetime(2026, 12, 1))  # naive
+    league.status = "drafting"
+    db.commit()
+    with pytest.raises(leagues.LeagueError, match="locked"):
+        leagues.set_draft_time(db, admin, league.id, moment)
+    assert db.get(League, league.id).draft_at is None

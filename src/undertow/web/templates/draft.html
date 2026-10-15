@@ -9,7 +9,7 @@
 
 {% block header %}
 <header class="dr-top">
-  <a class="dr-exit" href="/preview/league">‹ Exit</a>
+  <a class="dr-exit" href="{% if previews_enabled %}/preview/league{% elif nav_user %}/home{% else %}/{% endif %}">‹ Exit</a>
   <div class="dr-title"><strong>League One draft</strong><span class="muted">Practice draft · {{ n_teams }} teams · {{ rounds }} rounds</span></div>
   <span class="dr-exit" aria-hidden="true"></span>
 </header>
