@@ -1,6 +1,6 @@
 import pytest
 
-from undertow.services import draft as d
+from undertow.fantasy import draft as d
 from undertow.web import preview_data
 
 CFG = d.DraftConfig()

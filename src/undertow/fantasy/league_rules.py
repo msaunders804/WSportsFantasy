@@ -5,7 +5,7 @@ The caller passes in anything that comes from the database, such as the size of 
 
 from dataclasses import dataclass, field, fields
 
-from undertow.scoring.config import ScoringConfig
+from undertow.fantasy.scoring.config import ScoringConfig
 
 MIN_TEAMS = 4
 MAX_TEAMS = 12

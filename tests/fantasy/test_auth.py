@@ -3,8 +3,8 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy import select
 
-from undertow.models import AuthSession
-from undertow.services import auth
+from undertow.data.models import AuthSession
+from undertow.fantasy import auth
 
 
 def test_password_hash_roundtrip_and_salting():

@@ -7,8 +7,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from undertow.config import get_settings
-from undertow.models import League, LeagueSettings, User
-from undertow.services import auth, leagues
+from undertow.data.models import League, LeagueSettings, User
+from undertow.fantasy import auth, leagues
 from undertow.web import accounts
 from undertow.web import app as web_app
 

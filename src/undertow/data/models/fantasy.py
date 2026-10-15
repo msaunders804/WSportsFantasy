@@ -21,7 +21,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from undertow.db import Base
+from undertow.data import Base
 
 LEAGUE_ROLES = ("member", "commissioner", "co_commissioner")
 LEAGUE_STATUSES = ("setup", "drafting", "in_season", "playoffs", "complete")

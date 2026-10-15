@@ -10,6 +10,15 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from undertow.data.models import (
+    Game,
+    GoalieGameStats,
+    Player,
+    ProTeam,
+    RawSnapshot,
+    Season,
+    SkaterGameStats,
+)
 from undertow.ingest.dto import (
     BoxScoreDTO,
     GameDTO,
@@ -19,15 +28,6 @@ from undertow.ingest.dto import (
 )
 from undertow.ingest.feed import RawResponse
 from undertow.ingest.parsing import strip_jsonp
-from undertow.models import (
-    Game,
-    GoalieGameStats,
-    Player,
-    ProTeam,
-    RawSnapshot,
-    Season,
-    SkaterGameStats,
-)
 
 
 @lru_cache

@@ -25,7 +25,7 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 - **Leave `ACCOUNTS_ENABLED` unset** until you are ready for people to register; set it to `true` to open sign-up and login.
 
 ## Needed before the mock draft (Nov 18-20)
-8. **Email provider: Resend (decided).** Code is wired up (`services/notify.py` sends a new-signup alert); still need you to create a Resend account, verify the sending domain, and set `EMAIL_API_KEY`, `ALERT_EMAIL` and `EMAIL_FROM` in Railway. Until then, sending is a silent no-op. Also still open: pick the inbox for "live feed down" alerts (not built yet).
+8. **Email provider: Resend (decided).** Code is wired up (`notify.py` sends a new-signup alert); still need you to create a Resend account, verify the sending domain, and set `EMAIL_API_KEY`, `ALERT_EMAIL` and `EMAIL_FROM` in Railway. Until then, sending is a silent no-op. Also still open: pick the inbox for "live feed down" alerts (not built yet).
 9. **Off-site backup bucket** (S3, B2 or R2) with a write-only credential, and one restore test. Railway's own backups do not count.
 10. **Uptime monitor** on the health page (optional, free tier).
 11. **Recruit 20 managers** (10 per league) and **pick a draft date for each league**. Both before Dec 5; after training camp rosters (announced from Oct 18) and ideally the week after preseason starts (Nov 22). Schedule a mock draft with real users for Nov 18-20.

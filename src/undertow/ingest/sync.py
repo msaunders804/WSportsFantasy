@@ -7,6 +7,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
+from undertow.data.models import Game
 from undertow.ingest import store
 from undertow.ingest.feed import Feed
 from undertow.ingest.parsing import (
@@ -16,7 +17,6 @@ from undertow.ingest.parsing import (
     parse_seasons,
     parse_teams,
 )
-from undertow.models import Game
 
 log = logging.getLogger(__name__)
 

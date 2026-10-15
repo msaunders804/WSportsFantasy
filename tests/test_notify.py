@@ -2,8 +2,8 @@ import json
 
 import httpx
 
+from undertow import notify
 from undertow.config import Settings
-from undertow.services import notify
 
 
 def _settings(**overrides) -> Settings:

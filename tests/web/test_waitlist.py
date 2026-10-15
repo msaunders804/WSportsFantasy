@@ -3,8 +3,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from undertow.db import get_engine
-from undertow.services import notify, waitlist
+from undertow import notify
+from undertow.data import get_engine
+from undertow.fantasy import waitlist
 from undertow.web import app as web_app
 from undertow.web.ratelimit import RateLimiter
 

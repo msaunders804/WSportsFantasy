@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
-from undertow.db import get_engine
+from undertow.data import get_engine
 from undertow.ingest.feed import FixtureFeed
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "hockeytech"

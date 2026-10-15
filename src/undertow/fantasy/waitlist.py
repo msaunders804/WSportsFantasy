@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
-from undertow.models import WaitlistSignup
+from undertow.data.models import WaitlistSignup
 
 EXPERIENCE_CHOICES = {
     "new": "I'm brand new to fantasy",

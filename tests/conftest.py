@@ -26,7 +26,7 @@ def fantasy_db():
     """A clean fantasy schema with one current season (id 11). Needs DATABASE_URL."""
     from sqlalchemy import text
 
-    from undertow.db import get_engine
+    from undertow.data import get_engine
 
     engine = get_engine()
     with engine.begin() as conn:

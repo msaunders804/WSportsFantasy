@@ -3,9 +3,11 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import create_engine
 
-from undertow import models  # noqa: F401  (registers tables on Base.metadata)
 from undertow.config import get_settings
-from undertow.db import Base
+from undertow.data import (
+    Base,
+    models,  # noqa: F401  (registers tables on Base.metadata)
+)
 
 config = context.config
 if config.config_file_name:

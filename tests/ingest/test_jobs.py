@@ -3,9 +3,9 @@ from datetime import timedelta
 import pytest
 from sqlalchemy import select
 
+from undertow.data.models import Game, GoalieGameStats, JobRun, Player
 from undertow.ingest import jobs, sync
 from undertow.ingest.feed import FeedError
-from undertow.models import Game, GoalieGameStats, JobRun, Player
 
 pytestmark = pytest.mark.db
 

@@ -150,3 +150,22 @@ Full write-up of what is left to build is in [backlog.md](backlog.md#chat-decide
 - **How it is built:** the same SSE and Postgres LISTEN/NOTIFY design as the draft and matchup (Plan.MD section 2). No new infrastructure and no third-party chat service. Rules live in `services/chat.py` with no HTTP code. All times are UTC.
 - **Gating:** behind a `CHAT_ENABLED` flag, off by default. It depends on auth, leagues and teams (Plan Phase 3), so chat cannot ship before those.
 - **Why trade threads are in scope:** trades are in the plan (Plan.MD transactions), and a trade offer with nowhere to discuss it pushes people to outside group chats. A trade thread belongs to one trade, is visible only to the two teams involved and the commissioner, and closes when the trade is accepted, rejected or withdrawn. Open: whether the commissioner can see trade threads or only league rooms. Assumed yes, since trades need commissioner oversight; confirm before building.
+
+## 2026-10-15: One repo for fantasy, data and content (package restructure)
+Decided by Megan: a single repo handles all Undertow work, including analysis for social media. Code moved with `git mv` (history follows the files), with no behaviour change: the same 225 tests pass, a fresh database migrates to 0007, and the Docker image builds and imports.
+
+| Before | After |
+|---|---|
+| `db/` | `data/base.py`, `data/session.py` (import from `undertow.data`) |
+| `models/` | `data/models/` |
+| `migrations/` | `data/migrations/` (`alembic.ini` points at it; revision ids are unchanged, so Railway's existing `alembic_version` still matches) |
+| `scoring/` | `fantasy/scoring/` |
+| `services/draft, auth, leagues, league_rules, stat_lines, waitlist` | `fantasy/` |
+| `services/notify.py` | `notify.py` (shared by every package) |
+| `tests/scoring`, `tests/services` | `tests/fantasy/`; web tests moved to `tests/web/` |
+
+- **New:** `content/` (analytics, stat notes, sims; empty scaffold) and `analysis/` at the repo root (notebooks and one-off work, never deployed: not copied into the image).
+- **Kept as they were:** `ingest/`, `web/` and `config.py`. `worker/` also stays, because Railway's worker start command is `python -m undertow.worker.main` and renaming it would mean a dashboard change.
+- **Rule:** nothing outside `web` imports `web`; `fantasy`, `content` and `ingest` use `data`. The only cross-link is `ingest/replay.py`, which uses `fantasy.scoring` to check replayed games.
+- **Older entries** in this file still mention the old paths (`services/draft.py` and so on). They describe what was true when written, so they were left as they are.
+- No import shims were left behind. Any branch or notebook that imports `undertow.db`, `undertow.models`, `undertow.scoring` or `undertow.services` needs its imports updated.

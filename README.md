@@ -9,6 +9,9 @@ PWHL fantasy leagues: two independent 10-team leagues, head-to-head points scori
 - [TODO_MANUAL.md](TODO_MANUAL.md): things only the owner can do
 - [CLAUDE.md](CLAUDE.md): developer commands and conventions
 
+## One repo
+The fantasy game, the data feed and content work for social media all live here. See Layout in [CLAUDE.md](CLAUDE.md): `ingest/` (feed), `data/` (models and migrations), `fantasy/` (game rules), `content/` (analytics and sims), `web/` (site), and `analysis/` (notebooks, never deployed).
+
 ## Status
 | Phase | State |
 |---|---|
