@@ -62,3 +62,21 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 ## Notes
 - Oct 13: I ran the full 2025-26 replay against the live feed (about 130 throttled requests, once). Responses are cached locally in `data/replay_cache/` (gitignored), so it does not need to hit the feed again.
 - The scoring defaults are untested against real play beyond the replay; confirm item 12 before Phase 7.
+
+## Turn on email and accounts (do these in order)
+Resend account is made. Nothing below is done yet. Never paste keys into chat or commit them; they go in Railway variables only.
+- [ ] 1. **Verify the sending domain in Resend:** Domains, add your domain, then add the DNS records it shows at your domain host. Wait until Resend shows it as verified.
+- [ ] 2. **Rotate the API key** (the first one was pasted into a chat, so treat it as exposed): Resend, API Keys, create a new key with "Sending access" limited to your domain, then delete the old key.
+- [ ] 3. **Set Railway variables on the `web` service:**
+  - `EMAIL_API_KEY`: the new key.
+  - `EMAIL_FROM`: an address on the verified domain, for example `Undertow Fantasy <notifications@yourdomain>`.
+  - `ALERT_EMAIL`: your inbox, for "new signup" alerts.
+  - `BASE_URL`: the https address people will click (it goes into the password link).
+  - `SECRET_KEY`: a long random value, for example `openssl rand -hex 32`.
+- [ ] 4. **Merge PR #24** (accounts from signups, header Log in button) so the migration runs on deploy.
+- [ ] 5. **Set `ACCOUNTS_ENABLED=true`** on `web` and redeploy.
+- [ ] 6. **Test with your own email:** sign up on the landing page, check that the signup alert and the welcome email arrive, open the link, set a password, and confirm you land on `/account`. Also try Log in, Log out and "Forgot your password".
+- [ ] 7. **Make yourself staff** (so you can create leagues): after your account exists, run in the Railway Postgres console `UPDATE user_account SET is_admin = true WHERE email = 'you@example.com';`
+- [ ] 8. **Decide on the consent wording** for people who joined the list earlier (see the Waitlist accounts entry in docs/decisions.md), and send them a heads-up if you want one.
+- [ ] 9. **Backfill the existing list:** `railway run python -m undertow.fantasy.onboarding` is a dry run that prints who would get an account. When it looks right, run it again with `--send`.
+- [ ] 10. **Delete test rows** from `user_account` and `waitlist_signup` that came from your testing, if you don't want them on the real list.
