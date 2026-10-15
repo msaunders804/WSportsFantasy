@@ -18,6 +18,12 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 6. **Domain:** choose the public hostname. Needed for secure cookies, invite links and email. A `*.up.railway.app` URL is fine for the mock draft.
 7. **Secrets** in Railway variables (never in git): `DATABASE_URL`, `SECRET_KEY`, `HOCKEYTECH_KEY`, `HOCKEYTECH_USER_AGENT` (with a contact address), email and backup credentials. `.env.example` lists every variable.
 
+## Needed before accounts open (Phase 3)
+- **Set a real `SECRET_KEY`** on `web` in Railway (a long random value, for example `openssl rand -hex 32`). The app refuses to start with accounts on and the default key. Changing it later logs everyone out of forms in progress.
+- **Run the migration:** it runs on deploy via the `preDeployCommand` (migration 0007 adds the account and league tables).
+- **Make yourself staff** after you register, in the Railway Postgres console: `UPDATE user_account SET is_admin = true WHERE email = 'you@example.com';`
+- **Leave `ACCOUNTS_ENABLED` unset** until you are ready for people to register; set it to `true` to open sign-up and login.
+
 ## Needed before the mock draft (Nov 18-20)
 8. **Email provider: Resend (decided).** Code is wired up (`services/notify.py` sends a new-signup alert); still need you to create a Resend account, verify the sending domain, and set `EMAIL_API_KEY`, `ALERT_EMAIL` and `EMAIL_FROM` in Railway. Until then, sending is a silent no-op. Also still open: pick the inbox for "live feed down" alerts (not built yet).
 9. **Off-site backup bucket** (S3, B2 or R2) with a write-only credential, and one restore test. Railway's own backups do not count.

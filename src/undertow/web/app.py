@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from undertow.config import get_settings
 from undertow.db import get_session
 from undertow.services import notify, waitlist
-from undertow.web import draft_preview
+from undertow.web import accounts, draft_preview
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
@@ -49,6 +49,10 @@ def client_key(request: Request) -> str:
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    accounts_on = settings.accounts_enabled or not settings.is_prod
+    if accounts_on and settings.is_prod and settings.secret_key == "dev-only-change-me":
+        raise RuntimeError("SECRET_KEY must be set to a long random value before accounts open.")
+    templates.env.globals["accounts_enabled"] = accounts_on
     app = FastAPI(title=settings.app_name, docs_url=None if settings.is_prod else "/docs")
     app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
     signup_limiter = RateLimiter(max_events=5, window_seconds=600)
@@ -113,6 +117,9 @@ def create_app() -> FastAPI:
         return templates.TemplateResponse(
             request, "fantasy101.html", {"app_name": settings.app_name}
         )
+
+    if accounts_on:
+        app.include_router(accounts.router)
 
     if settings.preview_enabled or not settings.is_prod:
         # Design mockups on sample data (see preview_data.py). Replaced by real pages later.

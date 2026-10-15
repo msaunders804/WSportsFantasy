@@ -53,7 +53,7 @@ a { color: var(--primary); }
 .card h2 { font-size: 1.35rem; }
 .field { display: grid; gap: var(--space-1); margin-bottom: var(--space-4); }
 label { font-weight: 600; font-size: 0.95rem; }
-input[type="email"], input[type="text"], select {
+input[type="email"], input[type="text"], input[type="password"], input[type="number"], select {
   width: 100%; font: inherit; font-size: 1rem; color: var(--text); background: var(--bg);
   border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; min-height: 48px;
 }

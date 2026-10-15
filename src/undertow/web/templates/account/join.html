@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Join {{ league.name }} | Undertow Fantasy{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap page">
+    <h1>Join {{ league.name }}</h1>
+    <p class="muted">Pick a name for your team. Others in the league will see it.</p>
+    <form class="card" method="post" action="/join/{{ code }}">
+      {% if errors.form %}<p class="alert" role="alert">{{ errors.form }}</p>{% endif %}
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="team_name">Team name</label>
+        <input id="team_name" name="team_name" type="text" maxlength="40" required value="{{ form.team_name or '' }}">
+      </div>
+      <button class="btn" type="submit">Join league</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
