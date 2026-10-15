@@ -25,7 +25,7 @@ class LeagueSettingsData:
     roster_util: int = 1
     roster_g: int = 1
     roster_bench: int = 4
-    roster_ir: int = 1
+    roster_ir: int = 2
     max_goalies: int = 2
     waiver_hours: int = 48
     trade_review_hours: int = 24
@@ -40,8 +40,13 @@ class LeagueSettingsData:
 
     @property
     def roster_size(self) -> int:
-        """Every slot a team holds: starters, bench and IR (12 by default)."""
-        return self.starters + self.roster_bench + self.roster_ir
+        """Starters plus bench (11 by default). IR spots are separate and not counted here."""
+        return self.starters + self.roster_bench
+
+    @property
+    def players_held(self) -> int:
+        """Most players one team can own: the roster plus its IR spots (13 by default)."""
+        return self.roster_size + self.roster_ir
 
     def as_columns(self) -> dict:
         return {f.name: getattr(self, f.name) for f in fields(self)}
@@ -123,9 +128,9 @@ def validate_settings(
             f"{size * settings.roster_g} starting goalies, and the PWHL only has about "
             f"{STARTING_GOALIES_LEAGUE_WIDE}. Some goalie slots will sit empty."
         )
-    if active_pool and size * settings.roster_size > POOL_WARNING_SHARE * active_pool:
+    if active_pool and size * settings.players_held > POOL_WARNING_SHARE * active_pool:
         warnings.append(
-            f"Rosters would use {size * settings.roster_size} of about {active_pool} players, "
+            f"Rosters would use {size * settings.players_held} of about {active_pool} players, "
             "which leaves few good options on the waiver wire."
         )
     return Validation(errors, warnings)

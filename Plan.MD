@@ -123,8 +123,8 @@ The PWHL publishes stats through **HockeyTech**, the same platform the AHL uses.
 ### 4.1 Roster (scaled to a small player pool)
 The pool is about 276 players (about 36 goalies). Default lineup:
 - Starters: **3 F, 2 D, 1 UTIL (F/D), 1 G**
-- Bench: 4. IR: 1 (only eligible players).
-- Total: 12 players. Each 10-team league uses about 120 of roughly 276 players, which leaves a usable waiver pool.
+- Bench: 4. That makes an 11-player roster, and the draft is 11 rounds.
+- IR: **2 spots, separate from the roster and bench** (decided Oct 15, 2026). They do not count toward the 11, and only eligible (injured) players can go there. A team can own up to 13 players. Each 10-team league uses up to about 130 of roughly 276 players, which leaves a usable waiver pool.
 - Goalies: 10 starting G slots per league against 12 PWHL starters. Goalies will be scarce. Cap rostered goalies at 2 per team so one manager cannot corner the position.
 
 Warn the commissioner when (teams × roster size) exceeds about 50% of the active player pool, or when (teams × G slots) exceeds 12.

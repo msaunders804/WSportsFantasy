@@ -31,7 +31,7 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 11. **Recruit 20 managers** (10 per league) and **pick a draft date for each league**. Both before Dec 5; after training camp rosters (announced from Oct 18) and ideally the week after preseason starts (Nov 22). Schedule a mock draft with real users for Nov 18-20.
 
 ## Decisions for you
-12. **Scoring table** (before Phase 7, about Nov 16): confirm against ESPN's current hockey points defaults. Roster slots (3F/2D/1UTIL/1G, 4 bench, 1 IR), 48 h waivers, 24 h trade review and the draft pick timer (60/90/120 s) are the other defaults to confirm.
+12. **Scoring table** (before Phase 7, about Nov 16): confirm against ESPN's current hockey points defaults. Roster slots (3F/2D/1UTIL/1G, 4 bench, 2 IR kept separate from the roster), 48 h waivers, 24 h trade review and the draft pick timer (60/90/120 s) are the other defaults to confirm.
 13. **Feed risk:** the HockeyTech feed is unofficial and unlicensed for this use. Decide whether you accept that for a small private app, whether to contact the PWHL, and whether you want a manual stat-entry fallback for commissioners if the feed breaks.
 14. **Clean the fixtures (optional):** the recorded fixtures contain the public site key in their `Parameters` block. Say so if you want it scrubbed.
 

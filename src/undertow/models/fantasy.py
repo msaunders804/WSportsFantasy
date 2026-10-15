@@ -96,7 +96,7 @@ class LeagueSettings(Base):
     roster_util: Mapped[int] = mapped_column(Integer, default=1)
     roster_g: Mapped[int] = mapped_column(Integer, default=1)
     roster_bench: Mapped[int] = mapped_column(Integer, default=4)
-    roster_ir: Mapped[int] = mapped_column(Integer, default=1)
+    roster_ir: Mapped[int] = mapped_column(Integer, default=2)
     max_goalies: Mapped[int] = mapped_column(Integer, default=2)
     # Exact per-stat points as strings (ScoringConfig.to_dict), so no float ever enters storage.
     scoring_config: Mapped[dict] = mapped_column(JSONB)

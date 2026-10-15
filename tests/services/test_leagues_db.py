@@ -241,3 +241,8 @@ def test_default_playoff_size_never_exceeds_a_small_league(db, admin):
     big = new_league(db, admin, size=10, name="Big")
     assert db.get(LeagueSettings, small.id).playoff_teams == 4
     assert db.get(LeagueSettings, big.id).playoff_teams == 6
+
+
+def test_new_leagues_get_two_ir_spots(db, admin):
+    league = new_league(db, admin, size=10)
+    assert db.get(LeagueSettings, league.id).roster_ir == 2

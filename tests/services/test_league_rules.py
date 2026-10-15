@@ -8,7 +8,9 @@ def test_default_settings_match_plan():
     s = LeagueSettingsData()
     assert (s.roster_f, s.roster_d, s.roster_util, s.roster_g) == (3, 2, 1, 1)
     assert s.starters == 7
-    assert s.roster_size == 12  # 7 starters + 4 bench + 1 IR
+    assert s.roster_size == 11  # 7 starters + 4 bench; IR is separate
+    assert s.roster_ir == 2
+    assert s.players_held == 13
     assert s.max_goalies == 2
     assert s.scoring_config["ot_win_multiplier"] == "2/3"
 
@@ -26,7 +28,7 @@ def test_invalid_sizes(size):
 def test_default_ten_team_league_is_valid():
     result = rules.validate_settings(10, LeagueSettingsData(), active_pool=276)
     assert result.ok
-    # 10 teams x 12 players = 120 of 276, under half the pool.
+    # 10 teams x 13 players (roster plus IR) = 130 of 276, under half the pool.
     assert not any("waiver wire" in w for w in result.warnings)
 
 
@@ -84,3 +86,18 @@ def test_one_goalie_slot_minimum_means_there_is_always_a_starter():
 def test_clean_name_collapses_whitespace_and_caps_length():
     assert rules.clean_name("  Ice   Queens \n", max_length=40) == "Ice Queens"
     assert len(rules.clean_name("x" * 100, max_length=40)) == 40
+
+
+def test_ir_spots_are_separate_from_the_roster():
+    s = LeagueSettingsData(roster_ir=4)
+    assert s.roster_size == 11
+    assert s.players_held == 15
+
+
+def test_pool_warning_counts_players_on_ir():
+    # 10 teams x 11 = 110 would fit under half of 250, but x 13 with IR does not.
+    result = rules.validate_settings(10, LeagueSettingsData(), active_pool=250)
+    assert any("waiver wire" in w for w in result.warnings)
+    assert not rules.validate_settings(
+        10, LeagueSettingsData(roster_ir=0), active_pool=250
+    ).warnings
