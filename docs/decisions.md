@@ -183,3 +183,10 @@ Decided by Megan: joining the league interest list also makes an Undertow accoun
 - **Key dates in one place:** `fantasy/key_dates.py` now feeds the landing page, Fantasy 101 and the account page, so a date change is one edit. Before this the same dates were typed on several pages and went stale twice.
 - **Gating:** all of this stays behind `ACCOUNTS_ENABLED` in prod. While it is off, signup makes no account (the row is kept, so the backfill picks it up later) and the pages return 404.
 - **Not built:** a feed of staff-posted updates (announcements). The account page shows status and dates only. Added to backlog.md.
+
+## 2026-10-15: Account control in the header, theme toggle in the footer
+Decided by Megan: the header's prime spot belongs to the account, because that is where members will personalize their profile and it shows at a glance whether you are logged in. The light/dark button moved to the footer on every page.
+- **Header:** a "Log in" button when logged out; when logged in, the member's initial and name linking to `/account` (name hidden on narrow phones, with an `aria-label`). Hidden while `ACCOUNTS_ENABLED` is off in prod.
+- **Real login state on every page:** a template context processor (`nav_context` in `web/app.py`) looks up the session cookie, so the header is right even on public pages, and a stale or ended session shows "Log in". It costs one query, only for visitors who send a session cookie, and a lookup failure falls back to "Log in" rather than breaking the page.
+- **Theme button:** now in the footer of the public pages, the preview app shell and the draft room. It is no longer in any header. The draft room's top bar (exit, title) has no account control, since it is the pick clock.
+- Shared pieces are in `templates/partials/` (`account_nav.html`, `theme_toggle.html`).

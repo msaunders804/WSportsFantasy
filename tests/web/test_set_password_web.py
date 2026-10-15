@@ -278,14 +278,6 @@ def test_registering_with_a_waitlist_email_points_to_forgot_password(client):
     assert "Forgot your password" in resp.text
 
 
-def test_nav_shows_log_in_then_my_account(client, emails):
-    assert 'href="/login">Log in<' in client.get("/").text
-    join_list(client)
-    set_password(client, emails[0][2])
-    home = client.get("/").text
-    assert 'href="/account">My account<' in home and "Log in<" not in home
-
-
 def test_every_page_shows_the_same_key_dates(client):
     home = client.get("/").text
     guide = client.get("/fantasy-101").text

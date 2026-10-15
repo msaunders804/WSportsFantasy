@@ -14,13 +14,32 @@ from sqlalchemy.orm import Session
 from undertow import notify
 from undertow.config import get_settings
 from undertow.data import get_session
-from undertow.fantasy import key_dates, onboarding, waitlist
-from undertow.web import accounts, draft_preview
+from undertow.data.session import session_factory
+from undertow.fantasy import auth, key_dates, onboarding, waitlist
+from undertow.web import accounts, draft_preview, security
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
 WEB_DIR = Path(__file__).parent
-templates = Jinja2Templates(directory=WEB_DIR / "templates")
+
+
+def nav_context(request: Request) -> dict:
+    """The signed-in member for the header's Log in / account control, on every page.
+
+    Costs one lookup, and only for visitors who send a session cookie.
+    """
+    token = request.cookies.get(security.SESSION_COOKIE)
+    if not token:
+        return {"nav_user": None}
+    try:
+        with session_factory()() as session:
+            return {"nav_user": auth.user_for_token(session, token)}
+    except Exception:
+        logger.warning("Could not look up the signed-in member for the header", exc_info=True)
+        return {"nav_user": None}
+
+
+templates = Jinja2Templates(directory=WEB_DIR / "templates", context_processors=[nav_context])
 
 
 def static_version() -> str:

@@ -38,8 +38,7 @@
       <div class="bar-actions">
         <a class="nav-link" href="/about">Who we are</a>
         <a class="nav-link" href="/fantasy-101">Fantasy 101</a>
-        {% if accounts_enabled %}{% if request.cookies.get("ut_session") %}<a class="nav-link" href="/account">My account</a>{% else %}<a class="nav-link" href="/login">Log in</a>{% endif %}{% endif %}
-        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch between dark and light theme">Light mode</button>
+        {% include "partials/account_nav.html" %}
       </div>
     </header>
   </div>
@@ -49,6 +48,7 @@
   <footer>
     <div class="wrap">
       <p><strong>Unofficial and unaffiliated.</strong> Undertow Sports is an independent fan project. It is not affiliated with, endorsed by, or sponsored by the PWHL or any of its teams. Team names and logos belong to their owners.</p>
+      <p class="foot-tools">{% include "partials/theme_toggle.html" %}</p>
       <p>Built by women for women's sports. <a href="/about">Who we are</a> · <a href="/fantasy-101">Fantasy 101</a> · <a href="/privacy">Privacy</a> · <a href="mailto:dev@undertowsports.com">Contact us</a></p>
     </div>
   </footer>
@@ -56,6 +56,7 @@
   <script>
     (function () {
       var btn = document.getElementById("theme-toggle");
+      if (!btn) return;
       var root = document.documentElement;
       function label() { btn.textContent = root.dataset.theme === "light" ? "Dark mode" : "Light mode"; }
       label();
