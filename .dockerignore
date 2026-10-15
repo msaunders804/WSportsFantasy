@@ -1,6 +1,10 @@
 .venv
 .git
 tests
+analysis
+data
+scripts
+ci
 docs
 __pycache__
 .env

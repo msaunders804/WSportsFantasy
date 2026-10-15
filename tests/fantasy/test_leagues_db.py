@@ -4,9 +4,9 @@ import pytest
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from undertow.models import AuditLog, FantasyTeam, League, LeagueMember, LeagueSettings, User
-from undertow.services import auth, leagues
-from undertow.services.league_rules import LeagueSettingsData
+from undertow.data.models import AuditLog, FantasyTeam, League, LeagueMember, LeagueSettings, User
+from undertow.fantasy import auth, leagues
+from undertow.fantasy.league_rules import LeagueSettingsData
 
 pytestmark = pytest.mark.db
 

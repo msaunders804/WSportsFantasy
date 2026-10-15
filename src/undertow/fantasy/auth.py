@@ -17,7 +17,7 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from undertow.models import AuthSession, User
+from undertow.data.models import AuthSession, User
 
 SESSION_DAYS = 30
 # Only write last_seen_at when it is older than this, so a page view is not a database write.

@@ -11,9 +11,9 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from undertow.data.models import Game, JobRun
 from undertow.ingest import sync
 from undertow.ingest.feed import Feed
-from undertow.models import Game, JobRun
 
 log = logging.getLogger(__name__)
 

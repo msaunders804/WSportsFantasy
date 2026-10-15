@@ -17,12 +17,12 @@ from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from undertow.db.session import session_factory as default_session_factory
+from undertow.data.models import Game, GoalieGameStats, Player, SkaterGameStats
+from undertow.data.session import session_factory as default_session_factory
+from undertow.fantasy.scoring import ScoringConfig, score_goalie, score_skater
+from undertow.fantasy.stat_lines import goalie_stat_line, skater_stat_line
 from undertow.ingest import jobs
 from undertow.ingest.feed import Feed, HockeyTechFeed, RawResponse
-from undertow.models import Game, GoalieGameStats, Player, SkaterGameStats
-from undertow.scoring import ScoringConfig, score_goalie, score_skater
-from undertow.services.stat_lines import goalie_stat_line, skater_stat_line
 
 log = logging.getLogger(__name__)
 

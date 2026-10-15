@@ -1,4 +1,4 @@
-from undertow.models.fantasy import (
+from undertow.data.models.fantasy import (
     AuditLog,
     AuthSession,
     FantasyTeam,
@@ -7,7 +7,7 @@ from undertow.models.fantasy import (
     LeagueSettings,
     User,
 )
-from undertow.models.hockey import (
+from undertow.data.models.hockey import (
     Game,
     GoalieGameStats,
     JobRun,
@@ -17,7 +17,7 @@ from undertow.models.hockey import (
     Season,
     SkaterGameStats,
 )
-from undertow.models.waitlist import WaitlistSignup
+from undertow.data.models.waitlist import WaitlistSignup
 
 __all__ = [
     "AuditLog",

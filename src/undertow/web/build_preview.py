@@ -24,10 +24,10 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from undertow.db import get_engine
-from undertow.models import Game, GoalieGameStats, Player, ProTeam, SkaterGameStats
-from undertow.scoring import ScoringConfig, score_goalie, score_skater
-from undertow.services.stat_lines import goalie_stat_line, skater_stat_line
+from undertow.data import get_engine
+from undertow.data.models import Game, GoalieGameStats, Player, ProTeam, SkaterGameStats
+from undertow.fantasy.scoring import ScoringConfig, score_goalie, score_skater
+from undertow.fantasy.stat_lines import goalie_stat_line, skater_stat_line
 
 OUT = Path(__file__).with_name("preview_data.json")
 ET = ZoneInfo("America/New_York")

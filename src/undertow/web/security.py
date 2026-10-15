@@ -14,9 +14,9 @@ from fastapi import Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 
 from undertow.config import get_settings
-from undertow.db import get_session
-from undertow.models import User
-from undertow.services import auth
+from undertow.data import get_session
+from undertow.data.models import User
+from undertow.fantasy import auth
 
 SESSION_COOKIE = "ut_session"
 CSRF_COOKIE = "ut_csrf"

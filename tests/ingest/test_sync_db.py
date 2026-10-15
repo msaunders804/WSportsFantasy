@@ -1,8 +1,7 @@
 import pytest
 from sqlalchemy import func, select
 
-from undertow.ingest import sync
-from undertow.models import (
+from undertow.data.models import (
     Game,
     GoalieGameStats,
     Player,
@@ -11,6 +10,7 @@ from undertow.models import (
     Season,
     SkaterGameStats,
 )
+from undertow.ingest import sync
 
 pytestmark = pytest.mark.db
 
@@ -95,8 +95,8 @@ def test_raw_snapshot_dedupes_by_content_hash_and_url_has_no_key(session, feed):
 def test_stored_box_score_scores_end_to_end(session, feed):
     from fractions import Fraction
 
-    from undertow.scoring import ScoringConfig, score_goalie
-    from undertow.services.stat_lines import goalie_stat_line
+    from undertow.fantasy.scoring import ScoringConfig, score_goalie
+    from undertow.fantasy.stat_lines import goalie_stat_line
 
     seed(session, feed)
     sync.sync_game(session, feed, 227)

@@ -13,8 +13,8 @@ from sqlalchemy import text
 from sqlalchemy.engine import Connection
 
 from undertow.config import get_settings
-from undertow.db import get_engine
-from undertow.db.session import session_factory
+from undertow.data import get_engine
+from undertow.data.session import session_factory
 from undertow.ingest import jobs
 from undertow.ingest.feed import Feed, FeedError, HockeyTechFeed
 

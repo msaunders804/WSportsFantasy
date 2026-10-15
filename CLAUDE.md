@@ -13,13 +13,16 @@ Source of truth for scope and rules is [Plan.MD](Plan.MD); design decisions and 
 - Lint: `uv run ruff check . && uv run ruff format .`
 
 ## Layout
-- `src/undertow/config.py`: settings from env. `db/`: engine, session, Base.
-- `ingest/`: `feed.py` (the only HockeyTech access; live and fixture feeds), `parsing.py` (pure JSON to DTO), `dto.py`, `store.py` (snapshots and upserts), `sync.py` (sync functions), `jobs.py` (scheduled worker jobs), `replay.py` (season replay and integrity checks).
-- `models/`: SQLAlchemy tables (real-hockey tables so far). `data/`: small config data (conferences).
-- `scoring/`: pure scoring engine (exact fractions). `services/`: business logic with no HTTP; `stat_lines.py` bridges DB rows to scoring input.
-- `web/`: FastAPI app and templates. `worker/`: scheduler process.
-- `migrations/`: Alembic. `tests/`: `ingest/`, `scoring/`, fixtures in `tests/fixtures/hockeytech/`.
-- Later phases add fantasy tables, drafts, matchups and waivers under `models/` and `services/`.
+One repo for everything Undertow: the fantasy game, the data feed, and content work for social media.
+- `src/undertow/config.py`: settings from env. `notify.py`: outgoing email (Resend), shared by everything.
+- `ingest/`: the HockeyTech API client and the single source of truth for real-hockey data. `feed.py` (the only HockeyTech access; live and fixture feeds), `parsing.py` (pure JSON to DTO), `dto.py`, `store.py` (snapshots and upserts), `sync.py` (sync functions), `jobs.py` (scheduled worker jobs), `replay.py` (season replay and integrity checks).
+- `data/`: the data layer. `base.py` and `session.py` (engine, session, Base), `models/` (`hockey.py`, `fantasy.py`, `waitlist.py`), `migrations/` (Alembic), `conferences.json` (small config data).
+- `fantasy/`: the game, with no HTTP code. `scoring/` (pure scoring engine, exact fractions), `auth.py` (accounts and sessions), `leagues.py` and `league_rules.py` (leagues, teams, settings), `draft.py`, `waitlist.py`, `stat_lines.py` (bridges DB rows to scoring input).
+- `content/`: analytics, stat notes and simulations for social media. Reads the database through `undertow.data`, never the feed directly.
+- `web/`: FastAPI routes, templates and static files (`tokens.css`). `worker/`: the scheduler process (kept as `undertow.worker.main` because Railway's start command names it).
+- `analysis/` (repo root): notebooks and one-off work such as TikTok pieces. Never deployed (not copied into the Docker image). Anything reusable moves into `content/`.
+- `tests/` mirrors the package: `ingest/`, `fantasy/`, `web/`, fixtures in `tests/fixtures/hockeytech/`.
+- Dependencies point one way: `web` and `worker` use the other packages; `fantasy`, `content` and `ingest` use `data`; nothing outside `web` imports `web`. The one cross-link is `ingest/replay.py`, which scores replayed games with `fantasy.scoring` to check them.
 
 ## Rules (from Plan section 9)
 - One phase at a time; a phase is done when its tests pass.

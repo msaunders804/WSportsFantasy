@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from undertow.scoring import (
+from undertow.fantasy.scoring import (
     Decision,
     GoalieStatLine,
     ResultType,

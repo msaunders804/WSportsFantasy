@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from undertow.models import (
+from undertow.data.models import (
     AuditLog,
     FantasyTeam,
     League,
@@ -21,8 +21,8 @@ from undertow.models import (
     Player,
     User,
 )
-from undertow.services import league_rules
-from undertow.services.league_rules import LeagueSettingsData
+from undertow.fantasy import league_rules
+from undertow.fantasy.league_rules import LeagueSettingsData
 
 MAX_LEAGUE_NAME = 80
 MAX_TEAM_NAME = 40

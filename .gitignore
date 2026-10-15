@@ -9,3 +9,7 @@ __pycache__/
 dist/
 .claude/worktrees/
 /data/
+# Notebook and analysis scratch: keep code and notebooks, not exports or big data
+analysis/**/.ipynb_checkpoints/
+analysis/**/output/
+analysis/**/data/

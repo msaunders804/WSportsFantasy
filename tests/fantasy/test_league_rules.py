@@ -1,7 +1,7 @@
 import pytest
 
-from undertow.services import league_rules as rules
-from undertow.services.league_rules import LeagueSettingsData
+from undertow.fantasy import league_rules as rules
+from undertow.fantasy.league_rules import LeagueSettingsData
 
 
 def test_default_settings_match_plan():

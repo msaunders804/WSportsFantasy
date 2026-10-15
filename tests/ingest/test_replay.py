@@ -1,7 +1,7 @@
 import pytest
 
+from undertow.data.models import GoalieGameStats
 from undertow.ingest.replay import CachingFeed, leaderboard, run_replay, validate
-from undertow.models import GoalieGameStats
 
 pytestmark = pytest.mark.db
 

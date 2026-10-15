@@ -4,7 +4,7 @@ import re
 import pytest
 from fastapi.testclient import TestClient
 
-from undertow.services import draft
+from undertow.fantasy import draft
 from undertow.web import draft_preview
 from undertow.web.app import app
 

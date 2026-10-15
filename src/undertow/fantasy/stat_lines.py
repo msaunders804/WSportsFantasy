@@ -1,7 +1,7 @@
 """Bridge from stored stat rows to the pure scoring engine's input types."""
 
-from undertow.models import GoalieGameStats, SkaterGameStats
-from undertow.scoring import Decision, GoalieStatLine, ResultType, SkaterStatLine
+from undertow.data.models import GoalieGameStats, SkaterGameStats
+from undertow.fantasy.scoring import Decision, GoalieStatLine, ResultType, SkaterStatLine
 
 _SKATER_FIELDS = (
     "goals assists shots hits blocks penalty_minutes plus_minus toi_seconds pp_goals "

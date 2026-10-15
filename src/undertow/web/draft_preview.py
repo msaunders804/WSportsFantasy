@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-from undertow.services import draft
+from undertow.fantasy import draft
 from undertow.web import preview_data as sample
 
 router = APIRouter()
