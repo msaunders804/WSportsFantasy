@@ -4,7 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from undertow.db import get_engine
-from undertow.services import waitlist
+from undertow.services import notify, waitlist
 from undertow.web import app as web_app
 from undertow.web.ratelimit import RateLimiter
 
@@ -104,6 +104,21 @@ def test_duplicate_signup_is_a_quiet_noop(client):
     assert client.post("/signup", data=form).status_code == 303
     assert client.post("/signup", data={**form, "email": "FAN@example.com"}).status_code == 303
     assert count() == 1
+
+
+@pytest.mark.db
+def test_signup_triggers_alert_only_for_new_signups(client, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        notify,
+        "send_signup_alert",
+        lambda settings, email, first_name, **_: calls.append(email) or True,
+    )
+    form = {"email": "fan@example.com", "consent": "on"}
+    client.post("/signup", data=form)
+    assert calls == ["fan@example.com"]
+    client.post("/signup", data={**form, "email": "FAN@example.com"})
+    assert calls == ["fan@example.com"]  # duplicate did not trigger a second alert
 
 
 @pytest.mark.db

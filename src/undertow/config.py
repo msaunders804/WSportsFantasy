@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     # Serve the /preview design mockups even in prod (they are always on outside prod).
     preview_enabled: bool = False
 
+    # Resend API key for outgoing alert emails (e.g. new signups). Empty disables sending.
+    email_api_key: str = ""
+    # Where signup alerts go.
+    alert_email: str = ""
+    # Must be on a domain verified with the email provider (Resend).
+    email_from: str = "Undertow Fantasy <notifications@undertowsports.com>"
+
     hockeytech_key: str = ""
     hockeytech_client_code: str = "pwhl"
     hockeytech_user_agent: str = "UndertowSports/0.1 (contact: set HOCKEYTECH_USER_AGENT)"

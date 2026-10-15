@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from undertow.config import get_settings
 from undertow.db import get_session
-from undertow.services import waitlist
+from undertow.services import notify, waitlist
 from undertow.web import draft_preview
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
@@ -89,7 +89,9 @@ def create_app() -> FastAPI:
         data, errors = waitlist.clean_signup(form)
         if data is None:
             return landing(request, form, errors, status_code=422)
-        await run_in_threadpool(waitlist.add_signup, session, data)
+        created = await run_in_threadpool(waitlist.add_signup, session, data)
+        if created:
+            await run_in_threadpool(notify.send_signup_alert, settings, data.email, data.first_name)
         # Same answer whether or not the email was already on the list.
         return RedirectResponse("/thanks", status_code=303)
 
