@@ -24,6 +24,12 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 - **Make yourself staff** after you register, in the Railway Postgres console: `UPDATE user_account SET is_admin = true WHERE email = 'you@example.com';`
 - **Leave `ACCOUNTS_ENABLED` unset** until you are ready for people to register; set it to `true` to open sign-up and login.
 
+## Needed before waitlist signups get accounts (set-password links)
+- **Verify the Resend sending domain** (item 8 below) and set `EMAIL_API_KEY`, `EMAIL_FROM` and `BASE_URL` (must be the https address people will click, because it goes into the emailed link). Without these, nobody receives their link.
+- **Send a test link to yourself first:** set `ACCOUNTS_ENABLED=true`, sign up with your own email on the landing page, and check the email, the link, and the account page.
+- **Then the existing list:** `railway run python -m undertow.fantasy.onboarding` shows who would get an account. Add `--send` to email everyone. Decide first whether the new consent wording (see decisions.md) is fine for people who joined under the old one.
+- Until `ACCOUNTS_ENABLED` is on, signups are kept and picked up by that command later.
+
 ## Needed before the mock draft (Nov 18-20)
 8. **Email provider: Resend (decided).** Code is wired up (`notify.py` sends a new-signup alert); still need you to create a Resend account, verify the sending domain, and set `EMAIL_API_KEY`, `ALERT_EMAIL` and `EMAIL_FROM` in Railway. Until then, sending is a silent no-op. Also still open: pick the inbox for "live feed down" alerts (not built yet).
 9. **Off-site backup bucket** (S3, B2 or R2) with a write-only credential, and one restore test. Railway's own backups do not count.

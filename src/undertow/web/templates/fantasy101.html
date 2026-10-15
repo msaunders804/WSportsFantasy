@@ -27,11 +27,8 @@
     <table>
       <thead><tr><th scope="col">Date</th><th scope="col">What happens</th></tr></thead>
       <tbody>
-        <tr><td>Nov 15</td><td>Sign-ups close</td></tr>
-        <tr><td>By Nov 20</td><td>Leagues assigned, invites emailed</td></tr>
-        <tr><td>Nov 30 to Dec 4</td><td>Live snake draft, after the preseason</td></tr>
-        <tr><td>Dec 5</td><td>Season opens, Week 1 begins</td></tr>
-      </tbody>
+        {% for d in key_dates %}<tr><td>{{ d.table_when }}</td><td>{{ d.what }}</td></tr>
+        {% endfor %}      </tbody>
     </table>
 
     <h2 id="roster">Your roster</h2>
@@ -50,7 +47,7 @@
     <p class="muted">You can roster at most 2 goalies at a time. The PWHL only has 12 starting goalies league-wide, so we cap it to keep the position from getting cornered.</p>
 
     <h2 id="draft">Draft day</h2>
-    <p>Our live snake draft runs <strong>Nov 30 to Dec 4</strong>, after the preseason. Team 1 picks first in round 1, then Team 2, Team 3, and so on; the order reverses each round, so whoever picked last in round 1 picks first in round 2. Everyone gets a timer for each pick. If it runs out, autopick takes the best player left on your queue (or our default rankings if your queue is empty), respecting your open roster slots. You can practice the whole thing beforehand in the <a href="/preview/draft">draft room</a>.</p>
+    <p>Our live snake draft runs <strong>{{ dates.draft.when }}</strong>, after the preseason. Team 1 picks first in round 1, then Team 2, Team 3, and so on; the order reverses each round, so whoever picked last in round 1 picks first in round 2. Everyone gets a timer for each pick. If it runs out, autopick takes the best player left on your queue (or our default rankings if your queue is empty), respecting your open roster slots. You can practice the whole thing beforehand in the <a href="/preview/draft">draft room</a>.</p>
 
     <h2 id="scoring">Scoring</h2>
     <p>Every stat your players rack up in real PWHL games turns into fantasy points automatically.</p>

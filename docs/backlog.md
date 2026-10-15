@@ -40,3 +40,8 @@ Decisions and reasons are in [decisions.md](decisions.md) (2026-10-15, in-app ch
 
 ## Explain as we go
 - Brand rule: never leave a user guessing. Every term or number that is not obvious gets a "?" tip (`help` macro in `app/_macros.html`). When a new page adds a term, add its tip in the same change.
+
+## Account updates (wanted)
+- **Staff-posted updates on `/account`:** the account page shows the member's status and the key dates, but not a feed of announcements ("drafts are open", "your league is ready"). Needs an `announcement` table (title, body, published_at, optional league), a staff screen to post, and an "unread" marker. Decide whether each post also emails, which needs notification preferences and an unsubscribe link in every email.
+- **Unsubscribe:** the signup consent says "I can unsubscribe any time" and today that means emailing us. Add an unsubscribe link and a stored preference before sending anything beyond account links.
+- Account page extras: change name, password and email, and a "log out everywhere" button (`auth.end_all_sessions` already exists).

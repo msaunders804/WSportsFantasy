@@ -1,6 +1,7 @@
 from undertow.data.models.fantasy import (
     AuditLog,
     AuthSession,
+    AuthToken,
     FantasyTeam,
     League,
     LeagueMember,
@@ -22,6 +23,7 @@ from undertow.data.models.waitlist import WaitlistSignup
 __all__ = [
     "AuditLog",
     "AuthSession",
+    "AuthToken",
     "FantasyTeam",
     "Game",
     "GoalieGameStats",

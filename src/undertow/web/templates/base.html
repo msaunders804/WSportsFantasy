@@ -38,7 +38,7 @@
       <div class="bar-actions">
         <a class="nav-link" href="/about">Who we are</a>
         <a class="nav-link" href="/fantasy-101">Fantasy 101</a>
-        {% if accounts_enabled %}<a class="nav-link" href="/leagues">My leagues</a>{% endif %}
+        {% if accounts_enabled %}{% if request.cookies.get("ut_session") %}<a class="nav-link" href="/account">My account</a>{% else %}<a class="nav-link" href="/login">Log in</a>{% endif %}{% endif %}
         <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch between dark and light theme">Light mode</button>
       </div>
     </header>

@@ -17,6 +17,7 @@
         <input id="password" name="password" type="password" autocomplete="current-password" required>
       </div>
       <button class="btn" type="submit">Log in</button>
+      <p class="fine"><a href="/password/forgot">Forgot your password, or haven't set one yet?</a></p>
       <p class="fine">New here? <a href="/register{% if next %}?next={{ next | urlencode }}{% endif %}">Create an account</a>.</p>
     </form>
   </div>

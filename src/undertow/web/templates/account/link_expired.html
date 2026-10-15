@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Link expired | Undertow Fantasy{% endblock %}
+{% block head_extra %}<meta name="referrer" content="no-referrer">{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap page">
+    <h1>That link has expired</h1>
+    <p>Password links work once and for a limited time. Ask for a new one and we'll email it to you.</p>
+    <p><a class="btn" href="/password/forgot">Email me a new link</a></p>
+  </div>
+</section>
+{% endblock %}
