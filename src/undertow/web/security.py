@@ -92,7 +92,7 @@ def require_user(request: Request, user: User | None = Depends(optional_user)) -
     return user
 
 
-def safe_next(target: str, default: str = "/leagues") -> str:
+def safe_next(target: str, default: str = "/account") -> str:
     """Only allow same-site paths as a post-login destination (no open redirect)."""
     if target.startswith("/") and not target.startswith("//") and "\\" not in target:
         return target

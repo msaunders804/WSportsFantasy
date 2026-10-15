@@ -1,4 +1,5 @@
 import hashlib
+import logging
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -13,13 +14,32 @@ from sqlalchemy.orm import Session
 from undertow import notify
 from undertow.config import get_settings
 from undertow.data import get_session
-from undertow.fantasy import waitlist
-from undertow.web import accounts, draft_preview
+from undertow.data.session import session_factory
+from undertow.fantasy import auth, key_dates, onboarding, waitlist
+from undertow.web import accounts, draft_preview, security
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
 WEB_DIR = Path(__file__).parent
-templates = Jinja2Templates(directory=WEB_DIR / "templates")
+
+
+def nav_context(request: Request) -> dict:
+    """The signed-in member for the header's Log in / account control, on every page.
+
+    Costs one lookup, and only for visitors who send a session cookie.
+    """
+    token = request.cookies.get(security.SESSION_COOKIE)
+    if not token:
+        return {"nav_user": None}
+    try:
+        with session_factory()() as session:
+            return {"nav_user": auth.user_for_token(session, token)}
+    except Exception:
+        logger.warning("Could not look up the signed-in member for the header", exc_info=True)
+        return {"nav_user": None}
+
+
+templates = Jinja2Templates(directory=WEB_DIR / "templates", context_processors=[nav_context])
 
 
 def static_version() -> str:
@@ -35,7 +55,10 @@ def static_version() -> str:
 
 
 templates.env.globals["v"] = static_version()
+templates.env.globals["dates"] = key_dates.DATES
+templates.env.globals["key_dates"] = key_dates.KEY_DATES
 
+logger = logging.getLogger(__name__)
 MAX_FORM_BYTES = 8192
 UTM_FIELDS = ("utm_source", "utm_medium", "utm_campaign")
 
@@ -57,6 +80,15 @@ def create_app() -> FastAPI:
     app = FastAPI(title=settings.app_name, docs_url=None if settings.is_prod else "/docs")
     app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
     signup_limiter = RateLimiter(max_events=5, window_seconds=600)
+
+    def welcome(session: Session, email: str, first_name: str | None) -> None:
+        """Account and set-password email for a new signup. A failure here must never break the
+        signup itself (they are already on the list), so it is logged and swallowed."""
+        try:
+            onboarding.welcome_signup(session, settings, email=email, first_name=first_name)
+        except Exception:
+            session.rollback()
+            logger.exception("Could not create an account for a new waitlist signup")
 
     def landing(request: Request, form=None, errors=None, status_code: int = 200) -> Response:
         utm = {k: request.query_params.get(k, "")[:100] for k in UTM_FIELDS}
@@ -97,6 +129,8 @@ def create_app() -> FastAPI:
         created = await run_in_threadpool(waitlist.add_signup, session, data)
         if created:
             await run_in_threadpool(notify.send_signup_alert, settings, data.email, data.first_name)
+            if accounts_on:
+                await run_in_threadpool(welcome, session, data.email, data.first_name)
         # Same answer whether or not the email was already on the list.
         return RedirectResponse("/thanks", status_code=303)
 

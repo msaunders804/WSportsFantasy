@@ -118,7 +118,6 @@ body { padding-bottom: 24px; }
   .sheet { border-radius: var(--radius); }
 }
 
-.dr-top .theme-toggle { white-space: nowrap; }
 @media (max-width: 520px) {
   .rec-main { grid-template-columns: 1fr; }
   .dr-rec .btn { width: 100%; }

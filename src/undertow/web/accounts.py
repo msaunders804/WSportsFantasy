@@ -1,6 +1,8 @@
 """Pages for accounts and leagues: register, log in, join by invite link, league setup."""
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+import logging
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
@@ -9,16 +11,21 @@ from sqlalchemy.orm import Session
 from undertow.config import get_settings
 from undertow.data import get_session
 from undertow.data.models import FantasyTeam, League, LeagueMember, LeagueSettings, Season, User
-from undertow.fantasy import auth, league_rules, leagues
+from undertow.data.session import session_factory
+from undertow.fantasy import auth, league_rules, leagues, onboarding
 from undertow.fantasy.league_rules import INT_LIMITS
 from undertow.web import security
 from undertow.web.ratelimit import RateLimiter
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 login_ip_limiter = RateLimiter(max_events=20, window_seconds=600)
 login_email_limiter = RateLimiter(max_events=5, window_seconds=600)
 register_limiter = RateLimiter(max_events=5, window_seconds=600)
 join_limiter = RateLimiter(max_events=20, window_seconds=600)
+forgot_ip_limiter = RateLimiter(max_events=5, window_seconds=600)
+forgot_email_limiter = RateLimiter(max_events=3, window_seconds=3600)
+set_password_limiter = RateLimiter(max_events=10, window_seconds=600)
 
 SETTING_LABELS = {
     "roster_f": "Forward slots",
@@ -43,7 +50,9 @@ def client_key(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def page(request: Request, template: str, status_code: int = 200, **context) -> Response:
+def page(
+    request: Request, template: str, status_code: int = 200, private: bool = False, **context
+) -> Response:
     """Render a template with the CSRF token and app name filled in, and set the CSRF cookie."""
     from undertow.web.app import templates  # the app's shared Jinja environment
 
@@ -55,6 +64,10 @@ def page(request: Request, template: str, status_code: int = 200, **context) -> 
     }
     response = templates.TemplateResponse(request, template, context, status_code=status_code)
     security.attach_csrf_cookie(request, response)
+    if private:
+        # The address holds a one-time secret: keep it out of Referer headers and caches.
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Cache-Control"] = "no-store"
     return response
 
 
@@ -78,7 +91,7 @@ def check_csrf(request: Request, form: dict[str, str]) -> None:
 @router.get("/register", response_class=HTMLResponse)
 def register_form(request: Request, user: User | None = Depends(security.optional_user)):
     if user:
-        return redirect("/leagues")
+        return redirect("/account")
     return page(
         request,
         "account/register.html",
@@ -120,7 +133,7 @@ async def register(request: Request, session: Session = Depends(get_session)) ->
 @router.get("/login", response_class=HTMLResponse)
 def login_form(request: Request, user: User | None = Depends(security.optional_user)):
     if user:
-        return redirect("/leagues")
+        return redirect("/account")
     return page(
         request, "account/login.html", form={}, errors={}, next=request.query_params.get("next", "")
     )
@@ -165,6 +178,111 @@ async def logout(request: Request, session: Session = Depends(get_session)) -> R
     response = redirect("/")
     response.delete_cookie(security.SESSION_COOKIE, path="/")
     return response
+
+
+# ---- set or reset a password from an emailed link ----
+
+
+def set_password_page(request, token: str, status_code: int = 200, errors=None) -> Response:
+    return page(
+        request,
+        "account/set_password.html",
+        status_code,
+        private=True,
+        token=token,
+        errors=errors or {},
+    )
+
+
+@router.get("/account/set-password", response_class=HTMLResponse)
+def set_password_form(
+    request: Request, token: str = "", session: Session = Depends(get_session)
+) -> Response:
+    if not auth.token_is_valid(session, token):
+        return page(request, "account/link_expired.html", 410, private=True)
+    return set_password_page(request, token)
+
+
+@router.post("/account/set-password")
+async def set_password(request: Request, session: Session = Depends(get_session)) -> Response:
+    form = await security.read_form(request)
+    check_csrf(request, form)
+    token = form.get("token", "")
+    if not set_password_limiter.allow(client_key(request)):
+        return set_password_page(
+            request, token, 429, {"form": "Too many attempts. Please wait a few minutes."}
+        )
+    user, problem = await run_in_threadpool(
+        auth.set_password_with_token, session, token, form.get("password", "")
+    )
+    if user is None and problem == auth.LINK_EXPIRED:
+        return page(request, "account/link_expired.html", 410, private=True)
+    if user is None:
+        return set_password_page(request, token, 422, {"password": problem})
+    session_token = await run_in_threadpool(auth.create_session, session, user)
+    return redirect("/account", session_token)
+
+
+def send_link_in_background(email: str) -> None:
+    """Runs after the response, so how long the page takes does not depend on whether the email
+    has an account."""
+    try:
+        with session_factory()() as session:
+            onboarding.send_password_link(session, get_settings(), email)
+    except Exception:
+        logger.exception("Could not send a password link")
+
+
+@router.get("/password/forgot", response_class=HTMLResponse)
+def forgot_form(request: Request) -> Response:
+    return page(request, "account/forgot.html", form={}, errors={}, sent=False)
+
+
+@router.post("/password/forgot")
+async def forgot(request: Request, background: BackgroundTasks) -> Response:
+    form = await security.read_form(request)
+    check_csrf(request, form)
+    email = auth.normalize_email(form.get("email", ""))
+    if auth.validate_email(email):
+        return page(
+            request,
+            "account/forgot.html",
+            422,
+            form=form,
+            sent=False,
+            errors={"email": "Enter a valid email address."},
+        )
+    if not forgot_ip_limiter.allow(client_key(request)):
+        return page(
+            request,
+            "account/forgot.html",
+            429,
+            form=form,
+            sent=False,
+            errors={"form": "Too many requests. Please wait a few minutes."},
+        )
+    # Same answer whether or not the email has an account. A per-email limit stops anyone using
+    # this to flood a person's inbox, and it is silent for the same reason.
+    if forgot_email_limiter.allow(email):
+        background.add_task(send_link_in_background, email)
+    return page(request, "account/forgot.html", form={}, errors={}, sent=True)
+
+
+# ---- the member's own page ----
+
+
+@router.get("/account", response_class=HTMLResponse)
+def my_account(
+    request: Request,
+    user: User = Depends(security.require_user),
+    session: Session = Depends(get_session),
+):
+    return page(
+        request,
+        "account/account.html",
+        user=user,
+        rows=leagues.leagues_for_user(session, user),
+    )
 
 
 # ---- leagues ----

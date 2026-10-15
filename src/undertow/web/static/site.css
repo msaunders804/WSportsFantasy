@@ -34,6 +34,16 @@ a { color: var(--primary); }
 .wordmark small { font-weight: 500; font-size: 0.75em; color: var(--text-muted); margin-left: 0.35em; letter-spacing: 0; }
 .theme-toggle { background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 0.85rem; cursor: pointer; }
 .theme-toggle:hover { color: var(--text); }
+.foot-tools { margin-bottom: var(--space-3); }
+
+/* Account control in the header: a Log in button, or the member's initial and name */
+.login-link { display: inline-block; background: linear-gradient(135deg, var(--primary), var(--accent)); color: var(--on-primary); border-radius: 999px; padding: 8px 18px; font-weight: 700; font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+.login-link:hover { filter: brightness(1.08); }
+.acct { display: inline-flex; align-items: center; gap: 8px; max-width: 12rem; border: 1px solid var(--border); border-radius: 999px; padding: 4px 14px 4px 4px; color: var(--text); font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+.acct:hover { border-color: var(--primary); }
+.acct-avatar { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: var(--on-primary); font-family: var(--font-heading); font-weight: 700; font-size: 0.85rem; }
+.acct-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 480px) { .acct { padding-right: 4px; } .acct-name { display: none; } }
 
 /* Hero with wave fill */
 .hero { position: relative; overflow: hidden; padding: var(--space-6) 0 var(--space-7); }

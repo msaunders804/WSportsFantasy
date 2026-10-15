@@ -38,7 +38,8 @@ class User(Base):
     # Stored lower-cased and trimmed.
     email: Mapped[str] = mapped_column(String(254), unique=True)
     display_name: Mapped[str] = mapped_column(String(60))
-    password_hash: Mapped[str] = mapped_column(String(255))
+    # None until the person sets one from the emailed link (accounts made from the waitlist).
+    password_hash: Mapped[str | None] = mapped_column(String(255))
     timezone: Mapped[str] = mapped_column(String(64), default="UTC", server_default="UTC")
     # Undertow staff: may create leagues and remove chat messages.
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
@@ -46,6 +47,26 @@ class User(Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Set to lock an account without deleting it.
     disabled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AuthToken(Base):
+    """A one-time emailed link: set a first password, or reset a forgotten one."""
+
+    __tablename__ = "auth_token"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
+    purpose: Mapped[str] = mapped_column(String(20))
+    # SHA-256 of the token in the link. The raw token is only ever in the email.
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        CheckConstraint(_in("purpose", ("set_password",)), name="purpose_valid"),
+        Index("ix_auth_token_user_id", "user_id"),
+    )
 
 
 class AuthSession(Base):
