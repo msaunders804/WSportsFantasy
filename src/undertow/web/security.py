@@ -7,6 +7,7 @@ cookie but cannot compute the field. It works the same for logged-in and logged-
 
 import hashlib
 import hmac
+import logging
 import secrets
 from urllib.parse import parse_qs, quote
 
@@ -18,6 +19,7 @@ from undertow.data import get_session
 from undertow.data.models import User
 from undertow.fantasy import auth
 
+logger = logging.getLogger(__name__)
 SESSION_COOKIE = "ut_session"
 CSRF_COOKIE = "ut_csrf"
 MAX_FORM_BYTES = 8192
@@ -78,8 +80,16 @@ async def read_form(request: Request) -> dict[str, str]:
 
 
 def optional_user(request: Request, session: Session = Depends(get_session)) -> User | None:
+    """The signed-in member, or None. Never raises: if the lookup fails (database down) the
+    visitor is treated as signed out, so public pages such as the front page keep loading."""
     token = request.cookies.get(SESSION_COOKIE, "")
-    return auth.user_for_token(session, token) if token else None
+    if not token:
+        return None
+    try:
+        return auth.user_for_token(session, token)
+    except Exception:
+        logger.warning("Could not look up the signed-in member", exc_info=True)
+        return None
 
 
 def require_user(request: Request, user: User | None = Depends(optional_user)) -> User:
@@ -92,7 +102,7 @@ def require_user(request: Request, user: User | None = Depends(optional_user)) -
     return user
 
 
-def safe_next(target: str, default: str = "/account") -> str:
+def safe_next(target: str, default: str = "/home") -> str:
     """Only allow same-site paths as a post-login destination (no open redirect)."""
     if target.startswith("/") and not target.startswith("//") and "\\" not in target:
         return target

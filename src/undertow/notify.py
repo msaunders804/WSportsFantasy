@@ -66,6 +66,10 @@ def set_password_url(settings: Settings, token: str) -> str:
     return f"{settings.base_url.rstrip('/')}/account/set-password?token={token}"
 
 
+def site_url(settings: Settings, path: str = "/") -> str:
+    return f"{settings.base_url.rstrip('/')}{path}"
+
+
 def send_welcome_email(
     settings: Settings,
     to: str,
@@ -73,8 +77,11 @@ def send_welcome_email(
     token: str,
     days: int,
     client: httpx.Client | None = None,
+    invites_by: str | None = None,
+    draft_window: str | None = None,
 ) -> bool:
-    """Tell a new waitlist member their account exists and how to set a password.
+    """Welcome a new waitlist member: their account, the set-password link, and what they can
+    do while they wait for a league.
 
     Best-effort and never raises. Without an email key it sends nothing (and in dev it logs the
     link so the flow can be tried without a mail provider).
@@ -84,20 +91,39 @@ def send_welcome_email(
         if not settings.is_prod:
             logger.info("Welcome link for %s (email not configured): %s", to, link)
         return False
-    greeting = f"Hi {first_name}," if first_name else "Hi,"
+    greeting = f"Hi {first_name}!" if first_name else "Hi there!"
+    when = []
+    if invites_by:
+        when.append(f"We'll place you in a league and email your invite by {invites_by}")
+    if draft_window:
+        when.append(f"drafts run {draft_window}")
+    timeline = f"{' and '.join(when)}.\n\n" if when else ""
     text = (
         f"{greeting}\n\n"
-        "Thanks for joining the Undertow Fantasy list. We made you an account so you can follow "
-        "your league and see updates as they happen.\n\n"
-        f"Choose a password to finish setting it up (this link works for {days} days):\n{link}\n\n"
-        "If the link has expired, you can ask for a new one on the log in page.\n"
+        "We are SO excited for the PWHL season to begin, and even more excited to dive into "
+        "Fantasy PWHL with you! Thanks for joining the Undertow Fantasy list! We made you an "
+        "account so you can follow your league and catch every update as it happens.\n\n"
+        f"First, choose a password to finish setting it up (this link works for {days} days):\n"
+        f"{link}\n\n"
+        f"{timeline}"
+        "While you wait for your league, here's what you can do right now!\n"
+        f"- Take a practice draft and get a feel for the live draft room: "
+        f"{site_url(settings, '/preview/draft')}\n"
+        f"- Learn the rules, scoring and key dates in Fantasy 101: "
+        f"{site_url(settings, '/fantasy-101')}\n"
+        f"- Visit your home page (after you set your password): {site_url(settings, '/home')}\n"
+        f"- Meet the people behind Undertow: {site_url(settings, '/about')}\n"
+        f"- Know someone who would love this? Send them {site_url(settings)}\n\n"
+        "If your link expires, you can ask for a new one on the log in page.\n"
         "If you didn't sign up, you can ignore this email and nothing will happen.\n\n"
+        "See you on the ice!\n"
+        "The Undertow Fantasy team\n\n"
         "Undertow Fantasy is an independent fan project, not affiliated with the PWHL."
     )
     return _send(
         settings,
         to,
-        "Set your Undertow Fantasy password",
+        "Welcome to Undertow Fantasy! Set your password",
         text,
         client,
         "Failed to send welcome email",

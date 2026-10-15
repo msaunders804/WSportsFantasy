@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block head_extra %}<script src="/static/home.js?v={{ v }}" defer></script>{% endblock %}
+{% block title %}{% if home.league %}{{ home.league.name }}{% else %}Home{% endif %} | Undertow Fantasy{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap page">
+
+    {% if not home.league %}
+    <h1>Welcome, {{ user.display_name }}!</h1>
+    <p class="muted">You're on the list. Here's where things stand.</p>
+    <ol class="progress" aria-label="Progress">
+      <li class="done"><span class="step-name">Account created</span></li>
+      <li class="done"><span class="step-name">On the league list</span></li>
+      <li class="now" aria-current="step"><span class="step-name">Leagues assigned</span><small>by {{ dates.invites.when }}</small></li>
+      <li><span class="step-name">Draft</span><small>{{ dates.draft.when }}</small></li>
+      <li><span class="step-name">Season opens</span><small>{{ dates.season_opens.when }}</small></li>
+    </ol>
+    <p>We'll place you in a league and email your invite. Once you're in, your league and team show up right here.</p>
+    {% include "partials/while_you_wait.html" %}
+
+    {% else %}
+    <h1>{{ home.league.name }}</h1>
+    <p class="muted">Your team: <strong>{{ home.team.name if home.team else "" }}</strong> · {{ teams | length }} of {{ home.league.size }} teams joined · {{ {"setup": "forming"}.get(home.league.status, home.league.status.replace("_", " ")) }}</p>
+
+    {% if home.state.value == "league_setup" %}
+    <div class="card">
+      <h2>Your draft</h2>
+      {% if draft_at %}
+        <p class="big"><time data-local datetime="{{ draft_at_iso }}">{{ draft_at_text }}</time></p>
+        {% if draft_started %}<p class="muted">The scheduled start time has passed.</p>
+        {% else %}<p class="muted">Starts {{ draft_countdown }}.</p>{% endif %}
+      {% else %}
+        <p class="big">Draft time to be announced</p>
+        <p class="muted">Drafts run {{ dates.draft.when }}. We'll email you as soon as your league's time is set.</p>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="card">
+      <h2>Your league is {{ home.league.status.replace("_", " ") }}</h2>
+      <p class="muted">The league page has the teams and the settings.</p>
+    </div>
+    {% endif %}
+
+    <h2>Teams</h2>
+    <table>
+      <thead><tr><th scope="col">Team</th><th scope="col">Manager</th></tr></thead>
+      <tbody>
+      {% for team, manager_name, role, owner_id in teams %}
+        <tr><td>{{ team.name }}{% if home.team and team.id == home.team.id %} <span class="muted">(you)</span>{% endif %}</td><td>{{ manager_name }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p><a href="/leagues/{{ home.league.id }}">{% if manager %}Manage this league{% else %}League settings{% endif %}</a></p>
+    {% include "partials/while_you_wait.html" %}
+    {% endif %}
+
+    {% include "partials/share_card.html" %}
+  </div>
+</section>
+{% endblock %}

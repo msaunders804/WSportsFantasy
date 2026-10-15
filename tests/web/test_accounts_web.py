@@ -79,11 +79,11 @@ pytestmark = pytest.mark.db
 
 def test_register_logs_in_and_sets_a_hardened_cookie(client):
     resp = register(client)
-    assert resp.status_code == 303 and resp.headers["location"] == "/account"
+    assert resp.status_code == 303 and resp.headers["location"] == "/home"
     cookie = next(c for c in resp.headers.get_list("set-cookie") if c.startswith("ut_session="))
     assert "HttpOnly" in cookie and "SameSite=lax" in cookie and "Path=/" in cookie
-    page = client.get("/account")
-    assert page.status_code == 200 and "Hi, Sam" in page.text
+    page = client.get("/home")
+    assert page.status_code == 200 and "Welcome, Sam!" in page.text
 
 
 def test_post_without_csrf_token_is_refused(client):
@@ -169,7 +169,7 @@ def test_login_does_not_redirect_off_site(client, target):
     register(client)
     client.cookies.clear()
     resp = login(client, next_url=target)
-    assert resp.headers["location"] == "/account"
+    assert resp.headers["location"] == "/home"
 
 
 def test_login_redirects_back_to_a_same_site_page(client):

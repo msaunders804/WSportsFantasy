@@ -96,6 +96,9 @@ class League(Base):
     status: Mapped[str] = mapped_column(String(12), default="setup", server_default="setup")
     # Anyone holding the code can join until the league is full, so treat it like a password.
     invite_code: Mapped[str] = mapped_column(String(32), unique=True)
+    # When this league's draft starts (UTC). None until staff set it; pages then fall back to the
+    # general draft window from `fantasy.key_dates`.
+    draft_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("user_account.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

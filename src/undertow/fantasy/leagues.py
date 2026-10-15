@@ -7,6 +7,7 @@ one commissioner) back up the checks, so two people joining at once cannot overf
 
 import secrets
 from dataclasses import asdict
+from datetime import datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -250,3 +251,30 @@ def member_count(session: Session, league_id: int) -> int:
     return session.scalar(
         select(func.count()).select_from(LeagueMember).where(LeagueMember.league_id == league_id)
     )
+
+
+def set_draft_time(
+    session: Session, actor: User, league_id: int, draft_at: datetime | None
+) -> League:
+    """Set (or clear, with None) when a league's draft starts. Commissioner or staff, and only
+    before the draft has started. The time must carry a time zone, so it is never guessed."""
+    require_manager(session, actor, league_id)
+    league = session.get(League, league_id)
+    if league is None:
+        raise LeagueError("League not found.")
+    if league.status != "setup":
+        raise LeagueError("The draft time is locked once the draft has started.")
+    if draft_at is not None and draft_at.tzinfo is None:
+        raise LeagueError("The draft time needs a time zone.")
+    before = league.draft_at
+    league.draft_at = draft_at
+    _audit(
+        session,
+        league_id=league_id,
+        actor_id=actor.id,
+        action="league.set_draft_time",
+        before={"draft_at": before.isoformat() if before else None},
+        after={"draft_at": draft_at.isoformat() if draft_at else None},
+    )
+    session.commit()
+    return league

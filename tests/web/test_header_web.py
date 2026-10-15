@@ -62,7 +62,8 @@ def signed_in(fantasy_db, monkeypatch):
 
 
 # The full-screen draft room has no account control: its top bar is the pick clock.
-HEADER_PAGES = [p for p in PAGES if p != "/preview/draft"]
+# "/" sends signed-in members to /home, so /home stands in for it.
+HEADER_PAGES = ["/home" if p == "/" else p for p in PAGES if p != "/preview/draft"]
 
 
 @pytest.mark.db
@@ -76,7 +77,7 @@ def test_signed_in_members_see_their_account_instead_of_log_in(signed_in, path):
 
 @pytest.mark.db
 def test_account_control_shows_initial_and_escaped_name(signed_in):
-    html = signed_in.get("/").text
+    html = signed_in.get("/home").text
     assert '<span class="acct-avatar" aria-hidden="true">&lt;</span>' in html
     assert "&lt;b&gt;Patricia&lt;/b&gt;" in html and "<b>Patricia</b>" not in html
     assert 'aria-label="My account (&lt;b&gt;Patricia&lt;/b&gt; Long-Surname)"' in html
@@ -93,7 +94,7 @@ def test_a_bad_or_ended_session_shows_log_in(signed_in, fantasy_db):
         user = auth.authenticate(s, "pat@example.com", PASSWORD)
         token = auth.create_session(s, user)
         signed_in.cookies.set("ut_session", token)
-        assert 'class="acct"' in signed_in.get("/").text
+        assert 'class="acct"' in signed_in.get("/about").text
         auth.end_all_sessions(s, user.id)
     assert "login-link" in signed_in.get("/").text
 

@@ -77,7 +77,7 @@ def test_welcome_email_contains_the_link_and_goes_to_the_member():
     assert sent is True
     body = json.loads(calls[0].content)
     assert body["to"] == ["fan@example.com"]
-    assert "Hi Sam," in body["text"]
+    assert "Hi Sam!" in body["text"]
     assert "https://undertowsports.com/account/set-password?token=tok123" in body["text"]
     assert "14 days" in body["text"]
 
@@ -105,3 +105,45 @@ def test_member_emails_send_nothing_without_an_email_key():
 def test_member_email_failure_does_not_raise():
     client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(500)))
     assert notify.send_welcome_email(_settings(), "a@b.co", "A", "t", 14, client=client) is False
+
+
+def test_welcome_email_is_warm_and_lists_what_to_do_while_waiting():
+    calls, client = _capture()
+    settings = _settings(base_url="https://undertowsports.com")
+    notify.send_welcome_email(
+        settings,
+        "fan@example.com",
+        "Sam",
+        "tok",
+        14,
+        client=client,
+        invites_by="Nov 20",
+        draft_window="Nov 30 to Dec 4",
+    )
+    body = json.loads(calls[0].content)
+    text = body["text"]
+    assert body["subject"] == "Welcome to Undertow Fantasy! Set your password"
+    assert "Hi Sam!" in text
+    assert "SO excited for the PWHL season to begin" in text
+    assert "dive into Fantasy PWHL" in text
+    assert text.count("!") >= 5
+    # The password link comes first, then the dates, then the things to do in the meantime.
+    assert text.index("account/set-password?token=tok") < text.index("by Nov 20")
+    assert "email your invite by Nov 20 and drafts run Nov 30 to Dec 4." in text
+    for link in (
+        "https://undertowsports.com/preview/draft",
+        "https://undertowsports.com/fantasy-101",
+        "https://undertowsports.com/home",
+        "https://undertowsports.com/about",
+        "Send them https://undertowsports.com/\n",
+    ):
+        assert link in text
+    assert text.index("fantasy-101") > text.index("While you wait")
+
+
+def test_welcome_email_without_dates_or_name_still_reads_well():
+    calls, client = _capture()
+    notify.send_welcome_email(_settings(), "fan@example.com", None, "tok", 14, client=client)
+    text = json.loads(calls[0].content)["text"]
+    assert text.startswith("Hi there!")
+    assert "None" not in text and "{" not in text
