@@ -12,10 +12,12 @@ from undertow.data.models.hockey import (
     Game,
     GoalieGameStats,
     JobRun,
+    PenaltyEvent,
     Player,
     ProTeam,
     RawSnapshot,
     Season,
+    ShotEvent,
     SkaterGameStats,
 )
 from undertow.data.models.waitlist import WaitlistSignup
@@ -28,6 +30,7 @@ __all__ = [
     "Game",
     "GoalieGameStats",
     "JobRun",
+    "PenaltyEvent",
     "League",
     "LeagueMember",
     "LeagueSettings",
@@ -35,6 +38,7 @@ __all__ = [
     "ProTeam",
     "RawSnapshot",
     "Season",
+    "ShotEvent",
     "SkaterGameStats",
     "User",
     "WaitlistSignup",

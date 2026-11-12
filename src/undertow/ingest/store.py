@@ -6,22 +6,25 @@ from dataclasses import asdict
 from functools import lru_cache
 from importlib import resources
 
-from sqlalchemy import select
+from sqlalchemy import case, delete, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from undertow.data.models import (
     Game,
     GoalieGameStats,
+    PenaltyEvent,
     Player,
     ProTeam,
     RawSnapshot,
     Season,
+    ShotEvent,
     SkaterGameStats,
 )
 from undertow.ingest.dto import (
     BoxScoreDTO,
     GameDTO,
+    PlayByPlayDTO,
     PlayerDTO,
     SeasonDTO,
     TeamDTO,
@@ -106,6 +109,25 @@ def upsert_teams(session: Session, teams: list[TeamDTO]) -> None:
         )
 
 
+def ensure_teams(session: Session, teams: list[TeamDTO]) -> None:
+    """Create team rows that are missing; never overwrite (used by the history backfill)."""
+    conferences = conference_map()
+    for t in teams:
+        session.execute(
+            insert(ProTeam)
+            .values(
+                id=t.id,
+                name=t.name,
+                code=t.code,
+                city=t.city,
+                nickname=t.nickname,
+                logo_url=t.logo_url,
+                conference=conferences.get(t.code),
+            )
+            .on_conflict_do_nothing(index_elements=["id"])
+        )
+
+
 def _player_values(p: PlayerDTO) -> dict:
     return {
         "id": p.id,
@@ -122,22 +144,31 @@ def _player_values(p: PlayerDTO) -> dict:
 
 
 def upsert_roster_players(session: Session, players: list[PlayerDTO]) -> None:
-    """Roster data is authoritative for team, jersey and status, so it overwrites."""
+    """Roster data is authoritative for team, jersey and feed status, so it overwrites.
+
+    A player created by the history backfill is `inactive` with no team; appearing on a roster
+    makes them `active`. Any other availability status (injured, ltir) is left alone.
+    """
+    status = Player.__table__.c.status
     for p in players:
         stmt = insert(Player).values(**_player_values(p))
-        session.execute(
-            stmt.on_conflict_do_update(
-                index_elements=["id"],
-                set_={k: getattr(stmt.excluded, k) for k in _player_values(p) if k != "id"},
-            )
-        )
+        set_ = {k: getattr(stmt.excluded, k) for k in _player_values(p) if k != "id"}
+        set_["status"] = case((status == "inactive", "active"), else_=status)
+        session.execute(stmt.on_conflict_do_update(index_elements=["id"], set_=set_))
 
 
-def ensure_players(session: Session, players: list[PlayerDTO]) -> None:
-    """Create bare rows for box-score players the roster sync has not seen; never overwrite."""
+def ensure_players(session: Session, players: list[PlayerDTO], history_only: bool = False) -> None:
+    """Create bare rows for box-score players the roster sync has not seen; never overwrite.
+
+    `history_only` (the backfill of past seasons) creates them `inactive` with no team, so a
+    retired player never shows up as active or on a current team.
+    """
     for p in players:
+        values = _player_values(p)
+        if history_only:
+            values.update(pro_team_id=None, status="inactive")
         session.execute(
-            insert(Player).values(**_player_values(p)).on_conflict_do_nothing(index_elements=["id"])
+            insert(Player).values(**values).on_conflict_do_nothing(index_elements=["id"])
         )
 
 
@@ -168,9 +199,9 @@ def upsert_games(session: Session, games: list[GameDTO]) -> None:
         )
 
 
-def upsert_box_score(session: Session, box: BoxScoreDTO) -> None:
+def upsert_box_score(session: Session, box: BoxScoreDTO, history_only: bool = False) -> None:
     """Replace this game's stat lines with the latest box score (idempotent)."""
-    ensure_players(session, box.players)
+    ensure_players(session, box.players, history_only=history_only)
     game = session.get(Game, box.game_id)
     if game is None:
         raise ValueError(f"game {box.game_id} is not in the schedule; sync the schedule first")
@@ -196,3 +227,15 @@ def upsert_box_score(session: Session, box: BoxScoreDTO) -> None:
                     },
                 )
             )
+
+
+def upsert_play_by_play(session: Session, pbp: PlayByPlayDTO, history_only: bool = False) -> None:
+    """Replace this game's shot and penalty rows with the latest play-by-play (idempotent)."""
+    if session.get(Game, pbp.game_id) is None:
+        raise ValueError(f"game {pbp.game_id} is not in the schedule; sync the schedule first")
+    ensure_players(session, pbp.players, history_only=history_only)
+    session.execute(delete(ShotEvent).where(ShotEvent.game_id == pbp.game_id))
+    session.execute(delete(PenaltyEvent).where(PenaltyEvent.game_id == pbp.game_id))
+    session.flush()
+    session.add_all(ShotEvent(game_id=pbp.game_id, **asdict(s)) for s in pbp.shots)
+    session.add_all(PenaltyEvent(game_id=pbp.game_id, **asdict(p)) for p in pbp.penalties)

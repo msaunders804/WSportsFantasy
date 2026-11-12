@@ -86,3 +86,14 @@ All 120 games of season 8 were fetched and checked (see `undertow.ingest.replay`
 3. Bulk "season stats" table (`view=players`): not needed for scoring, skip unless rankings require it.
 4. Roster status for injuries/LTIR: see above.
 5. Terms of use unchanged: low volume, aggressive caching, identifying User-Agent.
+
+## Play-by-play findings (all 282 regular-season games of 2024, 2024-25, 2025-26; Nov 12, 2026)
+Request: `feed=gc&tab=pxpverbose&game_id=G` (cached as `pxp_G.json`). Stored in `shot_event` and `penalty_event` (migration 0010); the full response is also in `raw_snapshot`.
+- **Event types:** `shot` (on net), `blocked_shot`, `goal`, `penaltyshot`, `penalty`, `goalie_change`, `faceoff`, `hit`. **There are no missed-net or wide shots**, so an xG model sees only shots on net and blocked attempts.
+- **Goals appear twice:** as a `shot` carrying `game_goal_id`, and as a `goal` event with the power-play, empty-net and short-handed flags. The parser merges them into one row. Across all games, every goal matched a shot, and goals per team equal box-score skater goals in every game (shootout goals are in neither).
+- **Shots on net per team match box-score shots** in 556 of 564 team-games, and all 564 are within 1.
+- **Clock:** `s` is seconds elapsed **within the period**, not the game. Period 4 is overtime.
+- **Coordinates are normalised by team, not by period:** in every period including OT, the home team shoots toward low x (mean about 130) and the away team toward high x (mean about 465). The rink is about 600 wide and 300 tall in feed units; x ranges roughly 7 to 591. Normalise (mirror away shots) in analysis code, not at ingest. Blocked shots also carry an `orientation` field (0/1) that is not yet understood; it is in the raw snapshot.
+- **Strength state** is given only for goals. For other shots, rebuild it from `penalty_event` and the clock.
+- **Data gaps:** 13 shots have no goalie (empty net). Penalty shots have no coordinates (9 in all). Penalties by the bench or team name "player 0" with no name (treated as no player). One real shooter id (275) has no profile, only null names; the shot is kept with a blank-name player row.
+

@@ -66,6 +66,9 @@ class CachingFeed:
     def game_summary(self, game_id: int) -> RawResponse:
         return self._cached(f"game_{game_id}", lambda: self._inner.game_summary(game_id))
 
+    def play_by_play(self, game_id: int) -> RawResponse:
+        return self._cached(f"pxp_{game_id}", lambda: self._inner.play_by_play(game_id))
+
 
 def run_replay(session_factory, feed: Feed, season_id: int) -> None:
     """Drive the worker jobs through the season on a simulated clock."""
