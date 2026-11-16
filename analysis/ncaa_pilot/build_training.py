@@ -193,3 +193,28 @@ if len(sk) > 5:
     mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
     print(f"  mean NCAA points/GP {mx:.2f} vs mean PWHL points/GP {my:.2f}")
     print(f"  Spearman rank correlation (NCAA ppg vs PWHL ppg): {corr(ranks(xs), ranks(ys)):.2f}")
+
+
+# ---- 2026 class: NCAA lines for the players we will apply the translation to ----
+targets = list(csv.DictReader(open(HERE / "data/ncaa_targets.csv", encoding="utf-8")))
+applied = []
+for t in targets:
+    L, found_at = lookup("2025-26", slug(t["school"]), t["name"])
+    if L is None:
+        continue
+    applied.append(
+        {
+            "player": t["name"],
+            "pos": t["pos"],
+            "school": t["school"],
+            "pick": t["pick"],
+            "pwhl_team": t["pwhl_team"],
+            "ncaa_school_slug": found_at,
+            **{f"ncaa_{k}": int(L[k]) for k in STAT_KEYS},
+        }
+    )
+with open(HERE / "data/applied_2026.csv", "w", newline="", encoding="utf-8") as fh:
+    w = csv.DictWriter(fh, fieldnames=list(applied[0]))
+    w.writeheader()
+    w.writerows(applied)
+print(f"2026 class lines: {len(applied)} of {len(targets)} targets -> applied_2026.csv")

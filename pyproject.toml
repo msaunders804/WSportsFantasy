@@ -19,6 +19,9 @@ dependencies = [
 ]
 
 [dependency-groups]
+analysis = [
+    "numpy>=2",
+]
 dev = [
     "pytest>=8",
     "ruff>=0.6",

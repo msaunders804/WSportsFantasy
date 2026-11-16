@@ -53,6 +53,34 @@ Limits of the feed (**verified**, see [feed.md](feed.md)): no missed-net shots; 
 - **Stored in the Railway `research` schema** (private, never read by the web app): see [decisions.md](decisions.md).
 - **Not yet done:** the 62 unknown no-history players (schools not on any draft list); the 2023 draft class and undrafted free agents as extra training data; fitting the translation itself (needs age, position and team-strength adjustments). Stats are per game only, since skater ice time is not in the data. We have not checked NCAA terms of use for the underlying data.
 
+## 3b. NCAA-to-PWHL translation fit (Nov 16, 2026; `analysis/translation_fit/fit.py`)
+**Setup.** 53 skaters from the 2024 and 2025 drafts with at least 10 games in both their final NCAA season and their first PWHL season (21 from 2024, 32 from 2025; 17 defenders). Outcome: PWHL points per game. Six models were fixed before looking at results and compared by leave-one-out (LOO) error and by training on one draft class and predicting the other. The 7 goalies are **not modelled** (too few); use the position-average prior until more data exists.
+
+**Pre-specified result.** The simple ratio wins: **PWHL points per game is about 0.32 times NCAA points per game** (0.315, 90% bootstrap interval 0.26 to 0.37). Mean NCAA 0.91 vs PWHL 0.29 per game. Adding position, age, or points share of team goals made out-of-sample error **worse**, not better, so none of those adjustments is used.
+
+| Model | LOO RMSE | LOO R2 | Class 2024 to 2025 / 2025 to 2024 (vs mean-only) |
+|---|---|---|---|
+| Mean only | 0.234 | -0.04 | 0.230 / 0.243 |
+| Ratio (k times NCAA ppg) | **0.205** | **0.20** | **0.191 vs 0.230 / 0.217 vs 0.243** |
+| + position + age | 0.216 | 0.11 | 0.217 / 0.231 |
+| Points share + position + age | 0.241 | -0.11 | 0.256 / 0.245 |
+
+**How good is it? Modest.** NCAA scoring explains about 20% of out-of-sample variance. LOO residual sd is 0.21 points per game against an outcome sd of 0.23, and errors grow with the level (sd 0.17 for low predictions, 0.24 for high). The ratio beat the mean-only baseline in both directions of the class split. The model was picked from five alternatives, so its LOO score is slightly optimistic. Biggest misses: Sarah Fillier (actual 0.97, predicted 0.44), Izzy Daniel (0.23 vs 0.58), Jenna Buglioni (0.00 vs 0.36), Vanessa Upson (0.04 vs 0.36).
+
+**Exploratory finding (not pre-specified; a hypothesis, not a validated result).** **Draft position predicts PWHL scoring about as well as NCAA stats do and adds to them.** Using ln(pick divided by teams in the draft) (normalised, since the 2024, 2025 and 2026 drafts had 6, 8 and 12 teams): LOO R2 0.35 with draft position alone, 0.36 with NCAA ppg added, against 0.17 for NCAA ppg alone on the same players. Draft position tracks PWHL ice time most closely (rank correlation 0.59 with minutes per game), so it is mainly a **role** signal: teams give early picks more ice time, and more ice time means more points. Per-60 rates were no easier to predict from NCAA scoring (LOO R2 0.11). This was found after seeing the misses, so it carries extra risk of overfitting; it needs checking on the 2023 class or on the 2026 season as it plays out. It also carries a causal caveat: the pick itself partly reflects NCAA production.
+
+**Applied to the 2026 class.** 50 NCAA skaters from the draft have a translated prior with an 80% interval (empirical LOO residual quantiles) in `analysis/translation_fit/output/translated_priors_2026.csv` (local). Model A is the pre-specified ratio; model B adds draft position. Examples (A / B, points per game): Abbey Murphy 0.67 / 0.76, Tessa Janecke 0.49 / 0.63, Laila Edwards 0.51 / 0.61, Lacey Eden 0.59 / 0.61. All 2026 players are inside the training range of NCAA scoring (training maximum 2.15; 2026 maximum 2.13). Intervals are wide, for example 0.43 to 0.95 for Murphy under model A.
+
+**Limitations and cautions.**
+- **Small sample:** 53 players; bootstrap and LOO intervals reflect that, but the true uncertainty is larger because we also chose models.
+- **Survivors only:** training includes only drafted players who made the PWHL, so the translation tends to be too generous to outside players. Only about 5 to 6 NCAA draftees per class never played, so the bias is probably small but unmeasured.
+- **Role confounding:** points per game mix talent with ice time. The 2026 expansion teams are thin, so early picks there may get more ice time than the 2024 and 2025 picks did.
+- **NCAA skater ice time is unavailable,** so we cannot translate per 60.
+- **Season length:** 26 PWHL games on average, so each outcome is itself noisy.
+- **Coverage:** the 12 non-NCAA draftees in 2024 and 3 in 2025 (Europe, U SPORTS) are not in this fit, and neither are 62 camp players with no draft record.
+
+**Decision needed from Megan:** whether the production prior for rookies should be model A only (validated, weak), or A plus draft position (stronger in-sample, but exploratory). My recommendation: use model B but label it provisional, and **test it on the backtest harness before relying on it** (milestone M0).
+
 ## 4. Model structure
 Five layers, built in order. Each layer is testable on its own.
 
