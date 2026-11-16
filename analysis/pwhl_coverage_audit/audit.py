@@ -100,6 +100,7 @@ def main() -> None:
                         "team_id": team,
                         "team": p.get("team_name") or team,
                         "person_id": pid,
+                        "player_id": p.get("player_id") or p.get("id"),
                         "name": f"{p.get('first_name')} {p.get('last_name')}",
                         "pos": p.get("position"),
                         "status": p.get("status"),
