@@ -125,7 +125,7 @@ def resolve(games: dict[str, dict], label: str | None = None) -> dict[str, str |
     return out
 
 
-def boxscores(label: str) -> None:
+def boxscores(label: str, extra_slugs: list[str] | None = None) -> None:
     games = season_games(label)
     if not games:
         raise SystemExit("no scoreboards cached for that season; run the scoreboards stage first")
@@ -135,7 +135,7 @@ def boxscores(label: str) -> None:
     if missing:
         # not fatal: a school may not have played D-I women's hockey that season (or needs an alias)
         print(f"[{label}] UNRESOLVED schools, skipped (check ALIASES): {missing}")
-    slugs = set(mapping.values())
+    slugs = {v for v in mapping.values() if v} | set(extra_slugs or [])
     want = [
         gid
         for gid, g in games.items()
@@ -154,13 +154,14 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     ap.add_argument("stage", choices=["scoreboards", "boxscores", "plan"])
     ap.add_argument("--season", default="2025-26", help="for boxscores: e.g. 2023-24")
+    ap.add_argument("--extra-slugs", default="", help="boxscores: also pull these ncaa.com slugs")
     ap.add_argument("--start", default="2025-09-25")
     ap.add_argument("--end", default="2026-03-31")
     a = ap.parse_args()
     if a.stage == "scoreboards":
         scoreboards(date.fromisoformat(a.start), date.fromisoformat(a.end))
     elif a.stage == "boxscores":
-        boxscores(a.season)
+        boxscores(a.season, [x for x in a.extra_slugs.split(",") if x])
     else:
         games = season_games()
         print(len(games), "games cached;", resolve(games) if games else "")

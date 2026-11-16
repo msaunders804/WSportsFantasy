@@ -72,18 +72,63 @@ for f in glob.glob(str(CACHE / "game__*__boxscore.json")):
                 L[k] += num(p.get(k))
 
 
-def lookup(season: str, seo: str, player: str):
+STAT_KEYS = ("gp", "goals", "assists", "shots", "saves", "goalsAllowed", "goalieMinutes")
+
+
+def _name_parts(player: str) -> tuple[str, str]:
     first, _, last = player.partition(" ")
-    fn, ln = norm(first), norm(last.replace(" ", ""))
-    hits = [
-        v
-        for (s, t, last_k, first_k), v in lines.items()
-        if s == season
-        and t == seo
-        and (last_k == ln or last_k.startswith(ln) or ln.startswith(last_k))
-        and (first_k[:3] == fn[:3] or first_k[:1] == fn[:1])
-    ]
-    return hits[0] if len(hits) == 1 else None
+    return norm(first), norm(last.replace(" ", ""))
+
+
+def _collect(season: str, fn: str, ln: str, seo: str | None):
+    """Full-name rows for this player (same last name, first name sharing 3 letters), plus
+    initial-only rows ("G Philips"), which box scores use for the same player in some games."""
+    full, initial = {}, {}
+    for (s, t, last_k, first_k), v in lines.items():
+        if s != season or (seo is not None and t != seo):
+            continue
+        if not (last_k == ln or last_k.startswith(ln) or ln.startswith(last_k)):
+            continue
+        if first_k[:3] == fn[:3] and len(first_k) >= 3:
+            full[(t, last_k, first_k)] = v
+        elif len(first_k) == 1 and first_k == fn[:1]:
+            initial[(t, last_k, first_k)] = v
+    return full, initial
+
+
+def lookup(season: str, seo: str, player: str):
+    """(stats, school_slug) or (None, None). Tries the draft school, then any school (transfer).
+
+    Ambiguous cases (two different full first names at the same school, or full-name rows at more
+    than one school) return None rather than guess. Initial-only rows are merged in only when no
+    other player with the same last name and initial exists at that school that season.
+    """
+    fn, ln = _name_parts(player)
+    for scope in (seo, None):
+        full, initial = _collect(season, fn, ln, scope)
+        firsts = {(t, f) for (t, _, f) in full}
+        schools = {t for (t, _) in firsts}
+        if not full or len(schools) != 1:
+            if len(schools) > 1 and scope is None:
+                return None, None
+            continue
+        t = next(iter(schools))
+        names_here = {f for (tt, f) in firsts if tt == t}
+        if len(names_here) > 1 and fn not in names_here:
+            return None, None
+        keys = [k for k in full if k[0] == t and (len(names_here) == 1 or k[2] == fn)]
+        merged: dict[str, float] = defaultdict(float)
+        for k in keys:
+            for sk in STAT_KEYS:
+                merged[sk] += full[k][sk]
+        same_initial_others = {f for (tt, f) in firsts if tt == t} - {fn}
+        if not same_initial_others:
+            for k, v in initial.items():
+                if k[0] == t:
+                    for sk in STAT_KEYS:
+                        merged[sk] += v[sk]
+        return merged, t
+    return None, None
 
 
 cohort = list(csv.DictReader(open(HERE / "data/cohort_players.csv", encoding="utf-8")))
@@ -92,11 +137,17 @@ for c in cohort:
     year, seo = int(c["class"]), slug(c["school"])
     row = dict(c)
     for tag, season in (("final", FINAL[year]), ("prior", PRIOR[year])):
-        L = lookup(season, seo, c["player"])
-        cover[(tag, "found" if L else "missing")] += 1
-        for k in ("gp", "goals", "assists", "shots", "saves", "goalsAllowed", "goalieMinutes"):
+        L, found_at = lookup(season, seo, c["player"])
+        how = (
+            "missing"
+            if L is None
+            else ("found_draft_school" if found_at == seo else "found_other_school")
+        )
+        cover[(tag, how)] += 1
+        for k in STAT_KEYS:
             row[f"ncaa_{tag}_{k}"] = int(L[k]) if L else ""
         row[f"ncaa_{tag}_season"] = season
+        row[f"ncaa_{tag}_school"] = found_at or ""
     out_rows.append(row)
 
 out = HERE / "data/training_table.csv"

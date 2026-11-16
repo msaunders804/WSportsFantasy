@@ -23,8 +23,8 @@ Status: DRAFT for Megan's review, 2026-11-12. Nothing is built. Covers where pre
 
 `public` is not moved or renamed. `analytics` tables may hold foreign keys to `public.player`, `public.pro_team` and `public.game` (same database, so this works and keeps IDs honest).
 
-### Where raw research data lives
-Local only, never in Railway: licensed or scraped third-party records (NCAA, Elite Prospects, international, European leagues). The prediction job reads them from local files when it trains. Production receives only the outputs: ratings, run metadata, predictions. This keeps third-party terms of use out of the public service and keeps the production database small.
+### Where research data lives
+Third-party records (NCAA now; European leagues, Elite Prospects or international data if added) are stored as **clean rows in a private `research` schema** in the same database, so work can continue from any computer (decided Nov 16, see [decisions.md](decisions.md)). Raw responses stay in local caches. The web app never reads `research`, and the prediction job reads it only to train; production serves only derived ratings, run metadata and predictions. Source terms are unchecked, which is the reason nothing from `research` is published.
 
 ## New and changed tables
 

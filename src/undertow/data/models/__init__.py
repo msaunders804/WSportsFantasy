@@ -20,12 +20,19 @@ from undertow.data.models.hockey import (
     ShotEvent,
     SkaterGameStats,
 )
+from undertow.data.models.research import (
+    DraftPick,
+    NcaaGame,
+    NcaaPlayerGame,
+    TranslationTraining,
+)
 from undertow.data.models.waitlist import WaitlistSignup
 
 __all__ = [
     "AuditLog",
     "AuthSession",
     "AuthToken",
+    "DraftPick",
     "FantasyTeam",
     "Game",
     "GoalieGameStats",
@@ -34,12 +41,15 @@ __all__ = [
     "League",
     "LeagueMember",
     "LeagueSettings",
+    "NcaaGame",
+    "NcaaPlayerGame",
     "Player",
     "ProTeam",
     "RawSnapshot",
     "Season",
     "ShotEvent",
     "SkaterGameStats",
+    "TranslationTraining",
     "User",
     "WaitlistSignup",
 ]
