@@ -11,6 +11,7 @@ def test_scheduler_has_heartbeat_and_the_draft_clock_even_without_a_feed():
         "draft_clock",
         "lineup_lock",
         "calendar_sync",
+        "matchup_status",
     }
 
 
@@ -30,4 +31,5 @@ def test_ingestion_jobs_registered_only_when_a_feed_is_given():
         "draft_clock",
         "lineup_lock",
         "calendar_sync",
+        "matchup_status",
     }

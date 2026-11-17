@@ -44,7 +44,7 @@ def welcome_signup(
         first_name,
         token,
         days=auth.WELCOME_LINK_TTL.days,
-        invites_by=key_dates.DATES["invites"].when,
+        invites_from=key_dates.DATES["invites"].when,
         draft_window=key_dates.DATES["draft"].when,
     )
     return True

@@ -20,22 +20,13 @@ from undertow.fantasy import leagues, lineups, team_view
 from undertow.web import security
 from undertow.web.accounts import page
 from undertow.web.draft_live import member_league
+from undertow.web.nav import league_tabs
 from undertow.web.ratelimit import RateLimiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 move_limiter = RateLimiter(max_events=60, window_seconds=60)
 MAX_JSON_BYTES = 2_000
-
-
-def tabs_for(league_id: int) -> list[tuple[str, str, str]]:
-    """The tabs a signed-in member sees in a league. More are added as the pages are built."""
-    return [
-        ("team", "Team", f"/leagues/{league_id}/team"),
-        ("draft", "Draft", f"/leagues/{league_id}/draft"),
-        ("stats", "Stats", "/stats"),
-        ("league", "League", f"/leagues/{league_id}"),
-    ]
 
 
 def _week_number(value: str | None) -> int | None:
@@ -68,7 +59,7 @@ def _render(
         league=league,
         view=view,
         data=data,
-        tabs=tabs_for(league_id),
+        tabs=league_tabs(league),
         active="team",
         mine=team.owner_id == user.id,
         now=datetime.now(UTC),

@@ -1,0 +1,78 @@
+{% extends "app/base.html" %}
+{% from "app/_macros.html" import help %}
+{% block title %}Matchup | {{ league.name }} | Undertow Fantasy{% endblock %}
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="/static/matchup_live.css?v={{ v }}">
+  <script src="/static/matchup_live.js?v={{ v }}" defer></script>
+{% endblock %}
+{% macro side(s, lead) %}
+<div class="ms-team{% if lead %} lead{% endif %}">
+  <a class="ms-name" href="/leagues/{{ league.id }}/team/{{ s.team_id }}">{{ s.name }}</a>
+  <span class="muted ms-mgr">{{ "You" if s.mine else s.manager }}</span>
+  <strong class="ms-total">{{ s.total | pts }}</strong>
+</div>
+{% endmacro %}
+{% macro cell(c, mirror) %}
+{% if c %}
+<div class="mc st-{{ c.status }}{% if mirror %} right{% endif %}">
+  <span class="mc-pts">{{ c.points | pts }}</span>
+  <div class="mc-info">
+    <a class="mc-name" href="/stats/player/{{ c.player_id }}">{{ c.name }}</a>
+    <span class="mc-meta muted">{{ c.position }} · {{ c.pro_team }}{% if c.detail %} · {{ c.detail }}{% endif %}</span>
+    <span class="mc-state muted">{% if c.status == "live" %}Playing now{% elif c.status == "upcoming" %}{{ c.games_left }} {{ "game" if c.games_left == 1 else "games" }} to play{% elif c.status == "final" %}Done for the week{% else %}No games this week{% endif %}</span>
+  </div>
+</div>
+{% else %}<div class="mc empty"></div>{% endif %}
+{% endmacro %}
+{% block content %}
+<div class="wrap view" id="live-region" data-refresh="{{ refresh }}">
+  {% if not view %}
+  <h1>Matchup</h1>
+  <p>This league's schedule is not ready yet. It is created when the draft finishes. If your draft is done and you still see this, tell the commissioner.</p>
+  {% else %}
+  <div class="weekbar">
+    {% if view.prev_week %}<a class="icon-btn" href="/leagues/{{ league.id }}/matchup?week={{ view.prev_week }}" aria-label="Previous week">‹</a>{% else %}<span class="icon-btn off" aria-hidden="true">‹</span>{% endif %}
+    <div class="wk"><strong>Week {{ view.first_week }}{% if view.matchup.last_week_no != view.first_week %}-{{ view.matchup.last_week_no }}{% endif %}</strong>{% if view.week_dates %} <span class="muted">· {{ view.week_dates[0].strftime("%b %d") }} to {{ view.week_dates[1].strftime("%b %d") }}</span>{% endif %}</div>
+    {% if view.next_week %}<a class="icon-btn" href="/leagues/{{ league.id }}/matchup?week={{ view.next_week }}" aria-label="Next week">›</a>{% else %}<span class="icon-btn off" aria-hidden="true">›</span>{% endif %}
+  </div>
+
+  <div class="scoreboard card">
+    {{ side(view.left, view.leader == view.left.team_id) }}
+    <div class="ms-mid">
+      <span class="chip-status st-{{ view.status }}">{% if view.status == "live" %}Live{% elif view.status == "scheduled" %}Not started{% else %}Final{% endif %}</span>
+    </div>
+    {{ side(view.right, view.leader == view.right.team_id) }}
+  </div>
+  <p class="ms-note muted">
+    {% if view.leader is none %}{% if view.status == "scheduled" %}Nobody has scored yet.{% elif view.status in ("final", "finalized") %}This one ended in a tie.{% else %}Tied right now.{% endif %}
+    {% else %}{{ (view.left if view.leader == view.left.team_id else view.right).name }} {{ "won by" if view.status in ("final", "finalized") else "leads by" }} {{ ((view.left.total - view.right.total) | abs) | pts }}.{% endif %}
+    {% if view.status == "live" %} Scores update about every 30 seconds.{% elif view.status == "final" %} Scores are final once stat corrections settle, 3 days after the week ends. {{ help("Box scores sometimes get small corrections after a game. We wait 3 days so the result you see is the one that stays.") }}{% endif %}
+  </p>
+
+  <h2 class="section-h">Head to head {{ help("Each row pairs one starter from each team. Points count only for players who were in a starting spot when their game began.") }}</h2>
+  <div class="mgrid">
+    {% for r in view.rows %}
+    <div class="mrow">
+      {{ cell(r.left, false) }}
+      <span class="slot-tag">{{ r.group }}</span>
+      {{ cell(r.right, true) }}
+    </div>
+    {% else %}<p class="muted">No starters to show yet.</p>{% endfor %}
+  </div>
+
+  {% if view.others %}
+  <h2 class="section-h">Rest of the league</h2>
+  <ul class="others-list">
+    {% for o in view.others %}
+    <li><a href="/leagues/{{ league.id }}/matchup/{{ o.matchup.id }}">
+      <span class="o-team{% if o.home.total > o.away.total %} win{% endif %}">{{ o.home.name }}</span><span class="o-score">{{ o.home.total | pts }}</span>
+      <span class="o-vs muted">vs</span>
+      <span class="o-score">{{ o.away.total | pts }}</span><span class="o-team{% if o.away.total > o.home.total %} win{% endif %}">{{ o.away.name }}</span>
+    </a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

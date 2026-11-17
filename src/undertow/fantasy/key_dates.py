@@ -13,7 +13,7 @@ class KeyDate:
     key: str
     when: str
     what: str
-    # Shown before `when` in the Fantasy 101 table ("By Nov 20"); left out of running text.
+    # Shown before `when` in the Fantasy 101 table ("From Nov 20"); left out of running text.
     qualifier: str = ""
 
     @property
@@ -22,8 +22,14 @@ class KeyDate:
 
 
 KEY_DATES = (
-    KeyDate("signups_close", "Nov 15", "Sign-ups close"),
-    KeyDate("invites", "Nov 20", "Leagues assigned, invites emailed", qualifier="By "),
+    # Leagues are filled as people sign up, starting Nov 20, and sign-ups stay open until Dec 1.
+    KeyDate(
+        "invites",
+        "Nov 20",
+        "Leagues assigned and invites emailed as people sign up",
+        qualifier="From ",
+    ),
+    KeyDate("signups_close", "Dec 1", "Sign-ups close"),
     KeyDate("draft", "Nov 30 to Dec 4", "Live snake draft, after the preseason"),
     KeyDate("season_opens", "Dec 5", "Season opens, Week 1 begins"),
 )

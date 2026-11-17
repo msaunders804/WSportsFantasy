@@ -77,7 +77,7 @@ def send_welcome_email(
     token: str,
     days: int,
     client: httpx.Client | None = None,
-    invites_by: str | None = None,
+    invites_from: str | None = None,
     draft_window: str | None = None,
 ) -> bool:
     """Welcome a new waitlist member: their account, the set-password link, and what they can
@@ -93,8 +93,8 @@ def send_welcome_email(
         return False
     greeting = f"Hi {first_name}!" if first_name else "Hi there!"
     when = []
-    if invites_by:
-        when.append(f"We'll place you in a league and email your invite by {invites_by}")
+    if invites_from:
+        when.append(f"We start placing people in leagues and emailing invites on {invites_from}")
     if draft_window:
         when.append(f"drafts run {draft_window}")
     timeline = f"{' and '.join(when)}.\n\n" if when else ""
