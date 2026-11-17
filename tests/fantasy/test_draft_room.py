@@ -24,6 +24,7 @@ pytestmark = pytest.mark.db
 
 T0 = datetime(2026, 11, 30, 18, 0, tzinfo=UTC)
 FIRST_ID = 900_001
+NO_SUCH_PLAYER = 800_000_001  # never a real id, whatever data the dev database holds
 # 36 forwards, 16 defenders, 8 goalies: enough for a 4-team, 11-round draft (44 picks).
 POSITIONS = ["F"] * 36 + ["D"] * 16 + ["G"] * 8
 
@@ -201,7 +202,7 @@ def test_a_player_cannot_be_drafted_twice_or_if_unavailable(db):
     with pytest.raises(draft_room.DraftError, match="just taken"):
         draft_room.make_pick(db, second, draft.id, target, now=T0)
     with pytest.raises(draft_room.DraftError, match="cannot be drafted"):
-        draft_room.make_pick(db, second, draft.id, 1, now=T0)  # not a real player
+        draft_room.make_pick(db, second, draft.id, NO_SUCH_PLAYER, now=T0)
     injured = db.get(Player, next_player(db, "D"))
     injured.status = "injured"
     db.commit()
@@ -328,7 +329,7 @@ def test_queue_drops_taken_unknown_and_repeated_players(db):
     taken = next_player(db)
     draft_room.make_pick(db, me, draft.id, taken, now=T0)
     a, b = FIRST_ID + 5, FIRST_ID + 6
-    clean = draft_room.set_queue(db, me, draft.id, [b, taken, 5, a, b])
+    clean = draft_room.set_queue(db, me, draft.id, [b, taken, NO_SUCH_PLAYER, a, b])
     assert clean == [b, a]
     assert [
         q.player_id for q in db.scalars(select(DraftQueueEntry).order_by(DraftQueueEntry.rank))
@@ -533,3 +534,42 @@ def test_league_delete_cascades_the_draft(db):
     db.commit()
     assert db.scalar(select(func.count()).select_from(Draft)) == 0
     assert db.scalar(select(func.count()).select_from(RosterEntry)) == 0
+
+
+# ---- the worker's clock tick ----
+
+
+def test_clock_tick_autopicks_only_expired_drafts_and_ranks_once(fantasy_db, db):
+    league, users, draft = started(db)
+    calls = []
+
+    def ranking(session):
+        calls.append(1)
+        return best_first(session)
+
+    def factory():
+        return Session(fantasy_db)
+
+    assert draft_room.process_due_drafts(factory, ranking, now=T0 + timedelta(seconds=10)) == 0
+    assert calls == []  # nothing due, so the rankings were never computed
+    made = draft_room.process_due_drafts(factory, ranking, now=T0 + timedelta(seconds=91))
+    assert made == 1 and calls == [1]
+    db.expire_all()
+    pick = db.scalar(select(DraftSelection))
+    assert pick.is_autopick and pick.player_id == FIRST_ID
+    # The clock was reset by the pick, so the same instant is no longer due.
+    assert draft_room.process_due_drafts(factory, ranking, now=T0 + timedelta(seconds=91)) == 0
+
+
+def test_clock_tick_survives_a_broken_draft(fantasy_db, db):
+    league, users, draft = started(db)
+
+    def broken(session):
+        raise RuntimeError("rankings are down")
+
+    made = draft_room.process_due_drafts(
+        lambda: Session(fantasy_db), broken, now=T0 + timedelta(seconds=91)
+    )
+    assert made == 0  # logged, not raised
+    db.expire_all()
+    assert db.scalar(select(func.count()).select_from(DraftSelection)) == 0

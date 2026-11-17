@@ -10,6 +10,7 @@ the league's settings: a team may not take more than `max_goalies` goalies, and 
 pick that leaves it unable to fill its starting lineup in the picks it has left.
 """
 
+import logging
 import random
 from collections import Counter
 from collections.abc import Callable
@@ -35,6 +36,8 @@ from undertow.data.models import (
 )
 from undertow.fantasy import leagues
 from undertow.fantasy.draft import snake_slot
+
+log = logging.getLogger(__name__)
 
 DEFAULT_PICK_SECONDS = 90
 MIN_PICK_SECONDS = 10
@@ -366,6 +369,38 @@ def autopick(
         return result
     session.rollback()
     raise DraftError("No available player can be drafted for the team on the clock.")
+
+
+def process_due_drafts(
+    session_factory: Callable[[], Session], ranking: Ranking, *, now: datetime | None = None
+) -> int:
+    """One tick of the draft clock: autopick in every draft whose timer has run out.
+
+    Called by the worker every second. Each draft is handled on its own session and its own
+    errors, so one stuck draft cannot stop the others. The ranking is computed at most once per
+    tick. Returns how many picks were made.
+    """
+    now = now or datetime.now(UTC)
+    with session_factory() as session:
+        due = due_draft_ids(session, now)
+    if not due:
+        return 0
+    cached: list[list[int]] = []
+
+    def ranking_once(session: Session) -> list[int]:
+        if not cached:
+            cached.append(ranking(session))
+        return cached[0]
+
+    made = 0
+    for draft_id in due:
+        try:
+            with session_factory() as session:
+                if autopick(session, draft_id, ranking_once, now=now) is not None:
+                    made += 1
+        except Exception:
+            log.exception("autopick failed for draft %s", draft_id)
+    return made
 
 
 # ---- commissioner controls ----
