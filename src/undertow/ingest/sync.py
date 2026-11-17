@@ -12,6 +12,7 @@ from undertow.ingest import store
 from undertow.ingest.feed import Feed
 from undertow.ingest.parsing import (
     parse_box_score,
+    parse_play_by_play,
     parse_roster,
     parse_schedule,
     parse_seasons,
@@ -49,11 +50,23 @@ def sync_schedule(session: Session, feed: Feed, season_id: int) -> int:
     return len(games)
 
 
-def sync_game(session: Session, feed: Feed, game_id: int) -> bool:
+def sync_game(session: Session, feed: Feed, game_id: int, history_only: bool = False) -> bool:
     """Fetch and store one box score. Returns False if the game is not in the schedule."""
     if session.get(Game, game_id) is None:
         log.warning("skipping box score for unknown game %s", game_id)
         return False
     _, payload = store.save_snapshot(session, feed.game_summary(game_id))
-    store.upsert_box_score(session, parse_box_score(payload))
+    store.upsert_box_score(session, parse_box_score(payload), history_only=history_only)
+    return True
+
+
+def sync_play_by_play(
+    session: Session, feed: Feed, game_id: int, history_only: bool = False
+) -> bool:
+    """Fetch and store one game's shots and penalties. False if the game is not in the schedule."""
+    if session.get(Game, game_id) is None:
+        log.warning("skipping play-by-play for unknown game %s", game_id)
+        return False
+    _, payload = store.save_snapshot(session, feed.play_by_play(game_id))
+    store.upsert_play_by_play(session, parse_play_by_play(payload, game_id), history_only)
     return True

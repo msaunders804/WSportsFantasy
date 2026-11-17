@@ -6,6 +6,7 @@ HockeyTech JSON.
 
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from decimal import Decimal
 from enum import StrEnum
 
 
@@ -129,3 +130,49 @@ class BoxScoreDTO:
     # Minimal bio for players seen in the box score, so FK rows can be created for players
     # the roster feed has not (yet) listed.
     players: list[PlayerDTO] = field(default_factory=list)
+
+
+@dataclass(frozen=True, slots=True)
+class ShotEventDTO:
+    kind: str  # shot / blocked_shot / penalty_shot / goal
+    feed_id: int
+    period: int
+    period_seconds: int
+    team_id: int
+    is_home: bool
+    shooter_id: int
+    goalie_id: int | None
+    blocker_id: int | None
+    x: int | None
+    y: int | None
+    shot_type: str
+    quality: int | None
+    quality_label: str
+    is_goal: bool
+    is_empty_net: bool
+    is_power_play: bool
+    is_short_handed: bool
+    is_penalty_shot: bool
+
+
+@dataclass(frozen=True, slots=True)
+class PenaltyEventDTO:
+    feed_id: int
+    period: int
+    period_seconds: int
+    team_id: int
+    player_id: int | None
+    served_by_id: int | None
+    minutes: Decimal
+    penalty_class: str
+    description: str
+    is_bench: bool
+    is_penalty_shot: bool
+
+
+@dataclass(frozen=True, slots=True)
+class PlayByPlayDTO:
+    game_id: int
+    shots: list[ShotEventDTO]
+    penalties: list[PenaltyEventDTO]
+    players: list[PlayerDTO]  # everyone named in a shot or penalty, for bare player rows

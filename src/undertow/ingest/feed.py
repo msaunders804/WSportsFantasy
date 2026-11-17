@@ -34,6 +34,8 @@ class Feed(Protocol):
     def schedule(self, season_id: int) -> RawResponse: ...
     def roster(self, team_id: int, season_id: int) -> RawResponse: ...
     def game_summary(self, game_id: int) -> RawResponse: ...
+    def play_by_play(self, game_id: int) -> RawResponse: ...
+    def player_profile(self, player_id: int, season_id: int) -> RawResponse: ...
 
 
 class FeedError(RuntimeError):
@@ -89,6 +91,19 @@ class HockeyTechFeed:
     def game_summary(self, game_id: int) -> RawResponse:
         return self._get(feed="statviewfeed", view="gameSummary", game_id=game_id)
 
+    def play_by_play(self, game_id: int) -> RawResponse:
+        return self._get(feed="gc", tab="pxpverbose", game_id=game_id)
+
+    def player_profile(self, player_id: int, season_id: int) -> RawResponse:
+        return self._get(
+            feed="statviewfeed",
+            view="player",
+            player_id=player_id,
+            season_id=season_id,
+            site_id=0,
+            lang="en",
+        )
+
 
 class FixtureFeed:
     """Serves recorded responses from a directory. Mapping is by (kind, ids) -> file name."""
@@ -118,3 +133,9 @@ class FixtureFeed:
 
     def game_summary(self, game_id: int) -> RawResponse:
         return self._read(f"game:{game_id}")
+
+    def play_by_play(self, game_id: int) -> RawResponse:
+        return self._read(f"pxp:{game_id}")
+
+    def player_profile(self, player_id: int, season_id: int) -> RawResponse:
+        return self._read(f"player:{player_id}")

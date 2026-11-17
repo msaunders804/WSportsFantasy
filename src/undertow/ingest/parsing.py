@@ -9,6 +9,7 @@ mislabelled as Z, so `GameDateISO8601` is the authoritative start time.
 import json
 import logging
 from datetime import UTC, date, datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from undertow.ingest.dto import (
@@ -16,10 +17,13 @@ from undertow.ingest.dto import (
     GameDTO,
     GameStatus,
     GoalieLineDTO,
+    PenaltyEventDTO,
+    PlayByPlayDTO,
     PlayerDTO,
     Position,
     ResultType,
     SeasonDTO,
+    ShotEventDTO,
     SkaterLineDTO,
     TeamDTO,
 )
@@ -343,3 +347,143 @@ def parse_box_score(summary: dict) -> BoxScoreDTO:
         goalies=goalies,
         players=list(players.values()),
     )
+
+
+def _player_from_pxp(info: dict | None) -> PlayerDTO | None:
+    """Player stub from the small `player`/`goalie`/`blocker` objects in play-by-play events."""
+    # Bench and team penalties name "player 0" with no name; that is no player.
+    if not info or not to_int(info.get("player_id")):
+        return None
+    return PlayerDTO(
+        id=int(info["player_id"]),
+        person_id=None,
+        # The feed sometimes has an id with no profile (null names); keep the shot, blank names.
+        first_name=info.get("first_name") or "",
+        last_name=info.get("last_name") or "",
+        position=None,
+        raw_position="",
+        team_id=to_int_or_none(info.get("team_id")),
+        jersey=to_int_or_none(info.get("jersey_number")),
+        feed_status="",
+        shoots="",
+        birthdate=None,
+    )
+
+
+def _flag(value: Any) -> bool:
+    return str(value or "0") not in ("0", "", "false", "False")
+
+
+def parse_play_by_play(payload: dict, game_id: int) -> PlayByPlayDTO:
+    """Shots, blocked shots, penalty shots and penalties from a `pxpverbose` response.
+
+    A goal appears twice in the feed: as a `shot` (linked by `game_goal_id`) and as a `goal`
+    event that carries the power-play / empty-net / short-handed flags. They are merged into
+    one row; a goal with no matching shot becomes its own `goal` row. The feed has no
+    missed-net shots, and no strength state on non-goal shots (rebuild it from penalties).
+    """
+    events = payload["GC"]["Pxpverbose"]
+    goals = {str(e["id"]): e for e in events if e.get("event") == "goal"}
+    players: dict[int, PlayerDTO] = {}
+
+    def note(info: dict | None) -> int | None:
+        p = _player_from_pxp(info)
+        if p is None:
+            return None
+        players.setdefault(p.id, p)
+        return p.id
+
+    shots: list[ShotEventDTO] = []
+    matched: set[str] = set()
+    for e in events:
+        kind = e.get("event")
+        if kind not in ("shot", "blocked_shot", "penaltyshot"):
+            continue
+        shooter = note(e.get("player"))
+        if shooter is None:
+            log.warning("game %s: %s event %s has no shooter", game_id, kind, e.get("id"))
+            continue
+        goal = goals.get(str(e.get("game_goal_id") or ""))
+        if goal is not None:
+            matched.add(str(goal["id"]))
+        penalty_shot = kind == "penaltyshot" or (
+            goal is not None and _flag(goal.get("penalty_shot"))
+        )
+        shots.append(
+            ShotEventDTO(
+                kind="penalty_shot" if kind == "penaltyshot" else kind,
+                feed_id=to_int(e.get("id")),
+                period=to_int(e.get("period_id")),
+                period_seconds=to_int(e.get("s")),
+                team_id=to_int(e.get("team_id")),
+                is_home=_flag(e.get("home")),
+                shooter_id=shooter,
+                goalie_id=note(e.get("goalie")),
+                blocker_id=note(e.get("blocker")),
+                x=to_int_or_none(e.get("x_location")),
+                y=to_int_or_none(e.get("y_location")),
+                shot_type=e.get("shot_type_description") or "",
+                quality=to_int_or_none(e.get("quality")),
+                quality_label=e.get("shot_quality_description") or "",
+                is_goal=goal is not None or e.get("result") == "scored",
+                is_empty_net=goal is not None and _flag(goal.get("empty_net")),
+                is_power_play=goal is not None and _flag(goal.get("power_play")),
+                is_short_handed=goal is not None and _flag(goal.get("short_handed")),
+                is_penalty_shot=penalty_shot,
+            )
+        )
+    for gid, g in goals.items():
+        if gid in matched:
+            continue
+        scorer = note(g.get("goal_scorer"))
+        if scorer is None:
+            continue
+        log.warning("game %s: goal %s has no matching shot event", game_id, gid)
+        shots.append(
+            ShotEventDTO(
+                kind="goal",
+                feed_id=to_int(g.get("id")),
+                period=to_int(g.get("period_id")),
+                period_seconds=to_int(g.get("s")),
+                team_id=to_int(g.get("team_id")),
+                is_home=_flag(g.get("home")),
+                shooter_id=scorer,
+                goalie_id=None,
+                blocker_id=None,
+                x=to_int_or_none(g.get("x_location")),
+                y=to_int_or_none(g.get("y_location")),
+                shot_type="",
+                quality=None,
+                quality_label="",
+                is_goal=True,
+                is_empty_net=_flag(g.get("empty_net")),
+                is_power_play=_flag(g.get("power_play")),
+                is_short_handed=_flag(g.get("short_handed")),
+                is_penalty_shot=_flag(g.get("penalty_shot")),
+            )
+        )
+
+    penalties: list[PenaltyEventDTO] = []
+    for e in events:
+        if e.get("event") != "penalty":
+            continue
+        try:
+            minutes = Decimal(str(e.get("minutes") or "0"))
+        except InvalidOperation:
+            minutes = Decimal(0)
+        penalties.append(
+            PenaltyEventDTO(
+                feed_id=to_int(e.get("id")),
+                period=to_int(e.get("period_id")),
+                period_seconds=to_int(e.get("s")),
+                team_id=to_int(e.get("team_id")),
+                player_id=note(e.get("player_penalized_info")),
+                served_by_id=note(e.get("player_served_info")),
+                minutes=minutes,
+                penalty_class=e.get("penalty_class") or "",
+                description=e.get("lang_penalty_description") or "",
+                is_bench=_flag(e.get("bench")),
+                is_penalty_shot=_flag(e.get("penalty_shot")),
+            )
+        )
+    return PlayByPlayDTO(game_id, shots, penalties, list(players.values()))

@@ -16,6 +16,7 @@
       <li><span class="step-name">Season opens</span><small>{{ dates.season_opens.when }}</small></li>
     </ol>
     <p>We'll place you in a league and email your invite. Once you're in, your league and team show up right here.</p>
+    <p>Rather play with your own friends? <a href="/leagues/new">Register a league</a> and invite them.</p>
     {% include "partials/while_you_wait.html" %}
 
     {% else %}
@@ -40,6 +41,8 @@
       <p class="muted">The league page has the teams and the settings.</p>
     </div>
     {% endif %}
+
+    <p><a class="btn" href="/leagues/{{ home.league.id }}/draft">{% if home.league.status == "drafting" %}Join the draft now{% else %}Go to the draft room{% endif %}</a></p>
 
     <h2>Teams</h2>
     <table>

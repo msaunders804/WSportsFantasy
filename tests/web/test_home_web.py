@@ -165,14 +165,15 @@ def test_the_account_page_is_now_the_profile_page(client):
     assert 'href="/home"' in html and "Create a league" not in html
 
 
-def test_staff_find_the_create_league_link_on_the_account_page(client, fantasy_db):
+def test_staff_and_members_find_the_league_registration_link(client, fantasy_db):
     make_admin(fantasy_db)
     client.post(
         "/login",
         data={"csrf": csrf(client, "/login"), "email": "admin@example.com", "password": PASSWORD},
     )
     assert 'href="/leagues/new"' in client.get("/account").text
-    assert "/leagues/new" not in client.get("/home").text
+    assert "house leagues" in client.get("/account").text  # staff-only hint
+    assert 'href="/leagues/new"' in client.get("/home").text
 
 
 # ---- home with a league ----

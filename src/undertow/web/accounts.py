@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from undertow import notify
 from undertow.config import get_settings
 from undertow.data import get_session
 from undertow.data.models import FantasyTeam, League, LeagueMember, LeagueSettings, Season, User
@@ -24,6 +25,8 @@ login_ip_limiter = RateLimiter(max_events=20, window_seconds=600)
 login_email_limiter = RateLimiter(max_events=5, window_seconds=600)
 register_limiter = RateLimiter(max_events=5, window_seconds=600)
 join_limiter = RateLimiter(max_events=20, window_seconds=600)
+league_register_limiter = RateLimiter(max_events=5, window_seconds=3600)
+invite_limiter = RateLimiter(max_events=10, window_seconds=3600)
 forgot_ip_limiter = RateLimiter(max_events=5, window_seconds=600)
 forgot_email_limiter = RateLimiter(max_events=3, window_seconds=3600)
 set_password_limiter = RateLimiter(max_events=10, window_seconds=600)
@@ -318,9 +321,13 @@ def current_season_id(session: Session) -> int | None:
 
 @router.get("/leagues/new", response_class=HTMLResponse)
 def new_league_form(request: Request, user: User = Depends(security.require_user)):
-    if not user.is_admin:
-        raise HTTPException(status_code=403)
-    return page(request, "account/league_new.html", user=user, form={"size": "10"}, errors={})
+    return page(
+        request,
+        "account/league_new.html",
+        user=user,
+        form={"size": "10", "kind": "private"},
+        errors={},
+    )
 
 
 @router.post("/leagues/new")
@@ -329,23 +336,45 @@ async def new_league(
     user: User = Depends(security.require_user),
     session: Session = Depends(get_session),
 ) -> Response:
-    if not user.is_admin:
-        raise HTTPException(status_code=403)
+    """Any member registers a private league and becomes its commissioner. Staff can instead
+    create a house league (kind=house, the default for staff), which they do not join."""
     form = await security.read_form(request)
     check_csrf(request, form)
+    house = user.is_admin and form.get("kind", "house") == "house"
+    if not league_register_limiter.allow(f"user:{user.id}"):
+        return page(
+            request,
+            "account/league_new.html",
+            429,
+            user=user,
+            form=form,
+            errors={"form": "Too many attempts. Please wait a while and try again."},
+        )
     season_id = await run_in_threadpool(current_season_id, session)
     try:
         if season_id is None:
-            raise leagues.LeagueError("No current season is loaded yet. Run the ingest first.")
+            raise leagues.LeagueError("No current season is loaded yet. Please try again soon.")
         size = int(form.get("size", ""))
-        league, _ = await run_in_threadpool(
-            leagues.create_league,
-            session,
-            user,
-            name=form.get("name", ""),
-            season_id=season_id,
-            size=size,
-        )
+        if house:
+            league, _ = await run_in_threadpool(
+                leagues.create_league,
+                session,
+                user,
+                name=form.get("name", ""),
+                season_id=season_id,
+                size=size,
+            )
+        else:
+            league, _ = await run_in_threadpool(
+                lambda: leagues.register_league(
+                    session,
+                    user,
+                    name=form.get("name", ""),
+                    season_id=season_id,
+                    size=size,
+                    team_name=form.get("team_name", ""),
+                )
+            )
     except ValueError:
         return page(
             request,
@@ -420,6 +449,10 @@ def league_context(session: Session, user: User, league_id: int) -> dict:
         else "",
         "errors": {},
         "saved": False,
+        "seats_open": leagues.seats_open(session, league),
+        "is_private": league.kind == "private",
+        "invites": leagues.invites_for_league(session, league_id) if manager else [],
+        "invite_notice": None,
         "zones": draft_time.ZONES,
         "draft_input": draft_time.to_local_input(league.draft_at),
         **draft_time_context(league),
@@ -461,6 +494,56 @@ async def league_settings(
     session.expire_all()
     context = await run_in_threadpool(league_context, session, user, league_id)
     context["saved"] = True
+    return page(request, "account/league.html", **context)
+
+
+def send_invite_emails(emails: list[str], inviter: str, league_name: str, code: str) -> None:
+    """Runs after the response. One email per new invite; a failure never reaches the page."""
+    settings = get_settings()
+    for email in emails:
+        try:
+            notify.send_league_invite_email(settings, email, inviter, league_name, code)
+        except Exception:
+            logger.exception("Could not send a league invite")
+
+
+@router.post("/leagues/{league_id}/invites")
+async def league_invites(
+    request: Request,
+    league_id: int,
+    background: BackgroundTasks,
+    user: User = Depends(security.require_user),
+    session: Session = Depends(get_session),
+) -> Response:
+    """Commissioner emails invites to friends. The link they receive is the league's invite link."""
+    form = await security.read_form(request)
+    check_csrf(request, form)
+    context = await run_in_threadpool(league_context, session, user, league_id)
+    if not invite_limiter.allow(f"user:{user.id}"):
+        context["errors"] = {"invite": "Too many invites for now. Please wait a while."}
+        return page(request, "account/league.html", 429, **context)
+    try:
+        result = await run_in_threadpool(
+            leagues.invite_by_email,
+            session,
+            user,
+            league_id,
+            leagues.parse_emails(form.get("emails", "")),
+        )
+    except leagues.PermissionDenied as exc:
+        raise HTTPException(status_code=403) from exc
+    except leagues.LeagueError as exc:
+        context["errors"] = {"invite": str(exc)}
+        return page(request, "account/league.html", 422, **context)
+    league = context["league"]
+    background.add_task(
+        send_invite_emails, result.new, user.display_name, league.name, league.invite_code
+    )
+    session.expire_all()
+    context = await run_in_threadpool(league_context, session, user, league_id)
+    sent = f"Invited {len(result.new)}." if result.new else "No new invites."
+    skipped = "".join(f" {email}: {why}." for email, why in result.skipped.items())
+    context["invite_notice"] = (sent + skipped).strip()
     return page(request, "account/league.html", **context)
 
 

@@ -36,7 +36,8 @@ Decisions and reasons are in [decisions.md](decisions.md) (2026-10-15, in-app ch
 - **Trending** is a first-pass heuristic: last 3 games vs. season average, plus "just off a shutout", "won last 3 starts" and similar. Tune it against real play once the season is under way, and decide how it should treat small samples.
 
 ## League tab
-- The invite link was removed from the League tab: this season's leagues are managed by Undertow. Plan section 6 (join by invite link) and Phase 3 (invites) need revisiting: do we still need invite links, or does the commissioner add people directly? Also check the landing page step "You'll get an invite link" for the same reason.
+- Resolved 2026-11-17: invite links stay, and private leagues (registered by members) use them plus emailed invites. See decisions.md, "Private leagues". The demo League tab (`app/league.html`) still has no invite card, since it shows house leagues.
+- Private leagues, later: fill open seats from the solo waitlist, remind invitees who have not joined, let a commissioner remove an invite or a member, and a "league must be full" check when the live draft room is built.
 
 ## Explain as we go
 - Brand rule: never leave a user guessing. Every term or number that is not obvious gets a "?" tip (`help` macro in `app/_macros.html`). When a new page adds a term, add its tip in the same change.

@@ -147,3 +147,36 @@ def test_welcome_email_without_dates_or_name_still_reads_well():
     text = json.loads(calls[0].content)["text"]
     assert text.startswith("Hi there!")
     assert "None" not in text and "{" not in text
+
+
+def test_league_invite_email_carries_the_join_link_and_names_the_inviter():
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(200, json={"id": "abc"})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    settings = _settings(base_url="https://undertowsports.com")
+    sent = notify.send_league_invite_email(
+        settings, "friend@example.com", "Sam", "Friends", "code123", client=client
+    )
+
+    assert sent is True
+    body = json.loads(calls[0].content)
+    assert body["to"] == ["friend@example.com"]
+    assert "Sam invited you to Friends" in body["subject"]
+    assert "https://undertowsports.com/join/code123" in body["text"]
+
+
+def test_league_invite_email_is_a_quiet_no_op_without_an_email_key():
+    settings = Settings(email_api_key="", base_url="https://undertowsports.com")
+    assert notify.send_league_invite_email(settings, "a@example.com", "Sam", "F", "c") is False
+
+
+def test_league_invite_email_never_raises_when_resend_fails():
+    client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(500)))
+    sent = notify.send_league_invite_email(
+        _settings(), "a@example.com", "Sam", "F", "c", client=client
+    )
+    assert sent is False

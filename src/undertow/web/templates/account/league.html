@@ -7,13 +7,35 @@
     <h1>{{ league.name }}</h1>
     <p class="muted">{{ teams | length }} of {{ league.size }} teams joined. Status: {{ league.status.replace("_", " ") }}.</p>
 
+    <p><a class="btn" href="/leagues/{{ league.id }}/draft">{% if league.status == "setup" %}Draft room{% elif league.status == "drafting" %}Join the draft{% else %}View the draft{% endif %}</a></p>
     {% if errors.form %}<p class="alert" role="alert">{{ errors.form }}</p>{% endif %}
     {% if saved %}<p class="alert" role="status">Settings saved.</p>{% endif %}
 
     {% if invite_url %}
-    <h2>Invite link</h2>
-    <p>Anyone with this link can join until the league is full. Share it only with the people you are inviting.</p>
+    <h2>Invite your friends</h2>
+    <p>{% if seats_open %}{{ seats_open }} {{ "spot" if seats_open == 1 else "spots" }} open.{% else %}The league is full.{% endif %} Anyone with this link can join until the league is full. Share it only with the people you are inviting.</p>
     <p><input type="text" readonly value="{{ invite_url }}" aria-label="Invite link" onfocus="this.select()"></p>
+    {% if is_private and editable and seats_open %}
+    <form class="card" method="post" action="/leagues/{{ league.id }}/invites">
+      {% if errors.invite %}<p class="alert" role="alert">{{ errors.invite }}</p>{% endif %}
+      {% if invite_notice %}<p class="alert" role="status">{{ invite_notice }}</p>{% endif %}
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="emails">Or email them the link</label>
+        <textarea id="emails" name="emails" rows="3" maxlength="2000" placeholder="friend@example.com, another@example.com"></textarea>
+        <p class="fine">Separate addresses with commas or new lines. We send each person one email and don't add them to any list.</p>
+      </div>
+      <button class="btn" type="submit">Send invites</button>
+    </form>
+    {% endif %}
+    {% if invites %}
+    <table>
+      <thead><tr><th scope="col">Invited</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+      {% for invite in invites %}<tr><td>{{ invite.email }}</td><td>{{ "Joined" if invite.accepted_at else "Waiting" }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
     {% endif %}
 
     <h2>Draft time</h2>

@@ -22,6 +22,8 @@ def fresh_limiters():
         accounts.login_email_limiter,
         accounts.register_limiter,
         accounts.join_limiter,
+        accounts.league_register_limiter,
+        accounts.invite_limiter,
     ):
         limiter._events.clear()
 
@@ -186,10 +188,78 @@ def test_protected_pages_redirect_to_login_with_next(client):
     assert resp.headers["location"] == "/login?next=/join/abc%3Fx%3D1"
 
 
-def test_only_staff_can_open_league_creation(client, fantasy_db):
+def test_members_can_open_league_registration_but_not_make_house_leagues(client, fantasy_db):
     register(client)
-    assert client.get("/leagues/new").status_code == 403
-    assert post(client, "/leagues/new", {"name": "X", "size": "10"}).status_code == 403
+    form = client.get("/leagues/new")
+    assert form.status_code == 200 and "League type (staff)" not in form.text
+    # A member who sends kind=house still gets a private league they commission.
+    resp = post(
+        client,
+        "/leagues/new",
+        {"name": "X", "size": "10", "team_name": "Mine", "kind": "house"},
+        "/leagues/new",
+    )
+    assert resp.status_code == 303
+    with Session(fantasy_db) as s:
+        league = s.scalar(select(League))
+        assert league.kind == "private"
+
+
+def test_member_registers_a_private_league_and_sees_invite_tools(client, fantasy_db):
+    register(client)
+    resp = post(
+        client,
+        "/leagues/new",
+        {"name": "Friends", "size": "4", "team_name": "Ice Queens"},
+        "/leagues/new",
+    )
+    assert resp.status_code == 303
+    page = client.get(resp.headers["location"])
+    assert "Friends" in page.text and "Ice Queens" in page.text
+    assert "Invite your friends" in page.text and "Send invites" in page.text
+    assert "3 spots open" in page.text
+
+
+def test_league_registration_requires_a_team_name_and_even_size(client, fantasy_db):
+    register(client)
+    no_team = post(client, "/leagues/new", {"name": "F", "size": "4"}, "/leagues/new")
+    assert no_team.status_code == 422 and "team a name" in no_team.text
+    odd = post(client, "/leagues/new", {"name": "F", "size": "5", "team_name": "T"}, "/leagues/new")
+    assert odd.status_code == 422 and "even number" in odd.text
+
+
+def test_commissioner_invites_by_email_and_duplicates_are_skipped(client, fantasy_db, monkeypatch):
+    sent = []
+    monkeypatch.setattr(
+        accounts.notify,
+        "send_league_invite_email",
+        lambda settings, to, inviter, league_name, code, client=None: sent.append(to) or True,
+    )
+    register(client)
+    resp = post(
+        client, "/leagues/new", {"name": "F", "size": "4", "team_name": "T"}, "/leagues/new"
+    )
+    path = resp.headers["location"]
+    first = post(client, f"{path}/invites", {"emails": "a@example.com, b@example.com"}, path)
+    assert first.status_code == 200 and "Invited 2." in first.text
+    again = post(client, f"{path}/invites", {"emails": "a@example.com\nnot-an-email"}, path)
+    assert "No new invites." in again.text
+    assert "already invited" in again.text and "not a valid email" in again.text
+    assert sent == ["a@example.com", "b@example.com"]
+
+
+def test_members_cannot_send_invites_and_strangers_cannot_see_the_league(client, fantasy_db):
+    register(client, email="boss@example.com")
+    resp = post(
+        client, "/leagues/new", {"name": "F", "size": "4", "team_name": "T"}, "/leagues/new"
+    )
+    path = resp.headers["location"]
+    code = client.get(path).text.split("/join/")[1].split('"')[0]
+    client.post("/logout", data={"csrf": csrf(client, "/leagues")})
+    register(client, email="member@example.com")
+    post(client, f"/join/{code}", {"team_name": "Mem"}, f"/join/{code}")
+    denied = post(client, f"{path}/invites", {"emails": "x@example.com"}, "/leagues")
+    assert denied.status_code == 403
 
 
 def test_staff_create_a_league_and_see_the_invite_link(client, fantasy_db):

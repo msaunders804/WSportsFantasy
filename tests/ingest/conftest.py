@@ -10,7 +10,8 @@ from undertow.ingest.feed import FixtureFeed
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "hockeytech"
 
 TABLES = (
-    "skater_game_stats, goalie_game_stats, game, player, pro_team, season, raw_snapshot, job_run"
+    "shot_event, penalty_event, skater_game_stats, goalie_game_stats, game, player, "
+    "pro_team, season, raw_snapshot, job_run"
 )
 
 
@@ -28,6 +29,7 @@ def feed() -> FixtureFeed:
             "roster:1:10": "roster_bos_2026-27-pre.json",
             "game:210": "gamesummary_210_reg.json",
             "game:227": "gamesummary_227_so.json",
+            "pxp:210": "pxp_210.json",
         },
     )
 

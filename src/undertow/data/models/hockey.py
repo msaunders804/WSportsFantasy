@@ -1,6 +1,7 @@
 """Real-hockey tables. Primary keys are the HockeyTech IDs (stable integers)."""
 
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy import (
     BigInteger,
@@ -10,8 +11,10 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    Numeric,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -138,6 +141,66 @@ class GoalieGameStats(Base):
     started: Mapped[bool] = mapped_column(Boolean, default=False)
 
     __table_args__ = (Index("ix_goalie_game_stats_player_id", "player_id"),)
+
+
+class ShotEvent(Base):
+    """One shot attempt from play-by-play: on net (incl. goals), blocked, or penalty shot.
+
+    The feed has no missed-net shots. Coordinates are the feed's raw values; in the games checked
+    the home team always attacks toward low x (see docs/feed.md), but normalise in analysis code,
+    not here. A goal is one row: the `shot` event merged with its `goal` event's flags.
+    """
+
+    __tablename__ = "shot_event"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    game_id: Mapped[int] = mapped_column(ForeignKey("game.id"))
+    kind: Mapped[str] = mapped_column(String(15))  # shot / blocked_shot / penalty_shot / goal
+    feed_id: Mapped[int] = mapped_column(Integer)  # unique per (game, kind) only
+    period: Mapped[int] = mapped_column(Integer)  # 1-3, 4 = overtime
+    period_seconds: Mapped[int] = mapped_column(Integer)  # elapsed within the period
+    team_id: Mapped[int] = mapped_column(ForeignKey("pro_team.id"))  # shooting team
+    is_home: Mapped[bool] = mapped_column(Boolean)  # shooter is on the home team
+    shooter_id: Mapped[int] = mapped_column(ForeignKey("player.id"))
+    goalie_id: Mapped[int | None] = mapped_column(ForeignKey("player.id"))  # null: empty net
+    blocker_id: Mapped[int | None] = mapped_column(ForeignKey("player.id"))
+    x: Mapped[int | None] = mapped_column(Integer)
+    y: Mapped[int | None] = mapped_column(Integer)
+    shot_type: Mapped[str] = mapped_column(String(20), default="")
+    quality: Mapped[int | None] = mapped_column(Integer)  # the feed's own quality code
+    quality_label: Mapped[str] = mapped_column(String(40), default="")
+    is_goal: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_empty_net: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_power_play: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_short_handed: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_penalty_shot: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    __table_args__ = (
+        UniqueConstraint("game_id", "kind", "feed_id"),
+        Index("ix_shot_event_shooter_id", "shooter_id"),
+    )
+
+
+class PenaltyEvent(Base):
+    """One penalty from play-by-play; with the clock it lets analysis rebuild strength state."""
+
+    __tablename__ = "penalty_event"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    game_id: Mapped[int] = mapped_column(ForeignKey("game.id"))
+    feed_id: Mapped[int] = mapped_column(Integer)
+    period: Mapped[int] = mapped_column(Integer)
+    period_seconds: Mapped[int] = mapped_column(Integer)
+    team_id: Mapped[int] = mapped_column(ForeignKey("pro_team.id"))
+    player_id: Mapped[int | None] = mapped_column(ForeignKey("player.id"))  # null: bench minor
+    served_by_id: Mapped[int | None] = mapped_column(ForeignKey("player.id"))
+    minutes: Mapped[Decimal] = mapped_column(Numeric(4, 2))
+    penalty_class: Mapped[str] = mapped_column(String(20), default="")
+    description: Mapped[str] = mapped_column(String(100), default="")
+    is_bench: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_penalty_shot: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    __table_args__ = (UniqueConstraint("game_id", "feed_id"),)
 
 
 class RawSnapshot(Base):
