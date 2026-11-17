@@ -108,6 +108,15 @@ class MatchupScore:
         return self.home.team_id if self.home.total > self.away.total else self.away.team_id
 
 
+def dump_fraction(value: Fraction) -> str:
+    """An exact points total as text for storage: Fraction(33, 10) -> "33/10", 5 -> "5"."""
+    return str(value)
+
+
+def load_fraction(text: str) -> Fraction:
+    return Fraction(text)
+
+
 def week_window(start: date, end: date) -> tuple[datetime, datetime]:
     """The moments a week begins and ends, as Eastern midnights (end is exclusive)."""
     lo = datetime.combine(start, time(0, 0), tzinfo=EASTERN)

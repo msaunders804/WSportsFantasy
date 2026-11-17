@@ -16,7 +16,7 @@ from sqlalchemy.engine import Connection
 from undertow.config import get_settings
 from undertow.data import get_engine
 from undertow.data.session import session_factory
-from undertow.fantasy import draft_room, lineups, rankings, season_calendar
+from undertow.fantasy import draft_room, lineups, matchup_jobs, rankings, season_calendar
 from undertow.ingest import jobs
 from undertow.ingest.feed import Feed, FeedError, HockeyTechFeed
 
@@ -55,6 +55,17 @@ def lineup_lock_tick() -> None:
         log.exception("lineup lock tick failed")
 
 
+def matchup_job_tick() -> None:
+    """Update matchup statuses and finalize results whose time has come. Every 5 minutes; only
+    logs when something changed, and never raises."""
+    try:
+        summary = matchup_jobs.run_matchup_job(session_factory())
+        if summary != "status_changes=0 finalized=0":
+            log.info("matchups: %s", summary)
+    except Exception:
+        log.exception("matchup job failed")
+
+
 def calendar_sync_job() -> None:
     """Rebuild the fantasy calendar from the stored schedule. Weeks that have started never move."""
     try:
@@ -84,6 +95,14 @@ def build_scheduler(feed: Feed | None = None) -> BackgroundScheduler:
         "interval",
         seconds=30,
         id="lineup_lock",
+        max_instances=1,
+        coalesce=True,
+    )
+    scheduler.add_job(
+        matchup_job_tick,
+        "interval",
+        minutes=5,
+        id="matchup_status",
         max_instances=1,
         coalesce=True,
     )

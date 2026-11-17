@@ -281,7 +281,7 @@ def test_registering_with_a_waitlist_email_points_to_forgot_password(client):
 def test_every_page_shows_the_same_key_dates(client):
     home = client.get("/").text
     guide = client.get("/fantasy-101").text
-    for text in ("Nov 15", "Nov 20", "Nov 30 to Dec 4", "Dec 5"):
+    for text in ("Nov 20", "Dec 1", "Nov 30 to Dec 4", "Dec 5"):
         assert text in home and text in guide
 
 

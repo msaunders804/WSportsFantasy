@@ -1,0 +1,64 @@
+{% extends "app/base.html" %}
+{% from "app/_macros.html" import help %}
+{% block title %}League | {{ league.name }} | Undertow Fantasy{% endblock %}
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="/static/stats.css?v={{ v }}">
+  <link rel="stylesheet" href="/static/matchup_live.css?v={{ v }}">
+{% endblock %}
+{% block content %}
+<div class="wrap view">
+  <h1>{{ league.name }}</h1>
+  <h2 class="section-h">Standings {{ help("A win is worth 2 and a tie 1. Teams level on that are ordered by total points scored. The playoff tiebreak is applied when seeds are set.") }}</h2>
+  {% if not view.rows or (view.rows | selectattr("played") | list | length) == 0 %}
+  <p class="muted">No results yet. Standings appear once the first week is over.</p>
+  {% endif %}
+  <div class="table-scroll">
+  <table class="data">
+    <thead><tr>
+      <th class="num" scope="col">#</th><th scope="col">Team</th>
+      <th class="num" scope="col">W</th><th class="num" scope="col">L</th><th class="num" scope="col">T</th>
+      <th class="num" scope="col">PF {{ help("Points for: the total fantasy points your team has scored in matchups that are over.") }}</th><th class="num" scope="col">PA {{ help("Points against: what your opponents scored against you.") }}</th>
+    </tr></thead>
+    <tbody>
+    {% for r in view.rows %}
+      <tr{% if r.team_id == view.mine_team_id %} class="mine"{% endif %}>
+        <td class="num">{{ r.rank }}</td>
+        <td><a href="/leagues/{{ league.id }}/team/{{ r.team_id }}">{{ r.name }}</a><br><span class="muted fine">{{ r.manager }}</span></td>
+        <td class="num">{{ r.wins }}</td><td class="num">{{ r.losses }}</td><td class="num">{{ r.ties }}</td>
+        <td class="num">{{ r.points_for | pts }}</td><td class="num">{{ r.points_against | pts }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if view.provisional %}<p class="muted fine">Includes weeks that just ended. Results become permanent 3 days after a week ends.</p>{% endif %}
+
+  {% if view.this_week %}
+  <h2 class="section-h">Week {{ view.week_no }}</h2>
+  <ul class="others-list">
+    {% for o in view.this_week %}
+    <li><a href="/leagues/{{ league.id }}/matchup/{{ o.matchup.id }}">
+      <span class="o-team">{{ o.home.name }}</span><span class="o-score">{{ o.home.total | pts }}</span>
+      <span class="o-vs muted">vs</span>
+      <span class="o-score">{{ o.away.total | pts }}</span><span class="o-team">{{ o.away.name }}</span>
+    </a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% for week_no, items in view.results %}
+  <h2 class="section-h">Week {{ week_no }} results</h2>
+  <ul class="others-list">
+    {% for o in items %}
+    <li><a href="/leagues/{{ league.id }}/matchup/{{ o.matchup.id }}">
+      <span class="o-team{% if o.home.total > o.away.total %} win{% endif %}">{{ o.home.name }}</span><span class="o-score">{{ o.home.total | pts }}</span>
+      <span class="o-vs muted">vs</span>
+      <span class="o-score">{{ o.away.total | pts }}</span><span class="o-team{% if o.away.total > o.home.total %} win{% endif %}">{{ o.away.name }}</span>
+    </a></li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+  <p class="muted fine"><a href="/leagues/{{ league.id }}">League settings and members</a></p>
+</div>
+{% endblock %}

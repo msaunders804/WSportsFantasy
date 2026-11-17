@@ -1,0 +1,39 @@
+/* Matchup and League tabs (real pages). Builds on app.css and stats.css. */
+.scoreboard { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--space-3); align-items: center; padding: var(--space-4); margin: var(--space-3) 0; }
+.ms-team { display: grid; gap: 2px; min-width: 0; }
+.ms-team:last-child { text-align: right; }
+.ms-name { font-weight: 700; text-decoration: none; overflow-wrap: anywhere; line-height: 1.2; }
+.ms-mgr { font-size: 0.8rem; }
+.ms-total { font-family: var(--font-heading); font-size: 2.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ms-team.lead .ms-total { color: var(--primary); }
+.ms-mid { display: grid; place-items: center; }
+.chip-status { border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); white-space: nowrap; }
+.chip-status.st-live { color: #fff; background: var(--accent); border-color: var(--accent); }
+.chip-status.st-final, .chip-status.st-finalized { color: var(--text); }
+.ms-note { margin: 0 0 var(--space-3); font-size: 0.9rem; }
+
+.mgrid { display: grid; border-top: 1px solid var(--border); }
+.mrow { display: grid; grid-template-columns: 1fr 44px 1fr; gap: var(--space-2); align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.mrow .slot-tag { justify-self: center; min-width: 0; width: 100%; padding: 2px 4px; font-size: 0.65rem; text-align: center; }
+.mc { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2); align-items: center; min-width: 0; }
+.mc.right { grid-template-columns: 1fr auto; text-align: right; }
+.mc.right .mc-pts { order: 2; }
+.mc.empty { min-height: 1px; }
+.mc-pts { font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; min-width: 2.3rem; font-variant-numeric: tabular-nums; text-align: center; }
+.mc-info { display: grid; min-width: 0; line-height: 1.25; }
+.mc-name { font-weight: 600; font-size: 0.86rem; text-decoration: none; overflow-wrap: anywhere; }
+.mc-meta, .mc-state { font-size: 0.7rem; overflow-wrap: anywhere; }
+.mc.st-live .mc-name::before, .mc.st-final .mc-name::before, .mc.st-upcoming .mc-name::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; background: var(--border); vertical-align: middle; }
+.mc.st-live .mc-name::before { background: var(--accent); }
+.mc.st-final .mc-name::before { background: var(--positive); }
+.mc.right .mc-name::before { margin-right: 0; margin-left: 0; }
+.mc.right.st-live .mc-name::before, .mc.right.st-final .mc-name::before, .mc.right.st-upcoming .mc-name::before { margin-left: 0; margin-right: 6px; }
+.mc.st-none { opacity: 0.6; }
+
+.others-list { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--border); }
+.others-list a { display: grid; grid-template-columns: 1fr auto auto auto 1fr; gap: var(--space-2); align-items: center; padding: 12px 4px; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; }
+.others-list .o-team:last-child { text-align: right; }
+.others-list .o-team.win { font-weight: 700; }
+.others-list .o-score { font-family: var(--font-heading); font-weight: 700; font-variant-numeric: tabular-nums; }
+table.data tr.mine td { background: color-mix(in srgb, var(--primary) 8%, var(--surface)); }
+@media (min-width: 700px) { .mrow { grid-template-columns: 1fr 56px 1fr; } .mc-name { font-size: 0.95rem; } }

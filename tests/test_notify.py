@@ -117,7 +117,7 @@ def test_welcome_email_is_warm_and_lists_what_to_do_while_waiting():
         "tok",
         14,
         client=client,
-        invites_by="Nov 20",
+        invites_from="Nov 20",
         draft_window="Nov 30 to Dec 4",
     )
     body = json.loads(calls[0].content)
@@ -128,8 +128,8 @@ def test_welcome_email_is_warm_and_lists_what_to_do_while_waiting():
     assert "dive into Fantasy PWHL" in text
     assert text.count("!") >= 5
     # The password link comes first, then the dates, then the things to do in the meantime.
-    assert text.index("account/set-password?token=tok") < text.index("by Nov 20")
-    assert "email your invite by Nov 20 and drafts run Nov 30 to Dec 4." in text
+    assert text.index("account/set-password?token=tok") < text.index("invites on Nov 20")
+    assert "emailing invites on Nov 20 and drafts run Nov 30 to Dec 4." in text
     for link in (
         "https://undertowsports.com/preview/draft",
         "https://undertowsports.com/fantasy-101",

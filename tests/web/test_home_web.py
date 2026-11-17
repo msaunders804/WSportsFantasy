@@ -134,7 +134,7 @@ def test_home_without_a_league_shows_progress_links_and_the_share_card(client):
     html = client.get("/home").text
     assert "Welcome, Sam!" in html
     assert 'class="done"' in html and 'aria-current="step"' in html
-    for text in ("by Nov 20", "Nov 30 to Dec 4", "Dec 5"):
+    for text in ("from Nov 20", "Nov 30 to Dec 4", "Dec 5"):
         assert text in html
     assert 'href="/preview/draft"' in html and 'href="/fantasy-101"' in html
     assert "data-share" in html and "Copy link" in html
