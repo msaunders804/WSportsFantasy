@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }}: {{ data.season_name }} stats and fantasy points | Undertow Fantasy{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="/static/stats.css?v={{ v }}">{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap wide">
+    <a class="crumb-back" href="/stats?season={{ data.season_id }}">‹ All players</a>
+    <h1>{{ p.name }}</h1>
+    <p class="muted">{{ p.pos }} · {{ p.team }} · {{ data.season_name }}</p>
+
+    <div class="tiles">
+      <div class="tile"><strong>{{ p.fantasy | pts }}</strong><span>fantasy points</span></div>
+      <div class="tile"><strong>{{ p.fpg | pts(2) }}</strong><span>per game ({{ p.gp }} GP)</span></div>
+      <div class="tile"><strong>#{{ overall }}</strong><span>of {{ total_players }} players</span></div>
+      <div class="tile"><strong>#{{ at_pos }}</strong><span>among {{ "goalies" if goalie else ("forwards" if p.pos == "F" else "defenders") }}</span></div>
+    </div>
+
+    <h2>Where the points came from</h2>
+    <table class="data compact">
+      <thead><tr><th scope="col">Category</th><th class="num" scope="col">Points</th></tr></thead>
+      <tbody>
+        {% for label, pts in breakdown %}<tr><th scope="row">{{ label }}</th><td class="num{% if pts < 0 %} neg{% endif %}">{{ pts | pts }}</td></tr>{% endfor %}
+        <tr class="total"><th scope="row">Total</th><td class="num strong">{{ p.fantasy | pts }}</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Game by game</h2>
+    <div class="table-scroll">
+    <table class="data">
+      <thead><tr>
+        <th scope="col">Date</th><th scope="col">Opponent</th>
+        {% for c in columns %}<th class="num" scope="col">{{ c }}</th>{% endfor %}
+        <th class="num strong" scope="col">Fantasy pts</th>
+      </tr></thead>
+      <tbody>
+      {% for g in log %}
+        <tr>
+          <td>{{ g.day.strftime("%b %d") }}</td><td>{{ "vs" if g.home else "@" }} {{ g.opponent }}</td>
+          {% for c in columns %}<td class="num">{{ g.stats[c] }}</td>{% endfor %}
+          <td class="num strong">{{ g.fantasy | pts }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p class="muted fine">Scored with our standard table, game by game, and rounded only for display. Undertow is an independent fan project, not affiliated with the PWHL.</p>
+  </div>
+</section>
+{% endblock %}
