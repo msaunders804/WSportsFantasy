@@ -21,7 +21,7 @@ Updated Oct 14, 2026. Phase numbers refer to [Plan.MD](Plan.MD). Decisions alrea
 ## Needed before accounts open (Phase 3)
 - **Set a real `SECRET_KEY`** on `web` in Railway (a long random value, for example `openssl rand -hex 32`). The app refuses to start with accounts on and the default key. Changing it later logs everyone out of forms in progress.
 - **Run the migration:** it runs on deploy via the `preDeployCommand` (migration 0007 adds the account and league tables).
-- **Make yourself staff** after you register, in the Railway Postgres console: `UPDATE user_account SET is_admin = true WHERE email = 'you@example.com';`
+- **Make yourself staff** after you register: `railway run python -m undertow.fantasy.staff you@example.com` (a dry run), then again with `--yes`.
 - **Leave `ACCOUNTS_ENABLED` unset** until you are ready for people to register; set it to `true` to open sign-up and login.
 
 ## Needed before waitlist signups get accounts (set-password links)
@@ -76,7 +76,7 @@ Resend account is made. Nothing below is done yet. Never paste keys into chat or
 - [X] 4. **Merge PR #24** (accounts from signups, header Log in button) so the migration runs on deploy.
 - [ ] 5. **Set `ACCOUNTS_ENABLED=true`** on `web` and redeploy.
 - [ ] 6. **Test with your own email:** sign up on the landing page, check that the signup alert and the welcome email arrive, open the link, set a password, and confirm you land on `/account`. Also try Log in, Log out and "Forgot your password".
-- [ ] 7. **Make yourself staff** (so you can create leagues): after your account exists, run in the Railway Postgres console `UPDATE user_account SET is_admin = true WHERE email = 'you@example.com';`
+- [ ] 7. **Make yourself staff** (so you can create leagues and open `/admin`): after your account exists, run `railway run python -m undertow.fantasy.staff you@example.com` to see what it would do, then add `--yes` to do it. It prints which database it is about to change, and logs the change in the audit log. (The raw SQL, `UPDATE user_account SET is_admin = true WHERE email = '...'`, still works.)
 - [ ] 8. **Decide on the consent wording** for people who joined the list earlier (see the Waitlist accounts entry in docs/decisions.md), and send them a heads-up if you want one.
 - [ ] 9. **Backfill the existing list:** `railway run python -m undertow.fantasy.onboarding` is a dry run that prints who would get an account. When it looks right, run it again with `--send`.
 - [ ] 9b. **Set each league's draft time** once you know it: open the league page (as staff or commissioner), "Draft time", enter it in Eastern. Until then members see "to be announced" and the Nov 30 to Dec 4 window.
