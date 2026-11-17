@@ -44,8 +44,9 @@ MIN_PICK_SECONDS = 10
 MAX_PICK_SECONDS = 300
 MAX_QUEUE = 60
 
-# Best player first. Given the session, returns player ids; the caller decides how to rank.
-Ranking = Callable[[Session], list[int]]
+# Best player first. Given the session and the season being drafted (the league's season),
+# returns player ids; the caller decides how to rank.
+Ranking = Callable[[Session, int], list[int]]
 
 
 class DraftError(leagues.LeagueError):
@@ -337,6 +338,7 @@ def autopick(
         session.rollback()
         return None
     team_id = team_on_clock(draft)
+    league_season = session.get(League, draft.league_id).season_id
     settings = session.get(LeagueSettings, draft.league_id)
     counts = _roster_counts(session, draft.league_id, team_id)
     picks_left = draft.rounds - sum(counts.values())
@@ -351,7 +353,7 @@ def autopick(
         )
     )
     candidates = [pid for pid in queued if pid not in drafted] + [
-        pid for pid in ranking(session) if pid not in drafted
+        pid for pid in ranking(session, league_season) if pid not in drafted
     ]
     positions = dict(
         session.execute(
@@ -385,12 +387,12 @@ def process_due_drafts(
         due = due_draft_ids(session, now)
     if not due:
         return 0
-    cached: list[list[int]] = []
+    cached: dict[int, list[int]] = {}
 
-    def ranking_once(session: Session) -> list[int]:
-        if not cached:
-            cached.append(ranking(session))
-        return cached[0]
+    def ranking_once(session: Session, season_id: int) -> list[int]:
+        if season_id not in cached:
+            cached[season_id] = ranking(session, season_id)
+        return cached[season_id]
 
     made = 0
     for draft_id in due:

@@ -130,6 +130,15 @@ def rank_players(
     return [RankedPlayer(p, values[p.id]) for p in ranked]
 
 
-def default_ranking(session: Session) -> list[int]:
-    """Player ids best first. Matches `draft_room.Ranking`, so it can be passed to autopick."""
-    return [r.player.id for r in rank_players(session)]
+def default_ranking(session: Session, season_id: int | None = None) -> list[int]:
+    """Player ids best first, using the history before `season_id` (the season being drafted).
+    Matches `draft_room.Ranking`, so it can be passed to autopick."""
+    history = history_season_ids(session, season_id)
+    return [r.player.id for r in rank_players(session, season_ids=history)]
+
+
+def basis_name(session: Session, season_ids: list[int]) -> str | None:
+    """The name of the season the ratings come from, or None if there is no history at all."""
+    if not season_ids:
+        return None
+    return session.scalar(select(Season.name).where(Season.id == season_ids[0]))

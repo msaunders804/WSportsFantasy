@@ -176,3 +176,21 @@ def test_ranking_with_no_history_is_empty_of_value_but_still_lists_everyone(db):
     db.commit()
     ranked = [r.player.id for r in rankings.rank_players(db) if r.player.id >= BASE]
     assert ranked == ids  # all equal, so the tie breaks on id
+
+
+def test_basis_name_and_default_ranking_follow_the_season_being_drafted(db):
+    assert rankings.basis_name(db, []) is None
+    star, other = player(db, 1), player(db, 2)
+    for n in range(1, 6):
+        gid = game(db, n)  # season 10, "2025-26 Regular Season"
+        skater(db, gid, star, goals=2, assists=1, shots=4)
+        skater(db, gid, other, shots=1)
+    db.commit()
+    history = rankings.history_season_ids(db, 11)
+    assert history == [10]
+    assert rankings.basis_name(db, history) == "2025-26 Regular Season"
+    ranked = [i for i in rankings.default_ranking(db, 11) if i >= BASE]
+    assert ranked == [star, other]
+    # Drafting season 10 itself, there is no earlier regular season with stats: all equal.
+    flat = [i for i in rankings.default_ranking(db, 10) if i >= BASE]
+    assert flat == [star, other]  # equal value, so the id order

@@ -29,7 +29,7 @@ NO_SUCH_PLAYER = 800_000_001  # never a real id, whatever data the dev database 
 POSITIONS = ["F"] * 36 + ["D"] * 16 + ["G"] * 8
 
 
-def best_first(session):
+def best_first(session, season_id=None):
     return list(session.scalars(select(Player.id).where(Player.id >= FIRST_ID).order_by(Player.id)))
 
 
@@ -320,7 +320,7 @@ def test_autopick_skips_players_the_team_may_not_take(db):
 def test_autopick_fails_loudly_when_nobody_can_be_picked(db):
     league, users, draft = started(db)
     with pytest.raises(draft_room.DraftError, match="No available player"):
-        draft_room.autopick(db, draft.id, lambda s: [], now=T0 + timedelta(days=1))
+        draft_room.autopick(db, draft.id, lambda s, season_id: [], now=T0 + timedelta(days=1))
 
 
 def test_queue_drops_taken_unknown_and_repeated_players(db):
@@ -543,8 +543,8 @@ def test_clock_tick_autopicks_only_expired_drafts_and_ranks_once(fantasy_db, db)
     league, users, draft = started(db)
     calls = []
 
-    def ranking(session):
-        calls.append(1)
+    def ranking(session, season_id):
+        calls.append(season_id)
         return best_first(session)
 
     def factory():
@@ -553,7 +553,7 @@ def test_clock_tick_autopicks_only_expired_drafts_and_ranks_once(fantasy_db, db)
     assert draft_room.process_due_drafts(factory, ranking, now=T0 + timedelta(seconds=10)) == 0
     assert calls == []  # nothing due, so the rankings were never computed
     made = draft_room.process_due_drafts(factory, ranking, now=T0 + timedelta(seconds=91))
-    assert made == 1 and calls == [1]
+    assert made == 1 and calls == [11]  # the league's season is passed through
     db.expire_all()
     pick = db.scalar(select(DraftSelection))
     assert pick.is_autopick and pick.player_id == FIRST_ID
@@ -564,7 +564,7 @@ def test_clock_tick_autopicks_only_expired_drafts_and_ranks_once(fantasy_db, db)
 def test_clock_tick_survives_a_broken_draft(fantasy_db, db):
     league, users, draft = started(db)
 
-    def broken(session):
+    def broken(session, season_id):
         raise RuntimeError("rankings are down")
 
     made = draft_room.process_due_drafts(

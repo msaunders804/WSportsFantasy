@@ -42,6 +42,8 @@
     </div>
     {% endif %}
 
+    <p><a class="btn" href="/leagues/{{ home.league.id }}/draft">{% if home.league.status == "drafting" %}Join the draft now{% else %}Go to the draft room{% endif %}</a></p>
+
     <h2>Teams</h2>
     <table>
       <thead><tr><th scope="col">Team</th><th scope="col">Manager</th></tr></thead>
