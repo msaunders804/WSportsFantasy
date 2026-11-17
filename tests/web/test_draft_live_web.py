@@ -70,7 +70,13 @@ def world(fantasy_db):
 
     yield type("W", (), {"ids": ids, "client": staticmethod(client_for), "engine": fantasy_db})
     with fantasy_db.begin() as conn:
-        conn.execute(text("TRUNCATE draft_queue, draft_pick, draft, roster_entry CASCADE"))
+        conn.execute(
+            text(
+                "TRUNCATE draft_queue, draft_pick, draft, roster_entry, lineup_slot, lineup_lock, "
+                "matchup "
+                "CASCADE"
+            )
+        )
         conn.execute(text("DELETE FROM player WHERE id >= :n"), {"n": FIRST_ID})
 
 

@@ -51,7 +51,13 @@ def db(fantasy_db):
         s.commit()
         yield s
     with fantasy_db.begin() as conn:
-        conn.execute(text("TRUNCATE draft_queue, draft_pick, draft, roster_entry CASCADE"))
+        conn.execute(
+            text(
+                "TRUNCATE draft_queue, draft_pick, draft, roster_entry, lineup_slot, lineup_lock, "
+                "matchup "
+                "CASCADE"
+            )
+        )
         conn.execute(text("DELETE FROM player WHERE id >= :n"), {"n": FIRST_ID})
 
 
