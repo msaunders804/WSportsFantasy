@@ -23,6 +23,11 @@ Decisions and reasons are in [decisions.md](decisions.md) (2026-10-15, in-app ch
 - **Tests:** service rules (edit window, delete rights, trade visibility), database tests for membership checks and the paging cursor, and an SSE stream test using fixtures.
 - **Open:** whether the commissioner can read trade threads (assumed yes), and a time limit on how long ago a member can scroll back.
 
+## Profile pictures and favorite team (wanted, requested 2026-11-17, after stats and admin)
+- Members can set a **profile picture** and choose a **favorite PWHL team**, and both show up around the site (header avatar and account page first; then team and league tables, the draft board and chat later). Favorite team could also tint the member's own pages with that team's colors and logo (`pro_team.logo_url` already exists).
+- Needs: `user_account.favorite_team_id` (nullable FK to `pro_team`), an image upload path with storage (size and type limits, re-encode to a small square, serve from object storage rather than the database), a way to remove or replace it, moderation for what others can see (staff can clear a picture), and a privacy page update. Decide: initials-circle fallback stays as the default, and whether a picture is visible to people outside your league.
+- Overlaps the "Profile page" item below (team photo, nickname); build them together.
+
 ## Profile page (wanted)
 - A profile page where a manager can **change their team name**, **add a team photo**, and **give their players nicknames**.
 - Where it shows up: the team photo replaces the initials circle on the Matchup scoreboard (the placeholder is in `app/_macros.html`, `avatar`); the team name shows everywhere a team appears; nicknames show next to or in place of the player's name on Matchup and Team.

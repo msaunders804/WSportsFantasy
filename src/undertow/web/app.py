@@ -16,8 +16,8 @@ from undertow.config import get_settings
 from undertow.data import get_session
 from undertow.data.models import User
 from undertow.data.session import session_factory
-from undertow.fantasy import auth, key_dates, onboarding, waitlist
-from undertow.web import accounts, draft_live, draft_preview, security
+from undertow.fantasy import auth, key_dates, onboarding, season_stats, waitlist
+from undertow.web import accounts, admin, draft_live, draft_preview, security, stats
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
@@ -58,6 +58,8 @@ def static_version() -> str:
 templates.env.globals["v"] = static_version()
 templates.env.globals["dates"] = key_dates.DATES
 templates.env.globals["key_dates"] = key_dates.KEY_DATES
+templates.env.filters["pts"] = season_stats.show
+templates.env.filters["pts_plain"] = season_stats.plain
 
 logger = logging.getLogger(__name__)
 MAX_FORM_BYTES = 8192
@@ -157,9 +159,12 @@ def create_app() -> FastAPI:
             request, "fantasy101.html", {"app_name": settings.app_name}
         )
 
+    app.include_router(stats.router)
+
     if accounts_on:
         app.include_router(accounts.router)
         app.include_router(draft_live.router)
+        app.include_router(admin.router)
 
     previews_on = settings.preview_enabled or not settings.is_prod
     templates.env.globals["previews_enabled"] = previews_on

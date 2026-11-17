@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}{% if data %}{{ data.season_name }} stats and fantasy points{% else %}Stats{% endif %} | Undertow Fantasy{% endblock %}
+{% block head_extra %}
+  <meta name="description" content="Every PWHL player's stats from last season, and the fantasy points they would have scored under Undertow's standard scoring.">
+  <link rel="stylesheet" href="/static/stats.css?v={{ v }}">
+  <script src="/static/stats.js?v={{ v }}" defer></script>
+{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap wide">
+    {% if not data %}
+    <h1>Stats</h1>
+    <p>Past-season stats are not loaded yet. Check back soon.</p>
+    {% else %}
+    <h1>{{ data.season_name }}: stats and fantasy points</h1>
+    <p class="lede muted">Here is how every player would have scored in fantasy last season, using our standard scoring. {{ data.games }} games, {{ data.skaters | length }} skaters and {{ data.goalies | length }} goalies who played.</p>
+    {% if seasons | length > 1 %}
+    <p class="muted fine">Season:
+      {% for sid, name in seasons %}{% if sid == data.season_id %}<strong>{{ name }}</strong>{% else %}<a href="/stats?season={{ sid }}">{{ name }}</a>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}
+    </p>
+    {% endif %}
+
+    <details class="rules">
+      <summary>How we score it</summary>
+      <div class="rules-grid">
+        {% for group, items in rules.items() %}
+        <div>
+          <h2>{{ group }}</h2>
+          <table class="data compact"><tbody>
+            {% for label, pts in items %}<tr><th scope="row">{{ label }}</th><td class="num">{{ pts }}</td></tr>{% endfor %}
+          </tbody></table>
+        </div>
+        {% endfor %}
+      </div>
+      <p class="muted fine">This is the table every Undertow league starts with. Points are worked out game by game from the official box scores and rounded only for display. Players who did not play a game score nothing for it.</p>
+    </details>
+
+    <div class="controls" id="controls">
+      <div class="seg" role="group" aria-label="Show">
+        <button type="button" data-view="skaters" aria-pressed="true">Skaters</button>
+        <button type="button" data-view="goalies" aria-pressed="false">Goalies</button>
+      </div>
+      <label class="sr" for="q">Search players</label>
+      <input id="q" class="search" type="search" placeholder="Search players or teams" autocomplete="off">
+      <div class="chips" role="group" aria-label="Position" id="poschips">
+        <button class="chip" type="button" data-pos="all" aria-pressed="true">All</button>
+        <button class="chip" type="button" data-pos="F" aria-pressed="false">F</button>
+        <button class="chip" type="button" data-pos="D" aria-pressed="false">D</button>
+      </div>
+    </div>
+
+    <div class="table-scroll" data-table="skaters">
+      <table class="data sortable" id="t-skaters">
+        <thead><tr>
+          <th class="num" scope="col" data-sort="num">#</th>
+          <th scope="col" data-sort="text">Player</th><th scope="col" data-sort="text">Pos</th><th scope="col" data-sort="text">Team</th>
+          <th class="num" scope="col" data-sort="num">GP</th><th class="num" scope="col" data-sort="num">G</th><th class="num" scope="col" data-sort="num">A</th><th class="num" scope="col" data-sort="num">PTS</th>
+          <th class="num" scope="col" data-sort="num">SOG</th><th class="num" scope="col" data-sort="num">Hits</th><th class="num" scope="col" data-sort="num">Blk</th><th class="num" scope="col" data-sort="num">PPP</th>
+          <th class="num strong" scope="col" data-sort="num" data-default>Fantasy pts</th><th class="num" scope="col" data-sort="num">Per game</th>
+        </tr></thead>
+        <tbody>
+        {% for p in data.skaters %}
+          <tr data-pos="{{ p.pos }}" data-name="{{ p.name | lower }} {{ p.team | lower }}">
+            <td class="num" data-v="{{ loop.index }}">{{ loop.index }}</td>
+            <td><a href="/stats/player/{{ p.player_id }}?season={{ data.season_id }}">{{ p.name }}</a></td>
+            <td>{{ p.pos }}</td><td>{{ p.team }}</td>
+            <td class="num">{{ p.gp }}</td><td class="num">{{ p.goals }}</td><td class="num">{{ p.assists }}</td><td class="num">{{ p.points }}</td>
+            <td class="num">{{ p.shots }}</td><td class="num">{{ p.hits }}</td><td class="num">{{ p.blocks }}</td><td class="num">{{ p.pp_points }}</td>
+            <td class="num strong" data-v="{{ p.fantasy | float }}">{{ p.fantasy | pts }}</td>
+            <td class="num" data-v="{{ p.fpg | float }}">{{ p.fpg | pts(2) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-scroll" data-table="goalies" hidden>
+      <table class="data sortable" id="t-goalies">
+        <thead><tr>
+          <th class="num" scope="col" data-sort="num">#</th>
+          <th scope="col" data-sort="text">Player</th><th scope="col" data-sort="text">Team</th>
+          <th class="num" scope="col" data-sort="num">GP</th><th class="num" scope="col" data-sort="num">W</th><th class="num" scope="col" data-sort="num">L</th><th class="num" scope="col" data-sort="num">OTL</th>
+          <th class="num" scope="col" data-sort="num">SV%</th><th class="num" scope="col" data-sort="num">GA</th><th class="num" scope="col" data-sort="num">SO</th>
+          <th class="num strong" scope="col" data-sort="num" data-default>Fantasy pts</th><th class="num" scope="col" data-sort="num">Per game</th>
+        </tr></thead>
+        <tbody>
+        {% for g in data.goalies %}
+          <tr data-pos="G" data-name="{{ g.name | lower }} {{ g.team | lower }}">
+            <td class="num" data-v="{{ loop.index }}">{{ loop.index }}</td>
+            <td><a href="/stats/player/{{ g.player_id }}?season={{ data.season_id }}">{{ g.name }}</a></td>
+            <td>{{ g.team }}</td>
+            <td class="num">{{ g.gp }}</td><td class="num">{{ g.wins }}</td><td class="num">{{ g.losses }}</td><td class="num">{{ g.ot_losses }}</td>
+            <td class="num" data-v="{{ (g.saves / g.shots_against) if g.shots_against else 0 }}">{{ g.save_pct }}</td><td class="num">{{ g.goals_against }}</td><td class="num">{{ g.shutouts }}</td>
+            <td class="num strong" data-v="{{ g.fantasy | float }}">{{ g.fantasy | pts }}</td>
+            <td class="num" data-v="{{ g.fpg | float }}">{{ g.fpg | pts(2) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted empty" id="none" hidden>No players match.</p>
+    <p class="muted fine">Undertow is an independent fan project and is not affiliated with the PWHL. Stats come from the league's public data feed and may contain small errors. Past results do not predict this season.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

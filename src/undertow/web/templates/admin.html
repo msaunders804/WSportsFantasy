@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Staff overview | Undertow Fantasy{% endblock %}
+{% block head_extra %}<meta name="robots" content="noindex"><link rel="stylesheet" href="/static/stats.css?v={{ v }}">{% endblock %}
+{% block content %}
+<section class="block">
+  <div class="wrap wide">
+    <h1>Staff overview</h1>
+    <p class="muted">Every league and where it stands. Read only. Times are shown in your browser's time zone.</p>
+
+    <div class="tiles">
+      <div class="tile"><strong>{{ totals.users }}</strong><span>accounts</span></div>
+      <div class="tile"><strong>{{ totals.users_without_password }}</strong><span>have not set a password</span></div>
+      <div class="tile"><strong>{{ totals.waitlist }}</strong><span>on the waitlist</span></div>
+      <div class="tile"><strong>{{ totals.waitlist_without_account }}</strong><span>waitlist with no account</span></div>
+      <div class="tile"><strong>{{ rows | length }}</strong><span>leagues ({{ totals.leagues_by_kind.get("house", 0) }} house, {{ totals.leagues_by_kind.get("private", 0) }} private)</span></div>
+      <div class="tile"><strong>{{ totals.open_seats }}</strong><span>open seats in forming leagues</span></div>
+      <div class="tile {% if attention %}warn{% endif %}"><strong>{{ attention }}</strong><span>need attention</span></div>
+    </div>
+    <p class="muted fine">By status:
+      {% for status, n in totals.leagues_by_status.items() %}{{ status.replace("_", " ") }} {{ n }}{% if not loop.last %} · {% endif %}{% else %}no leagues yet{% endfor %}
+    </p>
+
+    {% if rows %}
+    <div class="table-scroll">
+    <table class="data">
+      <thead><tr>
+        <th scope="col">League</th><th scope="col">Type</th><th scope="col">Status</th>
+        <th scope="col" class="num">Teams</th><th scope="col">Commissioner</th>
+        <th scope="col">Draft</th><th scope="col" class="num">Invites out</th>
+        <th scope="col">Needs attention</th>
+      </tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr{% if r.flags %} class="flagged"{% endif %}>
+          <td><a href="/leagues/{{ r.id }}">{{ r.name }}</a><br><span class="muted fine">#{{ r.id }} · created <time data-local datetime="{{ r.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ r.created_at.strftime("%b %d") }}</time></span></td>
+          <td>{{ r.kind }}</td>
+          <td>{{ r.status.replace("_", " ") }}</td>
+          <td class="num">{{ r.teams }} / {{ r.size }}</td>
+          <td>{% if r.commissioner %}{{ r.commissioner }}<br><span class="muted fine">{{ r.commissioner_email }}</span>{% else %}<span class="muted">none</span>{% endif %}</td>
+          <td>
+            {% if r.draft_status %}
+              <a href="/leagues/{{ r.id }}/draft">{{ r.draft_status }}</a>, pick {{ r.picks_made }} of {{ r.picks_total }}
+            {% elif r.draft_at %}
+              <time data-local datetime="{{ r.draft_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ r.draft_at.strftime("%b %d %H:%M") }} UTC</time>
+            {% else %}<span class="muted">no time set</span>{% endif %}
+          </td>
+          <td class="num">{{ r.pending_invites }}</td>
+          <td>{% for f in r.flags %}<span class="flag">{{ f }}</span>{% else %}<span class="muted">-</span>{% endfor %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p>No leagues yet.</p>
+    {% endif %}
+    <p class="muted fine">Staff tools that change things (create a league, set a commissioner, set a draft time) are on the league pages and keep writing to the audit log.</p>
+  </div>
+</section>
+<script src="/static/home.js?v={{ v }}" defer></script>
+{% endblock %}
