@@ -26,6 +26,7 @@ from undertow.data.models import (
 )
 from undertow.fantasy import stat_lines
 from undertow.fantasy.scoring import ScoringConfig, score_goalie, score_skater
+from undertow.fantasy.season_calendar import eastern_date
 
 CACHE_TTL_SECONDS = 600
 SCORING = ScoringConfig()
@@ -133,6 +134,29 @@ class GameLine:
     stats: dict[str, str]  # label -> value, in display order
     fantasy: Fraction
     breakdown: dict[str, Fraction]
+
+
+def skater_summary(row: SkaterGameStats) -> dict[str, str]:
+    """A skater's game as display text, in column order."""
+    return {
+        "G": str(row.goals),
+        "A": str(row.assists),
+        "SOG": str(row.shots),
+        "Hits": str(row.hits),
+        "Blk": str(row.blocks),
+        "PPP": str(row.pp_goals + row.pp_assists),
+    }
+
+
+def goalie_summary(row: GoalieGameStats) -> dict[str, str]:
+    """A goalie's game as display text, in column order."""
+    return {
+        "Dec": row.decision or "-",
+        "SA": str(row.shots_against),
+        "SV": str(row.saves),
+        "GA": str(row.goals_against),
+        "SO": "1" if row.shutout else "0",
+    }
 
 
 def regular_seasons_with_stats(session: Session) -> list[tuple[int, str]]:
@@ -308,17 +332,10 @@ def game_log(session: Session, player_id: int, season_id: int) -> list[GameLine]
         log.append(
             GameLine(
                 game.id,
-                game.start_utc.date(),
+                eastern_date(game.start_utc),
                 away_code if is_home else home_code,
                 is_home,
-                {
-                    "G": str(row.goals),
-                    "A": str(row.assists),
-                    "SOG": str(row.shots),
-                    "Hits": str(row.hits),
-                    "Blk": str(row.blocks),
-                    "PPP": str(row.pp_goals + row.pp_assists),
-                },
+                skater_summary(row),
                 result.total,
                 result.breakdown,
             )
@@ -342,16 +359,10 @@ def game_log(session: Session, player_id: int, season_id: int) -> list[GameLine]
         log.append(
             GameLine(
                 game.id,
-                game.start_utc.date(),
+                eastern_date(game.start_utc),
                 away_code if is_home else home_code,
                 is_home,
-                {
-                    "Dec": row.decision or "-",
-                    "SA": str(row.shots_against),
-                    "SV": str(row.saves),
-                    "GA": str(row.goals_against),
-                    "SO": "1" if row.shutout else "0",
-                },
+                goalie_summary(row),
                 result.total,
                 result.breakdown,
             )

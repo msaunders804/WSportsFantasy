@@ -9,29 +9,33 @@
   {% if name == "matchup" %}<path d="M13 3 5 14h6l-1 7 8-11h-6z"/>
   {% elif name == "team" %}<path d="M8 4 4 6v5l3 1v8h10v-8l3-1V6l-4-2a4 4 0 0 1-8 0z"/>
   {% elif name == "players" %}<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>
-  {% elif name == "league" %}<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8"/>{% endif %}
+  {% elif name == "league" %}<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8"/>
+  {% elif name == "draft" %}<path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/>
+  {% elif name == "stats" %}<path d="M5 20V10M12 20V4M19 20v-7"/>{% endif %}
 </svg>
 {% endmacro %}
 
 {% block header %}
 <div class="appbar">
   <div class="wrap appbar-in">
-    <a class="wordmark" href="/preview/matchup" aria-label="Undertow Fantasy">
+    <a class="wordmark" href="{{ "/home" if tabs else "/preview/matchup" }}" aria-label="Undertow Fantasy">
       <svg class="wordmark-mark" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0a1628"/><path class="mark-w2" d="M1 17 C6 11 11 22 16 17 S23 11 27 16 L27 26 L1 26 Z"/><path class="mark-w1" d="M3 15 C8 10 12 20 17 15 S24 10 26 14 L26 26 L3 26 Z"/></svg>
       <span class="wordmark-text">under<span class="tow">tow</span></span>
     </a>
-    <button class="league-pill" type="button" aria-label="Switch league">{{ league.name }} <span aria-hidden="true">▾</span></button>
+    {% if tabs %}<a class="league-pill" href="/leagues/{{ league.id }}" aria-label="League settings and members">{{ league.name }}</a>
+    {% else %}<button class="league-pill" type="button" aria-label="Switch league">{{ league.name }} <span aria-hidden="true">▾</span></button>{% endif %}
     {% include "partials/account_nav.html" %}
   </div>
 </div>
 <nav class="tabs" aria-label="Main">
     <div class="wrap tabs-in">
-      {% for key, label in [("matchup", "Matchup"), ("team", "Team"), ("players", "Players"), ("league", "League")] %}
-      <a href="/preview/{{ key }}"{% if active == key %} aria-current="page"{% endif %}>{{ icon(key) }}<span>{{ label }}</span></a>
+      {# Real pages pass `tabs` as (key, label, href); the design previews use the fixed list. #}
+      {% for key, label, href in (tabs or [("matchup", "Matchup", "/preview/matchup"), ("team", "Team", "/preview/team"), ("players", "Players", "/preview/players"), ("league", "League", "/preview/league")]) %}
+      <a href="{{ href }}"{% if active == key %} aria-current="page"{% endif %}>{{ icon(key) }}<span>{{ label }}</span></a>
       {% endfor %}
     </div>
 </nav>
-<div class="sample-banner"><div class="wrap">Sample data for design preview. Players and stats are real 2025-26 PWHL numbers; the teams, managers and standings are made up.</div></div>
+{% if not tabs %}<div class="sample-banner"><div class="wrap">Sample data for design preview. Players and stats are real 2025-26 PWHL numbers; the teams, managers and standings are made up.</div></div>{% endif %}
 {% endblock %}
 
 {% block footer %}

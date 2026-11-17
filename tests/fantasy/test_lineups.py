@@ -410,3 +410,54 @@ def test_the_worker_job_reports_what_it_did(db, fantasy_db):
     assert (
         lineups.run_lock_job(lambda: Session(fantasy_db), NOW) == "locked=0 released=0 repaired=0"
     )
+
+
+# ---- the moves the page offers ----
+
+
+def test_move_options_match_what_move_player_accepts(db):
+    league, users, teams = league_of_four(db)
+    t = teams[1]
+    roster = [rostered(db, league, t, pos) for pos in "FFFFFDDDGG"]
+    hurt = rostered(db, league, t, "F", status="injured")
+    options = lineups.move_options(db, t, NOW)
+    assert set(options) == {p.id for p in roster} | {hurt.id}
+    first_f, bench_f, g1, g2 = roster[0], roster[4], roster[8], roster[9]
+    # A bench forward can swap with any starting forward (all forwards fit every forward slot).
+    assert {(o.slot, o.swap_with) for o in options[bench_f.id] if o.slot == "F"} == {
+        ("F", roster[0].id),
+        ("F", roster[1].id),
+        ("F", roster[2].id),
+    }
+    # A goalie can only go to the bench or swap with the other goalie (slot G is full).
+    assert {o.slot for o in options[g1.id]} == {"BN"} and {o.slot for o in options[g2.id]} == {"G"}
+    assert options[g2.id][0].swap_with == g1.id and options[g2.id][0].swap_name
+    # Healthy players are never offered IR; the injured one is, if it has room.
+    assert all(o.slot != "IR" for p in roster for o in options[p.id])
+    assert any(o.slot == "IR" and o.swap_with is None for o in options[hurt.id])
+    assert first_f.id in options
+    # Every offered option is accepted by move_player, and nothing else would be.
+    snapshot = slots(db, t)
+    for player_id, opts in options.items():
+        for o in opts:
+            lineups.move_player(db, users[1], t, player_id, o.slot, swap_with=o.swap_with, now=NOW)
+            for row, p in lineups.team_lineup(db, t):
+                row.slot = snapshot[p.id]
+            db.commit()
+
+
+def test_locked_players_are_not_offered_moves_and_not_offered_as_swap_partners(db):
+    league, users, teams = league_of_four(db)
+    t = teams[1]
+    playing = rostered(db, league, t, "F", pro=0)
+    free = rostered(db, league, t, "F", pro=2)
+    rostered(db, league, t, "F", pro=2)  # three forwards: the F slots are now full
+    benched = rostered(db, league, t, "F", pro=2)
+    lineups.move_player(db, users[1], t, benched.id, "BN", now=NOW)
+    game(db, 1, NOW - timedelta(minutes=5))  # team 0 is playing now
+    db.commit()
+    options = lineups.move_options(db, t, NOW)
+    assert options[playing.id] == []  # locked: no moves at all
+    for o in options[benched.id]:
+        assert o.swap_with != playing.id  # and cannot be swapped with
+    assert any(o.slot == "F" and o.swap_with == free.id for o in options[benched.id])

@@ -386,3 +386,42 @@ def count_by_slot(session: Session, team_id: int) -> dict[str, int]:
             .group_by(LineupSlot.slot)
         ).all()
     )
+
+
+@dataclass(frozen=True)
+class MoveOption:
+    """A move a player may make now: to `slot`, swapping with `swap_with` if that slot is full."""
+
+    slot: str
+    swap_with: int | None = None
+    swap_name: str = ""
+
+
+def move_options(
+    session: Session, team_id: int, now: datetime | None = None
+) -> dict[int, list[MoveOption]]:
+    """Every move each unlocked player on the team could make right now, using the same rules as
+    `move_player`, so the page never offers a move the server would refuse."""
+    now = now or datetime.now(UTC)
+    rows = _rows(session, team_id)
+    caps = capacities(_settings(session, team_id))
+    used = Counter(s.slot for s, _ in rows)
+    locked = locked_player_ids(session, [p.id for _, p in rows], _season_id(session, team_id), now)
+    in_slot: dict[str, list[tuple[LineupSlot, Player]]] = {}
+    for row, player in rows:
+        in_slot.setdefault(row.slot, []).append((row, player))
+    out: dict[int, list[MoveOption]] = {}
+    for row, player in rows:
+        options: list[MoveOption] = []
+        if player.id not in locked:
+            for slot in LINEUP_SLOTS:
+                if slot == row.slot or not eligible(player.position, slot, player.status):
+                    continue
+                if used[slot] < caps[slot]:
+                    options.append(MoveOption(slot))
+                    continue
+                for _, other in in_slot.get(slot, []):
+                    if other.id not in locked and eligible(other.position, row.slot, other.status):
+                        options.append(MoveOption(slot, other.id, _name(other)))
+        out[player.id] = options
+    return out

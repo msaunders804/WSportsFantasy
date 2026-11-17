@@ -1,0 +1,72 @@
+{% extends "app/base.html" %}
+{% from "app/_macros.html" import help %}
+{% block title %}{{ view.team.name }} | {{ league.name }} | Undertow Fantasy{% endblock %}
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="/static/team_live.css?v={{ v }}">
+  <script src="/static/team_live.js?v={{ v }}" defer></script>
+{% endblock %}
+{% macro row(r) %}
+{% if r.empty %}
+<li class="trow live empty-slot"><span class="slot-tag">{{ r.slot }}</span><span class="muted">Empty</span><span></span><span></span><span></span></li>
+{% else %}
+<li class="trow live{% if r.injured %} hurt{% endif %}" data-player="{{ r.player_id }}">
+  <span class="slot-tag">{{ r.slot }}</span>
+  <div class="tinfo">
+    <a class="pl-name" href="/stats/player/{{ r.player_id }}">{{ r.name }}</a>
+    <span class="pl-meta muted">{{ r.position }}{% if r.pro_team %} · {{ r.pro_team }}{% endif %}{% if r.injured %} · Injured{% endif %}{% if r.next_game %} · Next {{ r.next_game }}{% endif %}</span>
+  </div>
+  <span class="games" title="Games this week">{{ r.games_total }}</span>
+  <span class="pts" title="Fantasy points this week{% if r.slot in ('BN', 'IR') %} (not counted: not in your lineup){% endif %}">{% if r.slot in ("BN", "IR") %}<span class="muted">-</span>{% else %}{{ r.points | pts }}{% endif %}</span>
+  {% if r.locked %}<span class="lock" role="img" aria-label="Locked: this player's game has started today" title="Locked: their game has started today">🔒</span>
+  {% elif r.moves %}<button class="mini js-move" type="button" data-player="{{ r.player_id }}">Move</button>
+  {% else %}<span></span>{% endif %}
+</li>
+{% endif %}
+{% endmacro %}
+{% block content %}
+<div class="wrap view">
+  <div class="weekbar">
+    {% if view.prev_week %}<a class="icon-btn" href="?week={{ view.prev_week }}" aria-label="Previous week">‹</a>{% else %}<span class="icon-btn off" aria-hidden="true">‹</span>{% endif %}
+    <div class="wk">
+      <strong>{{ view.team.name }}</strong>
+      <span class="muted">{% if view.week %}· Week {{ view.week.week_no }}{% if not view.is_current %} · {{ view.week.start.strftime("%b %d") }} to {{ view.week.end.strftime("%b %d") }}{% endif %}{% else %}· Season calendar not loaded yet{% endif %}</span>
+    </div>
+    {% if view.next_week %}<a class="icon-btn" href="?week={{ view.next_week }}" aria-label="Next week">›</a>{% else %}<span class="icon-btn off" aria-hidden="true">›</span>{% endif %}
+  </div>
+  <p class="muted fine">Managed by {{ view.manager }}{% if not mine %} · you're looking at another team{% endif %}</p>
+
+  {% if view.week %}
+  <div class="summary card">
+    <div><strong class="big">{{ view.total | pts }}</strong><span class="muted"> points this week{% if not view.is_current %} (final or upcoming){% endif %}</span></div>
+    {% if view.is_current %}<div class="muted">{{ view.games_left }} {{ "game" if view.games_left == 1 else "games" }} left for your starters</div>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if view.league.status == "drafting" %}<p class="alert" role="note">The draft is still running. Your lineup fills in as you pick, and you can rearrange it once it starts.</p>{% endif %}
+  <p class="errline alert" id="move-error" role="alert" hidden></p>
+
+  <h2 class="section-h">Lineup {{ help("Your starters. Their points count toward this week's matchup. A player scores for you only if they were in a starting spot when their game began.") }}</h2>
+  <div class="thead live" aria-hidden="true">
+    <span>Slot</span><span>Player</span>
+    <span class="games-h">Games {{ help("Games this week: how many games this player's team plays from Monday to Sunday. More games means more chances to score. Zero means they sit this week out.", "right") }}</span>
+    <span>Pts</span><span></span>
+  </div>
+  <ul class="tlist">{% for r in view.starters %}{{ row(r) }}{% endfor %}</ul>
+
+  <h2 class="section-h">Bench {{ help("Bench players score nothing for you. Swap one into the lineup before their game starts.") }}</h2>
+  <ul class="tlist">{% for r in view.bench %}{{ row(r) }}{% endfor %}</ul>
+
+  <h2 class="section-h">Injured reserve {{ help("A spot for hurt players, so they do not use up a roster spot while they recover.") }}</h2>
+  <ul class="tlist">{% for r in view.ir %}{{ row(r) }}{% endfor %}</ul>
+
+  <p class="legend muted">🔒 Locked {{ help("A player is locked once their game has started today. They stay locked until 4 a.m. Eastern the next morning. You can still move everyone else.") }}</p>
+
+  {% if view.others | length > 1 %}
+  <h2 class="section-h">Other teams</h2>
+  <p class="others">{% for tid, name in view.others %}{% if tid != view.team.id %}<a href="/leagues/{{ league.id }}/team/{{ tid }}{% if view.week %}?week={{ view.week.week_no }}{% endif %}">{{ name }}</a>{% endif %}{% endfor %}</p>
+  {% endif %}
+</div>
+<script id="team-data" type="application/json">{{ data | tojson }}</script>
+<script id="team-csrf" type="application/json">{{ csrf_token | tojson }}</script>
+{% endblock %}
