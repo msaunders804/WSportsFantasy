@@ -159,3 +159,43 @@ def send_password_reset_email(
         client,
         "Failed to send password link email",
     )
+
+
+def send_league_invite_email(
+    settings: Settings,
+    to: str,
+    inviter_name: str,
+    league_name: str,
+    code: str,
+    client: httpx.Client | None = None,
+) -> bool:
+    """Tell someone a friend invited them to a private league. Best-effort, never raises.
+
+    Sent only when a commissioner enters the address, once per address per league. The address
+    is used for this one email and to recognise the invite when that person joins.
+    """
+    link = site_url(settings, f"/join/{code}")
+    if not settings.email_api_key:
+        if not settings.is_prod:
+            logger.info("League invite for %s (email not configured): %s", to, link)
+        return False
+    text = (
+        f"Hi,\n\n{inviter_name} invited you to join their Undertow Fantasy league, "
+        f'"{league_name}", for the PWHL season.\n\n'
+        f"Open this link to join (you'll make a free account first if you don't have one):\n"
+        f"{link}\n\n"
+        "New to fantasy? No problem. We explain every step: "
+        f"{site_url(settings, '/fantasy-101')}\n\n"
+        "If you don't know who this is, you can ignore this email. We only send it once and "
+        "won't add you to any list.\n\n"
+        "The Undertow Fantasy team\n\n"
+        "Undertow Fantasy is an independent fan project, not affiliated with the PWHL."
+    )
+    return _send(
+        settings,
+        to,
+        f"{inviter_name} invited you to {league_name} on Undertow Fantasy",
+        text,
+        client,
+        "Failed to send league invite email",
+    )

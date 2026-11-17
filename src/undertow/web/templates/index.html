@@ -15,7 +15,7 @@
 
     <form class="card" id="join" method="post" action="/signup" novalidate>
       <h2>Get on the list</h2>
-      <p class="muted">We'll email you your league invite when spots open.</p>
+      <p class="muted">We'll email you your league invite when spots open. Have a group already? <a href="/register?next=/leagues/new">Register your own league</a>.</p>
       {% if errors.form %}<div class="alert" role="alert">{{ errors.form }}</div>{% endif %}
       <div class="field">
         <label for="email">Email</label>
@@ -130,8 +130,9 @@
     <details><summary>Is it free?</summary><p>Yes. It's free to join and play.</p></details>
     <details><summary>Is this the official PWHL game?</summary><p>No. Undertow is an independent fan project with no affiliation with the PWHL or its teams.</p></details>
     <details><summary>What do you do with my email?</summary><p>We use it to send your league invite and Undertow updates, and nothing else. <a href="/privacy">Read the details.</a></p></details>
+    <details><summary>Can I start my own league with my friends?</summary><p>Yes. Create a free account, then register a league of 4 to 12 teams. You'll be its commissioner and can invite friends by link or email. You can also join the list and be placed in one of our leagues.</p></details>
     <details><summary>I have a friend I want to play in a league with. How can we make sure we end up in the same league?</summary><p>Add their email in the "Signing up with a friend?" field when you sign up, and we'll make sure you're placed in the same league.</p></details>
-    <p style="margin-top: var(--space-5)"><a class="btn" href="#join">Get on the list</a></p>
+    <p style="margin-top: var(--space-5)"><a class="btn" href="#join">Get on the list</a> <a href="/register?next=/leagues/new">or start a league with friends</a></p>
   </div>
 </section>
 {% endblock %}

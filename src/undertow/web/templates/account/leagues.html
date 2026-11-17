@@ -21,7 +21,7 @@
     {% else %}
     <p>You are not in a league yet. When your invite arrives, open the link in the email to join.</p>
     {% endif %}
-    {% if user.is_admin %}<p><a href="/leagues/new">Create a league</a></p>{% endif %}
+    <p><a href="/leagues/new">Register a league with your friends</a></p>
     <form method="post" action="/logout">
       <input type="hidden" name="csrf" value="{{ csrf_token }}">
       <button class="btn" type="submit">Log out</button>

@@ -6,8 +6,8 @@ one commissioner) back up the checks, so two people joining at once cannot overf
 """
 
 import secrets
-from dataclasses import asdict
-from datetime import datetime
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -17,16 +17,22 @@ from undertow.data.models import (
     AuditLog,
     FantasyTeam,
     League,
+    LeagueInvite,
     LeagueMember,
     LeagueSettings,
     Player,
     User,
 )
-from undertow.fantasy import league_rules
+from undertow.data.models.fantasy import LEAGUE_KINDS
+from undertow.fantasy import auth, league_rules
 from undertow.fantasy.league_rules import LeagueSettingsData
 
 MAX_LEAGUE_NAME = 80
 MAX_TEAM_NAME = 40
+# Anyone can register a private league, so the amount of it one person can do is capped.
+MAX_PRIVATE_LEAGUES_PER_USER = 2
+# Emailed invites per league: a few times the league size, so a typo'd list cannot be a mail cannon.
+INVITES_PER_SEAT = 3
 
 
 class LeagueError(Exception):
@@ -88,10 +94,32 @@ def create_league(
     season_id: int,
     size: int,
     settings: LeagueSettingsData | None = None,
+    kind: str = "house",
 ) -> tuple[League, league_rules.Validation]:
-    """Create a league in `setup` status. Staff only: this season's leagues are run by Undertow."""
+    """Create a league in `setup` status. Staff only: house leagues are run by Undertow. Members
+    register their own through `register_league`."""
     if not actor.is_admin:
         raise PermissionDenied("Only Undertow staff can create leagues.")
+    return _create_league(
+        session, actor, name=name, season_id=season_id, size=size, settings=settings, kind=kind
+    )
+
+
+def _create_league(
+    session: Session,
+    actor: User,
+    *,
+    name: str,
+    season_id: int,
+    size: int,
+    settings: LeagueSettingsData | None,
+    kind: str,
+    team_name: str | None = None,
+) -> tuple[League, league_rules.Validation]:
+    """Insert a league, its settings and audit row (and, for `team_name`, the actor as its
+    commissioner with a team) in one transaction."""
+    if kind not in LEAGUE_KINDS:
+        raise LeagueError("Unknown league type.")
     name = league_rules.clean_name(name, max_length=MAX_LEAGUE_NAME)
     if not name:
         raise LeagueError("Give the league a name.")
@@ -107,6 +135,7 @@ def create_league(
         name=name,
         season_id=season_id,
         size=size,
+        kind=kind,
         invite_code=secrets.token_urlsafe(12),
         created_by_id=actor.id,
     )
@@ -114,18 +143,61 @@ def create_league(
     try:
         session.flush()
         session.add(LeagueSettings(league_id=league.id, **settings.as_columns()))
+        if team_name is not None:
+            session.add(LeagueMember(league_id=league.id, user_id=actor.id, role="commissioner"))
+            session.add(FantasyTeam(league_id=league.id, owner_id=actor.id, name=team_name))
         _audit(
             session,
             league_id=league.id,
             actor_id=actor.id,
             action="league.create",
-            after={"name": name, "size": size, **settings.as_columns()},
+            after={"name": name, "size": size, "kind": kind, **settings.as_columns()},
         )
         session.commit()
     except IntegrityError as exc:
         session.rollback()
         raise LeagueError("A league with that name already exists this season.") from exc
     return league, result
+
+
+def register_league(
+    session: Session,
+    user: User,
+    *,
+    name: str,
+    season_id: int,
+    size: int,
+    team_name: str,
+) -> tuple[League, league_rules.Validation]:
+    """A member registers their own private league and becomes its commissioner, with a team.
+
+    Capped at `MAX_PRIVATE_LEAGUES_PER_USER` per person. Settings start at the defaults and stay
+    editable by the commissioner until the draft starts.
+    """
+    team_name = league_rules.clean_name(team_name, max_length=MAX_TEAM_NAME)
+    if not team_name:
+        raise LeagueError("Give your team a name.")
+    # Serialise a person's registrations so two quick submits cannot slip past the cap.
+    session.scalar(select(User.id).where(User.id == user.id).with_for_update())
+    owned = session.scalar(
+        select(func.count())
+        .select_from(League)
+        .where(League.created_by_id == user.id, League.kind == "private")
+    )
+    if owned >= MAX_PRIVATE_LEAGUES_PER_USER:
+        raise LeagueError(
+            f"You can register up to {MAX_PRIVATE_LEAGUES_PER_USER} leagues of your own."
+        )
+    return _create_league(
+        session,
+        user,
+        name=name,
+        season_id=season_id,
+        size=size,
+        settings=None,
+        kind="private",
+        team_name=team_name,
+    )
 
 
 def join_league(session: Session, user: User, invite_code: str, team_name: str) -> FantasyTeam:
@@ -149,9 +221,16 @@ def join_league(session: Session, user: User, invite_code: str, team_name: str) 
     if members >= league.size:
         raise LeagueError("This league is full.")
 
+    invite = session.scalar(
+        select(LeagueInvite).where(
+            LeagueInvite.league_id == league.id, LeagueInvite.email == user.email
+        )
+    )
     session.add(LeagueMember(league_id=league.id, user_id=user.id, role="member"))
     team = FantasyTeam(league_id=league.id, owner_id=user.id, name=team_name)
     session.add(team)
+    if invite is not None and invite.accepted_at is None:
+        invite.accepted_at = datetime.now(UTC)
     try:
         session.commit()
     except IntegrityError as exc:
@@ -278,3 +357,92 @@ def set_draft_time(
     )
     session.commit()
     return league
+
+
+def seats_open(session: Session, league: League) -> int:
+    return max(0, league.size - member_count(session, league.id))
+
+
+def is_full(session: Session, league: League) -> bool:
+    return seats_open(session, league) == 0
+
+
+@dataclass(frozen=True)
+class InviteResult:
+    """Who was newly invited (the caller emails them) and who was skipped, with the reason."""
+
+    new: list[str]
+    skipped: dict[str, str]
+
+
+def parse_emails(raw: str) -> list[str]:
+    """Split a pasted list (commas, semicolons, spaces, new lines) into distinct emails."""
+    seen: dict[str, None] = {}
+    for part in raw.replace(";", ",").replace("\n", ",").replace(" ", ",").split(","):
+        email = auth.normalize_email(part)
+        if email:
+            seen.setdefault(email)
+    return list(seen)
+
+
+def invite_by_email(
+    session: Session, actor: User, league_id: int, emails: list[str]
+) -> InviteResult:
+    """Record invites for a league. Commissioner or staff, setup status, and only while seats
+    remain. Someone already invited or already in the league is skipped, so nobody is emailed
+    twice. The caller sends the emails for `result.new`."""
+    require_manager(session, actor, league_id)
+    league = session.scalar(select(League).where(League.id == league_id).with_for_update())
+    if league is None:
+        raise LeagueError("League not found.")
+    if league.status != "setup":
+        raise LeagueError("This league has already started, so it is closed to new teams.")
+    if not emails:
+        raise LeagueError("Enter at least one email address.")
+    if is_full(session, league):
+        raise LeagueError("This league is full.")
+    existing_invites = set(
+        session.scalars(select(LeagueInvite.email).where(LeagueInvite.league_id == league_id))
+    )
+    if len(existing_invites) + len(emails) > INVITES_PER_SEAT * league.size:
+        raise LeagueError("That is more invites than this league needs.")
+    members = set(
+        session.scalars(
+            select(User.email)
+            .join(LeagueMember, LeagueMember.user_id == User.id)
+            .where(LeagueMember.league_id == league_id)
+        )
+    )
+    new: list[str] = []
+    skipped: dict[str, str] = {}
+    for email in emails:
+        problem = auth.validate_email(email)
+        if problem:
+            skipped[email] = "not a valid email address"
+        elif email in members:
+            skipped[email] = "already in this league"
+        elif email in existing_invites:
+            skipped[email] = "already invited"
+        else:
+            session.add(LeagueInvite(league_id=league_id, email=email, invited_by_id=actor.id))
+            new.append(email)
+    if new:
+        _audit(
+            session,
+            league_id=league_id,
+            actor_id=actor.id,
+            action="league.invite",
+            after={"count": len(new)},
+        )
+    session.commit()
+    return InviteResult(new=new, skipped=skipped)
+
+
+def invites_for_league(session: Session, league_id: int) -> list[LeagueInvite]:
+    return list(
+        session.scalars(
+            select(LeagueInvite)
+            .where(LeagueInvite.league_id == league_id)
+            .order_by(LeagueInvite.created_at)
+        )
+    )

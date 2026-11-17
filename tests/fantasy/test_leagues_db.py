@@ -283,3 +283,103 @@ def test_draft_time_refusals(db, admin):
     with pytest.raises(leagues.LeagueError, match="locked"):
         leagues.set_draft_time(db, admin, league.id, moment)
     assert db.get(League, league.id).draft_at is None
+
+
+def register(db, user, name="Friends", size=4, team="Ice Queens"):
+    return leagues.register_league(db, user, name=name, season_id=11, size=size, team_name=team)
+
+
+def test_member_registers_a_private_league_as_its_commissioner(db):
+    fan = make_user(db, "fan@example.com")
+    league, _ = register(db, fan)
+    assert league.kind == "private" and league.status == "setup" and league.created_by_id == fan.id
+    assert leagues.membership(db, fan.id, league.id).role == "commissioner"
+    team = db.scalar(select(FantasyTeam).where(FantasyTeam.league_id == league.id))
+    assert team.owner_id == fan.id and team.name == "Ice Queens"
+    assert db.get(LeagueSettings, league.id).roster_f == 3
+    assert leagues.seats_open(db, league) == 3 and not leagues.is_full(db, league)
+    entry = db.scalar(select(AuditLog).where(AuditLog.action == "league.create"))
+    assert entry.after["kind"] == "private"
+    assert leagues.can_manage(db, fan, league.id)
+
+
+def test_staff_leagues_stay_house_leagues_without_a_member(db, admin):
+    league = new_league(db, admin)
+    assert league.kind == "house"
+    assert leagues.member_count(db, league.id) == 0
+
+
+def test_register_league_validates_and_leaves_nothing_behind_on_failure(db):
+    fan = make_user(db, "fan@example.com")
+    with pytest.raises(leagues.LeagueError, match="team a name"):
+        register(db, fan, team="  ")
+    with pytest.raises(leagues.LeagueError):
+        register(db, fan, size=5)
+    register(db, fan, name="Friends")
+    with pytest.raises(leagues.LeagueError, match="already exists"):
+        register(db, make_user(db, "other@example.com"), name="Friends")
+    assert db.scalar(select(func.count()).select_from(League)) == 1
+    assert db.scalar(select(func.count()).select_from(FantasyTeam)) == 1
+
+
+def test_private_league_registration_is_capped_per_person(db):
+    fan = make_user(db, "fan@example.com")
+    for i in range(leagues.MAX_PRIVATE_LEAGUES_PER_USER):
+        register(db, fan, name=f"L{i}", team=f"T{i}")
+    with pytest.raises(leagues.LeagueError, match="up to"):
+        register(db, fan, name="One too many", team="TX")
+
+
+def test_house_leagues_do_not_count_toward_a_members_cap(db, admin):
+    for i in range(leagues.MAX_PRIVATE_LEAGUES_PER_USER):
+        register(db, admin, name=f"L{i}", team=f"T{i}")
+    new_league(db, admin, name="House")  # staff can still create house leagues
+
+
+def test_parse_emails_splits_lowercases_and_dedupes():
+    raw = "A@x.com, b@x.com;\n a@X.com  c@x.com,,"
+    assert leagues.parse_emails(raw) == ["a@x.com", "b@x.com", "c@x.com"]
+
+
+def test_invites_record_new_addresses_and_skip_members_repeats_and_junk(db):
+    boss = make_user(db, "boss@example.com")
+    league, _ = register(db, boss)
+    result = leagues.invite_by_email(
+        db, boss, league.id, ["a@example.com", "boss@example.com", "junk"]
+    )
+    assert result.new == ["a@example.com"]
+    assert result.skipped == {
+        "boss@example.com": "already in this league",
+        "junk": "not a valid email address",
+    }
+    again = leagues.invite_by_email(db, boss, league.id, ["a@example.com"])
+    assert again.new == [] and again.skipped == {"a@example.com": "already invited"}
+    assert [i.email for i in leagues.invites_for_league(db, league.id)] == ["a@example.com"]
+
+
+def test_only_managers_invite_and_only_while_open_and_not_full(db):
+    boss = make_user(db, "boss@example.com")
+    league, _ = register(db, boss, size=4)
+    stranger = make_user(db, "stranger@example.com")
+    with pytest.raises(leagues.PermissionDenied):
+        leagues.invite_by_email(db, stranger, league.id, ["a@example.com"])
+    with pytest.raises(leagues.LeagueError, match="at least one"):
+        leagues.invite_by_email(db, boss, league.id, [])
+    too_many = [f"u{i}@example.com" for i in range(leagues.INVITES_PER_SEAT * 4 + 1)]
+    with pytest.raises(leagues.LeagueError, match="more invites"):
+        leagues.invite_by_email(db, boss, league.id, too_many)
+    for i in range(3):
+        leagues.join_league(db, make_user(db, f"u{i}@example.com"), league.invite_code, f"T{i}")
+    assert leagues.is_full(db, league)
+    with pytest.raises(leagues.LeagueError, match="full"):
+        leagues.invite_by_email(db, boss, league.id, ["late@example.com"])
+
+
+def test_joining_through_the_link_marks_the_invite_accepted(db):
+    boss = make_user(db, "boss@example.com")
+    league, _ = register(db, boss)
+    leagues.invite_by_email(db, boss, league.id, ["friend@example.com"])
+    friend = make_user(db, "friend@example.com")
+    leagues.join_league(db, friend, league.invite_code, "Friend FC")
+    (invite,) = leagues.invites_for_league(db, league.id)
+    assert invite.accepted_at is not None

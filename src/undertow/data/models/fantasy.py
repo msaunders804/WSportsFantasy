@@ -25,6 +25,9 @@ from undertow.data import Base
 
 LEAGUE_ROLES = ("member", "commissioner", "co_commissioner")
 LEAGUE_STATUSES = ("setup", "drafting", "in_season", "playoffs", "complete")
+# "house" leagues are run by Undertow staff and filled from the waitlist; "private" leagues are
+# registered by any member, who becomes the commissioner and invites their own friends.
+LEAGUE_KINDS = ("house", "private")
 
 
 def _in(column: str, values: tuple[str, ...]) -> str:
@@ -94,6 +97,7 @@ class League(Base):
     # Number of teams. Must be even so there is no bye week or median game (Plan 4.5).
     size: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(12), default="setup", server_default="setup")
+    kind: Mapped[str] = mapped_column(String(10), default="house", server_default="house")
     # Anyone holding the code can join until the league is full, so treat it like a password.
     invite_code: Mapped[str] = mapped_column(String(32), unique=True)
     # When this league's draft starts (UTC). None until staff set it; pages then fall back to the
@@ -105,8 +109,28 @@ class League(Base):
     __table_args__ = (
         CheckConstraint("size >= 4 AND size <= 12 AND MOD(size, 2) = 0", name="size_even_4_to_12"),
         CheckConstraint(_in("status", LEAGUE_STATUSES), name="status_valid"),
+        CheckConstraint(_in("kind", LEAGUE_KINDS), name="kind_valid"),
         UniqueConstraint("season_id", "name", name="uq_league_season_name"),
     )
+
+
+class LeagueInvite(Base):
+    """An emailed invite from a commissioner. Joining happens through the league's invite link;
+    this row records who was invited (so nobody is emailed twice) and whether they joined."""
+
+    __tablename__ = "league_invite"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    league_id: Mapped[int] = mapped_column(ForeignKey("league.id", ondelete="CASCADE"))
+    # Stored lower-cased and trimmed.
+    email: Mapped[str] = mapped_column(String(254))
+    invited_by_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user_account.id", ondelete="SET NULL")
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (UniqueConstraint("league_id", "email", name="uq_league_invite_league_email"),)
 
 
 class LeagueSettings(Base):

@@ -16,7 +16,8 @@ def pytest_collection_modifyitems(config, items):
 
 
 FANTASY_TABLES = (
-    "audit_log, auth_token, auth_session, fantasy_team, league_member, league_settings, league, "
+    "audit_log, auth_token, auth_session, fantasy_team, league_member, league_settings, "
+    "league_invite, league, "
     "user_account, waitlist_signup, season"
 )
 

@@ -1,13 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Create a league | Undertow Fantasy{% endblock %}
+{% block title %}Register a league | Undertow Fantasy{% endblock %}
 {% block content %}
 <section class="block">
   <div class="wrap page">
-    <h1>Create a league</h1>
-    <p class="muted">Starts with the standard settings. You can adjust them on the next page before the draft.</p>
+    <h1>Register a league</h1>
+    <p class="muted">Start your own league and invite your friends. You'll be its commissioner. It starts with the standard settings, which you can adjust on the next page before the draft.</p>
     <form class="card" method="post" action="/leagues/new">
       {% if errors.form %}<p class="alert" role="alert">{{ errors.form }}</p>{% endif %}
       <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      {% if user.is_admin %}
+      <div class="field">
+        <label for="kind">League type (staff)</label>
+        <select id="kind" name="kind">
+          <option value="private"{% if form.kind != "house" %} selected{% endif %}>Private: I'm the commissioner and get a team</option>
+          <option value="house"{% if form.kind == "house" %} selected{% endif %}>House: run by Undertow, I don't get a team</option>
+        </select>
+      </div>
+      {% endif %}
       <div class="field">
         <label for="name">League name</label>
         <input id="name" name="name" type="text" maxlength="80" required value="{{ form.name or '' }}">
@@ -15,10 +24,15 @@
       <div class="field">
         <label for="size">Number of teams</label>
         <input id="size" name="size" type="number" min="4" max="12" step="2" required value="{{ form.size or '' }}">
-        <p class="fine">An even number from 4 to 12, so every team has an opponent every week.</p>
+        <p class="fine">An even number from 4 to 12, so every team has an opponent every week. Count yourself.</p>
         {% if errors.size %}<p class="err">{{ errors.size }}</p>{% endif %}
       </div>
-      <button class="btn" type="submit">Create league</button>
+      <div class="field">
+        <label for="team_name">Your team name</label>
+        <input id="team_name" name="team_name" type="text" maxlength="40"{% if not user.is_admin %} required{% endif %} value="{{ form.team_name or '' }}">
+        <p class="fine">Others in the league will see it.{% if user.is_admin %} Leave blank for a house league.{% endif %}</p>
+      </div>
+      <button class="btn" type="submit">Register league</button>
     </form>
   </div>
 </section>
