@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "app/_macros.html" import help %}
+{% block title %}Draft room | {{ league.name }} | Undertow Fantasy{% endblock %}
+{% block head_extra %}
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/static/app.css?v={{ v }}">
+  <link rel="stylesheet" href="/static/draft.css?v={{ v }}">
+{% endblock %}
+
+{% block header %}
+<header class="dr-top">
+  <a class="dr-exit" href="/leagues/{{ league.id }}">‹ Exit</a>
+  <div class="dr-title"><strong>{{ league.name }} draft</strong><span class="muted">{{ n_teams }} teams · {{ rounds }} rounds</span></div>
+  <span class="dr-exit" aria-hidden="true"></span>
+</header>
+{% endblock %}
+
+{% block content %}
+<main class="dr" id="dr" data-state="live" data-tab="board">
+  <div class="dr-live" id="live">
+    <section class="dr-clock" id="clock" aria-live="polite"></section>
+    <section class="dr-controls" id="controls" hidden></section>
+    <section class="dr-rec" id="rec" hidden></section>
+    <section class="dr-feed" id="feed" aria-label="Latest picks"></section>
+
+    <nav class="dr-tabs" aria-label="Draft sections" id="tabs">
+      <button type="button" data-tab="board" aria-pressed="true">Board</button>
+      <button type="button" data-tab="players" aria-pressed="false">Players</button>
+      <button type="button" data-tab="queue" aria-pressed="false">Queue <span class="count" id="queue-count"></span></button>
+      <button type="button" data-tab="team" aria-pressed="false">My team</button>
+    </nav>
+
+    <div class="dr-grid">
+      <section class="panel" data-panel="board" aria-label="Draft board">
+        <div class="board-note muted">Your column is highlighted. {{ help("Each column is a team and each row is a round. Arrows show the direction: → runs left to right, ← right to left. The glowing cell is the pick on the clock.") }}</div>
+        <div class="board-scroll" id="board-scroll"><table class="board" id="board"></table></div>
+      </section>
+
+      <div class="side">
+        <section class="panel" data-panel="players" aria-label="Available players">
+          <label class="sr" for="q">Search players</label>
+          <input id="q" class="search" type="search" placeholder="Search players" autocomplete="off">
+          <div class="chips" role="group" aria-label="Filter by position">
+            <button class="chip" type="button" data-pos="all" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-pos="F" aria-pressed="false">F</button>
+            <button class="chip" type="button" data-pos="D" aria-pressed="false">D</button>
+            <button class="chip" type="button" data-pos="G" aria-pressed="false">G</button>
+            <span class="grow"></span>
+            <span class="muted sortlbl">Ranked by our rating {{ help("Our rating compares each player with a typical replacement at their position, using last season's points per game. It is a rough guide, not a promise. Rookies and expansion-team players have no history, so they are rated as average.", "right") }}</span>
+          </div>
+          <p class="muted fine" id="basis"></p>
+          <ul class="dr-list" id="plist"></ul>
+          <p class="muted empty" id="pempty" hidden>No players match.</p>
+        </section>
+
+        <section class="panel" data-panel="queue" aria-label="Your queue">
+          <p class="muted">Star players to line them up here. {{ help("If your time runs out, we pick the first player in this list who is still available and fits your team.") }}</p>
+          <ol class="dr-queue" id="queue"></ol>
+          <p class="muted empty" id="qempty">Nothing queued yet. Tap the star next to a player.</p>
+        </section>
+
+        <section class="panel" data-panel="team" aria-label="My team">
+          <div id="needs" class="needs"></div>
+          <ul class="slotlist" id="slots"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="sheet-back" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <p class="muted" id="sheet-pos"></p>
+    <h2 id="sheet-title"></h2>
+    <p class="muted" id="sheet-why"></p>
+    <div class="sheet-actions">
+      <button class="mini" type="button" id="sheet-cancel">Cancel</button>
+      <button class="btn" type="button" id="sheet-ok">Confirm pick</button>
+    </div>
+  </div>
+</div>
+
+<script id="draft-data" type="application/json">{{ data | tojson }}</script>
+<script src="/static/draft_live.js?v={{ v }}" defer></script>
+<script src="/static/help.js?v={{ v }}" defer></script>
+{% endblock %}
+
+{% block footer %}
+<footer class="app-foot"><div class="wrap"><p class="foot-tools">{% include "partials/theme_toggle.html" %}</p><p><strong>Unofficial and unaffiliated.</strong> Undertow is an independent fan project, not affiliated with or endorsed by the PWHL or its teams.</p><p><a href="/about">Who we are</a> · <a href="/fantasy-101">Fantasy 101</a></p></div></footer>
+{% endblock %}

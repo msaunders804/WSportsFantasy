@@ -17,7 +17,7 @@ from undertow.data import get_session
 from undertow.data.models import User
 from undertow.data.session import session_factory
 from undertow.fantasy import auth, key_dates, onboarding, waitlist
-from undertow.web import accounts, draft_preview, security
+from undertow.web import accounts, draft_live, draft_preview, security
 from undertow.web import preview_data as sample
 from undertow.web.ratelimit import RateLimiter
 
@@ -159,6 +159,7 @@ def create_app() -> FastAPI:
 
     if accounts_on:
         app.include_router(accounts.router)
+        app.include_router(draft_live.router)
 
     previews_on = settings.preview_enabled or not settings.is_prod
     templates.env.globals["previews_enabled"] = previews_on

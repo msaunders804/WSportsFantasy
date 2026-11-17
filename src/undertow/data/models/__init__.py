@@ -1,3 +1,4 @@
+from undertow.data.models.draft import Draft, DraftQueueEntry, DraftSelection, RosterEntry
 from undertow.data.models.fantasy import (
     AuditLog,
     AuthSession,
@@ -30,6 +31,10 @@ from undertow.data.models.research import (
 from undertow.data.models.waitlist import WaitlistSignup
 
 __all__ = [
+    "Draft",
+    "DraftQueueEntry",
+    "DraftSelection",
+    "RosterEntry",
     "AuditLog",
     "AuthSession",
     "AuthToken",

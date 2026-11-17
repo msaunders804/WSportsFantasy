@@ -122,3 +122,8 @@ body { padding-bottom: 24px; }
   .rec-main { grid-template-columns: 1fr; }
   .dr-rec .btn { width: 100%; }
 }
+
+/* Commissioner controls (real draft room) */
+.dr-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-3); padding: var(--space-2) var(--space-3); border: 1px dashed var(--border); border-radius: var(--radius); font-size: 0.85rem; }
+.dr-controls[hidden] { display: none; }
+.dr-clock a.mini { text-decoration: none; display: inline-block; }

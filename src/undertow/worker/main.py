@@ -15,6 +15,7 @@ from sqlalchemy.engine import Connection
 from undertow.config import get_settings
 from undertow.data import get_engine
 from undertow.data.session import session_factory
+from undertow.fantasy import draft_room, rankings
 from undertow.ingest import jobs
 from undertow.ingest.feed import Feed, FeedError, HockeyTechFeed
 
@@ -34,9 +35,26 @@ def heartbeat() -> None:
     log.info("worker heartbeat")
 
 
+def draft_clock_tick() -> None:
+    """Autopick for any draft whose pick timer has run out. Never raises, so the job keeps going."""
+    try:
+        draft_room.process_due_drafts(session_factory(), rankings.default_ranking)
+    except Exception:
+        log.exception("draft clock tick failed")
+
+
 def build_scheduler(feed: Feed | None = None) -> BackgroundScheduler:
     scheduler = BackgroundScheduler(timezone="UTC")
     scheduler.add_job(heartbeat, "interval", minutes=5, id="heartbeat")
+    # The draft clock does not need the HockeyTech feed, so it runs even when ingestion is off.
+    scheduler.add_job(
+        draft_clock_tick,
+        "interval",
+        seconds=1,
+        id="draft_clock",
+        max_instances=1,
+        coalesce=True,
+    )
     if feed is not None:
         season_ids = get_settings().season_ids
         sf = session_factory()
@@ -70,7 +88,7 @@ def build_scheduler(feed: Feed | None = None) -> BackgroundScheduler:
         )
         add(lambda: jobs.poll_live(sf, feed), "poll_live", "interval", seconds=90)
         add(lambda: jobs.reconcile_finals(sf, feed), "reconcile_finals", "interval", minutes=30)
-    # Later phases register scoring recompute, waiver processing and the draft clock here.
+    # Later phases register scoring recompute and waiver processing here.
     return scheduler
 
 
