@@ -7,7 +7,7 @@
     <h1>{{ league.name }}</h1>
     <p class="muted">{{ teams | length }} of {{ league.size }} teams joined. Status: {{ league.status.replace("_", " ") }}.</p>
 
-    <p><a class="btn" href="/leagues/{{ league.id }}/draft">{% if league.status == "setup" %}Draft room{% elif league.status == "drafting" %}Join the draft{% else %}View the draft{% endif %}</a></p>
+    <p><a class="btn" href="/leagues/{{ league.id }}/team">My team</a> <a class="btn" href="/leagues/{{ league.id }}/draft">{% if league.status == "setup" %}Draft room{% elif league.status == "drafting" %}Join the draft{% else %}View the draft{% endif %}</a></p>
     {% if errors.form %}<p class="alert" role="alert">{{ errors.form }}</p>{% endif %}
     {% if saved %}<p class="alert" role="status">Settings saved.</p>{% endif %}
 

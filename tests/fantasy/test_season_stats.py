@@ -214,3 +214,26 @@ def test_game_log_lists_each_game_with_opponent_and_points(db):
     (gl,) = ss.game_log(db, g, 10)
     assert gl.stats["Dec"] == "W" and gl.stats["SV"] == "28" and gl.fantasy == Fraction(28, 5)
     assert ss.game_log(db, p, 9) == []
+
+
+def test_game_log_dates_are_eastern_not_utc(db):
+    p = player(db, 1)
+    # 7 pm Eastern on Jan 13 is 00:00 UTC on Jan 14. The log must say Jan 13.
+    db.add(
+        Game(
+            id=77,
+            season_id=10,
+            home_team_id=HOME,
+            away_team_id=AWAY,
+            start_utc=datetime(2026, 1, 14, 0, 0, tzinfo=UTC),
+            status="final",
+            result_type="REG",
+        )
+    )
+    db.flush()
+    skater(db, 77, p, goals=1)
+    g = player(db, 2, "G")
+    goalie(db, 77, g, 30, 2, "W")
+    db.commit()
+    assert ss.game_log(db, p, 10)[0].day.isoformat() == "2026-01-13"
+    assert ss.game_log(db, g, 10)[0].day.isoformat() == "2026-01-13"

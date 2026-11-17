@@ -1,0 +1,25 @@
+/* Team tab (real pages). Builds on app.css. */
+.trow.live { grid-template-columns: 44px 1fr 34px 54px 76px; }
+.thead.live { display: grid; grid-template-columns: 44px 1fr 34px 54px 76px; gap: var(--space-3); padding: 0 4px 6px; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.thead.live .games-h, .thead.live span:nth-child(4) { text-align: right; }
+.trow.live .pts { font-family: var(--font-heading); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.trow.live.hurt .pl-name { color: var(--negative); }
+.summary { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); align-items: baseline; margin: var(--space-3) 0; padding: var(--space-3) var(--space-4); }
+.summary .big { font-family: var(--font-heading); font-size: 1.7rem; }
+.icon-btn.off { opacity: 0.35; display: inline-grid; place-items: center; cursor: default; }
+a.icon-btn { display: inline-grid; place-items: center; text-decoration: none; }
+.wk { text-align: center; }
+.others { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.others a { border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; text-decoration: none; }
+.errline[hidden] { display: none; }
+
+/* The move sheet */
+.mv-back { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
+.mv-back[hidden] { display: none; }
+.mv { background: var(--surface); width: min(520px, 100%); border-radius: var(--radius) var(--radius) 0 0; padding: var(--space-4) var(--space-4) var(--space-5); max-height: 80vh; overflow: auto; }
+.mv h2 { font-size: 1.15rem; margin: 0 0 var(--space-3); }
+.mv ul { list-style: none; margin: 0 0 var(--space-3); padding: 0; display: grid; gap: var(--space-2); }
+.mv li button { width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font: inherit; color: var(--text); cursor: pointer; min-height: 48px; }
+.mv li button:hover, .mv li button:focus-visible { border-color: var(--primary); }
+.mv .none { color: var(--text-muted); }
+@media (min-width: 700px) { .mv-back { align-items: center; } .mv { border-radius: var(--radius); } }

@@ -27,7 +27,7 @@ MAX_JSON_BYTES = 8_000
 CONTROL_ACTIONS = ("pause", "resume", "undo")
 
 
-def _member_league(session: Session, user: User, league_id: int) -> League:
+def member_league(session: Session, user: User, league_id: int) -> League:
     """The league, or a 404 for anyone who is not in it (so its existence is not revealed)."""
     league = session.get(League, league_id)
     if league is None:
@@ -70,7 +70,7 @@ def draft_page(
     user: User = Depends(security.require_user),
     session: Session = Depends(get_session),
 ) -> Response:
-    league = _member_league(session, user, league_id)
+    league = member_league(session, user, league_id)
     dr = draft_room.draft_for_league(session, league_id)
     if dr is None:
         teams = session.execute(leagues_teams_query(league_id)).all()
@@ -123,7 +123,7 @@ async def draft_start(
 ) -> Response:
     form = await security.read_form(request)
     check_csrf(request, form)
-    await run_in_threadpool(_member_league, session, user, league_id)
+    await run_in_threadpool(member_league, session, user, league_id)
     try:
         seconds = int(form.get("pick_seconds", "") or draft_room.DEFAULT_PICK_SECONDS)
         await run_in_threadpool(
@@ -159,7 +159,7 @@ def draft_state(
     user: User = Depends(security.require_user),
     session: Session = Depends(get_session),
 ) -> Response:
-    league = _member_league(session, user, league_id)
+    league = member_league(session, user, league_id)
     dr = draft_room.draft_for_league(session, league_id)
     if dr is None:
         raise HTTPException(status_code=404)
@@ -176,7 +176,7 @@ async def draft_pick(
     session: Session = Depends(get_session),
 ) -> Response:
     data = await _json_body(request)
-    league = await run_in_threadpool(_member_league, session, user, league_id)
+    league = await run_in_threadpool(member_league, session, user, league_id)
     dr = await run_in_threadpool(draft_room.draft_for_league, session, league_id)
     if dr is None:
         raise HTTPException(status_code=404)
@@ -226,7 +226,7 @@ async def draft_control(
 ) -> Response:
     """Commissioner (or staff): pause, resume, or take back the last pick."""
     data = await _json_body(request)
-    league = await run_in_threadpool(_member_league, session, user, league_id)
+    league = await run_in_threadpool(member_league, session, user, league_id)
     dr = await run_in_threadpool(draft_room.draft_for_league, session, league_id)
     if dr is None:
         raise HTTPException(status_code=404)
