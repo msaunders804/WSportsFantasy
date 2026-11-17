@@ -7,6 +7,7 @@ accidentally scaled to more than one instance. A standby instance waits and retr
 import logging
 import signal
 import threading
+from datetime import UTC, datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import text
@@ -15,7 +16,7 @@ from sqlalchemy.engine import Connection
 from undertow.config import get_settings
 from undertow.data import get_engine
 from undertow.data.session import session_factory
-from undertow.fantasy import draft_room, rankings
+from undertow.fantasy import draft_room, lineups, rankings, season_calendar
 from undertow.ingest import jobs
 from undertow.ingest.feed import Feed, FeedError, HockeyTechFeed
 
@@ -43,6 +44,29 @@ def draft_clock_tick() -> None:
         log.exception("draft clock tick failed")
 
 
+def lineup_lock_tick() -> None:
+    """Freeze lineups for games that have started. Runs every 30 seconds, so it only logs when it
+    actually did something (or failed), and never raises."""
+    try:
+        summary = lineups.run_lock_job(session_factory())
+        if summary != "locked=0 released=0 repaired=0":
+            log.info("lineup lock: %s", summary)
+    except Exception:
+        log.exception("lineup lock tick failed")
+
+
+def calendar_sync_job() -> None:
+    """Rebuild the fantasy calendar from the stored schedule. Weeks that have started never move."""
+    try:
+        sf = session_factory()
+        for season_id in get_settings().season_ids:
+            with sf() as session:
+                weeks = season_calendar.sync_calendar(session, season_id)
+            log.info("calendar: season %s has %s fantasy weeks", season_id, len(weeks))
+    except Exception:
+        log.exception("calendar sync failed")
+
+
 def build_scheduler(feed: Feed | None = None) -> BackgroundScheduler:
     scheduler = BackgroundScheduler(timezone="UTC")
     scheduler.add_job(heartbeat, "interval", minutes=5, id="heartbeat")
@@ -54,6 +78,26 @@ def build_scheduler(feed: Feed | None = None) -> BackgroundScheduler:
         id="draft_clock",
         max_instances=1,
         coalesce=True,
+    )
+    scheduler.add_job(
+        lineup_lock_tick,
+        "interval",
+        seconds=30,
+        id="lineup_lock",
+        max_instances=1,
+        coalesce=True,
+    )
+    # After the 04:30 schedule sync, and once at startup so a fresh deploy has a calendar.
+    scheduler.add_job(
+        calendar_sync_job,
+        "cron",
+        hour=4,
+        minute=45,
+        timezone="America/New_York",
+        id="calendar_sync",
+        max_instances=1,
+        coalesce=True,
+        next_run_time=datetime.now(UTC),
     )
     if feed is not None:
         season_ids = get_settings().season_ids

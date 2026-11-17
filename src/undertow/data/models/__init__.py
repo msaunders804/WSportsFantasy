@@ -22,6 +22,7 @@ from undertow.data.models.hockey import (
     ShotEvent,
     SkaterGameStats,
 )
+from undertow.data.models.lineup import FantasyWeek, LineupLock, LineupSlot, Matchup
 from undertow.data.models.research import (
     DraftPick,
     NcaaGame,
@@ -31,6 +32,10 @@ from undertow.data.models.research import (
 from undertow.data.models.waitlist import WaitlistSignup
 
 __all__ = [
+    "FantasyWeek",
+    "LineupLock",
+    "LineupSlot",
+    "Matchup",
     "Draft",
     "DraftQueueEntry",
     "DraftSelection",

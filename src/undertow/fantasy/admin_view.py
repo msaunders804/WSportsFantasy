@@ -16,6 +16,7 @@ from undertow.data.models import (
     League,
     LeagueInvite,
     LeagueMember,
+    Matchup,
     User,
     WaitlistSignup,
 )
@@ -71,6 +72,7 @@ def league_rows(session: Session, *, now: datetime | None = None) -> list[League
         ).all()
     )
     drafts = {d.league_id: d for d in session.scalars(select(Draft))}
+    scheduled = set(session.scalars(select(Matchup.league_id).distinct()))
     bosses = {
         league_id: (name, email)
         for league_id, name, email in session.execute(
@@ -102,6 +104,8 @@ def league_rows(session: Session, *, now: datetime | None = None) -> list[League
             pending_invites=pending.get(league.id, 0),
         )
         row.flags = _flags(league, row, draft, now)
+        if league.status in ("in_season", "playoffs") and league.id not in scheduled:
+            row.flags.append("No schedule yet: run python -m undertow.fantasy.schedule")
         rows.append(row)
     return rows
 

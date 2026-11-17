@@ -34,7 +34,7 @@ from undertow.data.models import (
     RosterEntry,
     User,
 )
-from undertow.fantasy import leagues
+from undertow.fantasy import leagues, lineups, schedule
 from undertow.fantasy.draft import snake_slot
 
 log = logging.getLogger(__name__)
@@ -61,6 +61,17 @@ class PickResult:
 
 def _audit(session: Session, league_id: int, actor_id: int | None, action: str, after=None) -> None:
     session.add(AuditLog(league_id=league_id, actor_id=actor_id, action=action, after=after))
+
+
+def _start_season_schedule(session: Session, league_id: int) -> None:
+    """Create the league's matchups once its draft is complete. Never raises: a draft finishing
+    must not fail because the season calendar is missing. Staff see "no schedule" on the overview
+    and can run `python -m undertow.fantasy.schedule`."""
+    try:
+        schedule.create_league_schedule(session, league_id)
+    except Exception:
+        session.rollback()
+        log.exception("could not create the schedule for league %s", league_id)
 
 
 def _locked_draft(session: Session, draft_id: int) -> Draft:
@@ -263,6 +274,9 @@ def _make_pick(
             acquired_at=now,
         )
     )
+    # Every drafted player gets a lineup slot straight away, so lineups always match rosters.
+    session.flush()
+    lineups.place_new_player(session, team_id, player)
     # A drafted player leaves every team's queue so nobody autopicks a taken player.
     session.execute(delete(DraftQueueEntry).where(DraftQueueEntry.player_id == player_id))
     complete = overall >= total_picks(draft)
@@ -307,7 +321,10 @@ def make_pick(
     except DraftError:
         session.rollback()
         raise
+    league_id = draft.league_id
     session.commit()
+    if result.complete:
+        _start_season_schedule(session, league_id)
     return result
 
 
@@ -367,7 +384,10 @@ def autopick(
         if position is None or check_pick_allowed(counts, position, settings, picks_left):
             continue
         result = _make_pick(session, draft, team_id, pid, now, autopick=True)
+        league_id = draft.league_id
         session.commit()
+        if result.complete:
+            _start_season_schedule(session, league_id)
         return result
     session.rollback()
     raise DraftError("No available player can be drafted for the team on the clock.")
@@ -465,6 +485,7 @@ def undo_last_pick(
             RosterEntry.released_at.is_(None),
         )
     )
+    lineups.remove_player(session, last.team_id, last.player_id)
     session.delete(last)
     session.flush()
     if draft.status == "complete":
